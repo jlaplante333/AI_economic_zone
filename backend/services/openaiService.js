@@ -1,0 +1,50 @@
+const { apiKey, apiUrl } = require('../config/openaiConfig');
+const axios = require('axios');
+
+async function getOpenAIResponse(prompt, businessType) {
+  // Check if API key is configured
+  if (!apiKey || apiKey === 'your_openai_api_key_here') {
+    // Return a helpful fallback response
+    const fallbackResponses = {
+      restaurant: `Hello! I'm here to help with your ${businessType} business in Oakland. I can assist with permits, regulations, and local business requirements. What specific question do you have about running your restaurant in Oakland?`,
+      retail: `Hello! I'm here to help with your ${businessType} business in Oakland. I can assist with permits, regulations, and local business requirements. What specific question do you have about running your retail business in Oakland?`,
+      default: `Hello! I'm here to help with your ${businessType} business in Oakland. I can assist with permits, regulations, and local business requirements. What specific question do you have?`
+    };
+    
+    return fallbackResponses[businessType] || fallbackResponses.default;
+  }
+
+  try {
+    const systemPrompt = `You are an Oakland local small business expert. You help immigrant-owned businesses navigate local regulations, permits, and business requirements. 
+
+Business Type: ${businessType}
+
+Provide helpful, accurate, and practical advice specific to Oakland, California. Be friendly, supportive, and explain things clearly. If you don't know something specific, suggest where they can find more information.`;
+
+    const response = await axios.post(
+      `${apiUrl}/chat/completions`,
+      {
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('OpenAI API Error:', error.response?.data || error.message);
+    return `I'm having trouble connecting right now. Please try again in a moment. (Error: ${error.message})`;
+  }
+}
+
+module.exports = { getOpenAIResponse }; 
