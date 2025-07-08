@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '../.env' });
 const request = require('supertest');
 const express = require('express');
 const chatRoutes = require('../routes/chatRoutes');

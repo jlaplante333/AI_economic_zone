@@ -1,6 +1,9 @@
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config({ path: '../.env' });
+
+console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+console.log('OPENAI_API_KEY starts with sk-:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.startsWith('sk-') : false);
 
 const app = express();
 app.use(cors());

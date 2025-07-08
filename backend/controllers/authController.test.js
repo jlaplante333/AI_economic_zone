@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '../.env' });
 const request = require('supertest');
 const express = require('express');
 const authRoutes = require('../routes/authRoutes');

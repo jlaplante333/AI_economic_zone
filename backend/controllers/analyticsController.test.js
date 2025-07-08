@@ -1,18 +1,22 @@
+require('dotenv').config({ path: '../.env' });
 const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const analyticsRoutes = require('../routes/analyticsRoutes');
 
 // Mock the database
+const mockPool = {
+  query: jest.fn()
+    .mockResolvedValueOnce({ rows: [{ total_chats: '10' }] }) // total chats
+    .mockResolvedValueOnce({ rows: [{ active_users: '5' }] }) // active users
+    .mockResolvedValueOnce({ rows: [{ business_type: 'restaurant', count: '3' }] }) // business types
+    .mockResolvedValueOnce({ rows: [{ recent_chats: '3' }] }) // recent chats
+};
+
 jest.mock('../config/db', () => ({
-  query: jest.fn().mockResolvedValue({
-    rows: [
-      { total_chats: '10' },
-      { active_users: '5' },
-      { recent_chats: '3' }
-    ]
-  })
+  getPool: jest.fn().mockReturnValue(mockPool)
 }));
+
+const analyticsRoutes = require('../routes/analyticsRoutes');
 
 const app = express();
 app.use(express.json());

@@ -21,8 +21,15 @@ function ChatPage() {
       {/* Left side - Welcome section */}
       <div className="welcome-section">
         <div className="logo-section">
-          <div className="logo-icon">🍃</div>
-          <div className="logo-text">Oakland AI</div>
+          <div className="logo-text" style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.02em'
+          }}>Oakland AI</div>
         </div>
         
         <h1 className="main-heading">

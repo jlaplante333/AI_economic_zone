@@ -2,8 +2,16 @@ const { apiKey, apiUrl } = require('../config/openaiConfig');
 const axios = require('axios');
 
 async function getOpenAIResponse(prompt, businessType) {
+  console.log('=== getOpenAIResponse called ===');
+  console.log('Prompt:', prompt);
+  console.log('Business Type:', businessType);
+  // Debug: Log API key status
+  console.log('API Key configured:', !!apiKey);
+  console.log('API Key starts with sk-:', apiKey ? apiKey.startsWith('sk-') : false);
+  
   // Check if API key is configured
   if (!apiKey || apiKey === 'your_openai_api_key_here') {
+    console.log('Using fallback response - API key not configured');
     // Return a helpful fallback response
     const fallbackResponses = {
       restaurant: `Hello! I'm here to help with your ${businessType} business in Oakland. I can assist with permits, regulations, and local business requirements. What specific question do you have about running your restaurant in Oakland?`,
