@@ -1,0 +1,115 @@
+/* Login Section Styles */
+.login-section {
+  background-color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Container */
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 40px 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* Başlık */
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 15px;
+  color: #94a3b8;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+/* Etiketler */
+.form-label {
+  font-size: 13px;
+  color: #cbd5e1;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+  margin-top: 16px;
+}
+
+/* Input alanları */
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  font-size: 15px;
+  color: #f1f5f9;
+  transition: border 0.2s ease, background 0.2s ease;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+  margin-bottom: 6px;
+}
+
+.form-input::placeholder {
+  color: #64748b;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(30, 41, 59, 0.9);
+}
+
+/* Buton */
+.login-button {
+  margin-top: 24px;
+  width: 100%;
+  padding: 14px 0;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: #f8fafc;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.login-button:hover {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Footer */
+.login-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.login-footer a:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}

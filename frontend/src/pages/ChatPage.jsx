@@ -80,9 +80,9 @@ function ChatPage() {
           Speak your language.<br />
           Get answers. No paperwork.
         </p>
-        <p>
-          Already have an account? <a href="/login" className="login-link">Log in</a>
-        </p>
+          <p style={{ color: '#64748b', fontSize: '16px' }}>
+            Already have an account? <a href="/login" className="login-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Log in</a>
+          </p>
         {/* Status Modal */}
         {showStatus && (
           <div style={{

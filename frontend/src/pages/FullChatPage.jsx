@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff } from 'lucide-react';
+import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 function FullChatPage() {
   const [messages, setMessages] = useState([]);
@@ -8,9 +9,35 @@ function FullChatPage() {
   const [businessType, setBusinessType] = useState('');
   const [user, setUser] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [showQuickOptionsModal, setShowQuickOptionsModal] = useState(false);
+  const [showBusinessOptionsModal, setShowBusinessOptionsModal] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Theme context
+  const { theme, isDarkTheme, toggleTheme } = useTheme();
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
+  
+  // Close profile menu and modals when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showProfileMenu && !event.target.closest('.user-info')) {
+        setShowProfileMenu(false);
+      }
+      if (showQuickOptionsModal && !event.target.closest('.modal-content')) {
+        setShowQuickOptionsModal(false);
+      }
+      if (showBusinessOptionsModal && !event.target.closest('.modal-content')) {
+        setShowBusinessOptionsModal(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileMenu, showQuickOptionsModal, showBusinessOptionsModal]);
   const [changingOptions, setChangingOptions] = useState(new Set());
   const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
 
@@ -42,6 +69,21 @@ function FullChatPage() {
     { type: 'jewelry store', icon: <Gem size={32} color="#60a5fa" />, label: 'I own a jewelry store' },
     { type: 'vintage shop', icon: <Book size={32} color="#f59e42" />, label: 'I own a vintage shop' },
     { type: 'tech startup', icon: <MonitorSmartphone size={32} color="#a78bfa" />, label: 'I own a tech startup' },
+    { type: 'dental office', icon: <User size={32} color="#60a5fa" />, label: 'I own a dental office' },
+    { type: 'law firm', icon: <Briefcase size={32} color="#f59e42" />, label: 'I own a law firm' },
+    { type: 'real estate', icon: <Building2 size={32} color="#34d399" />, label: 'I own a real estate business' },
+    { type: 'insurance agency', icon: <Shield size={32} color="#f472b6" />, label: 'I own an insurance agency' },
+    { type: 'accounting firm', icon: <DollarSign size={32} color="#fbbf24" />, label: 'I own an accounting firm' },
+    { type: 'marketing agency', icon: <Megaphone size={32} color="#a78bfa" />, label: 'I own a marketing agency' },
+    { type: 'web design', icon: <MonitorSmartphone size={32} color="#60a5fa" />, label: 'I own a web design business' },
+    { type: 'construction', icon: <Building size={32} color="#f59e42" />, label: 'I own a construction business' },
+    { type: 'landscaping', icon: <Droplet size={32} color="#34d399" />, label: 'I own a landscaping business' },
+    { type: 'plumbing', icon: <Settings size={32} color="#60a5fa" />, label: 'I own a plumbing business' },
+    { type: 'electrical', icon: <Lightbulb size={32} color="#fbbf24" />, label: 'I own an electrical business' },
+    { type: 'HVAC', icon: <Flame size={32} color="#f59e42" />, label: 'I own an HVAC business' },
+    { type: 'roofing', icon: <Building size={32} color="#a3a3a3" />, label: 'I own a roofing business' },
+    { type: 'painting', icon: <Edit size={32} color="#f472b6" />, label: 'I own a painting business' },
+    { type: 'carpentry', icon: <Settings size={32} color="#f59e42" />, label: 'I own a carpentry business' },
     { type: 'other', icon: <Building2 size={32} color="#a3a3a3" />, label: 'I own another type of business' }
   ];
 
@@ -67,6 +109,30 @@ function FullChatPage() {
     { label: 'Certifications', icon: <BadgeCheck size={32} color="#93c5fd" />, value: 'Certifications' },
     { label: 'Emergencies', icon: <AlertTriangle size={32} color="#93c5fd" />, value: 'Emergencies' },
     { label: 'Innovation', icon: <Lightbulb size={32} color="#93c5fd" />, value: 'Innovation' },
+    { label: 'Networking', icon: <Users size={32} color="#93c5fd" />, value: 'Business Networking' },
+    { label: 'Financing', icon: <DollarSign size={32} color="#93c5fd" />, value: 'Business Financing' },
+    { label: 'Legal Help', icon: <Briefcase size={32} color="#93c5fd" />, value: 'Legal Assistance' },
+    { label: 'Accounting', icon: <FileText size={32} color="#93c5fd" />, value: 'Accounting Services' },
+    { label: 'Technology', icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
+    { label: 'Sustainability', icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
+    { label: 'Export/Import', icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' },
+    { label: 'E-commerce', icon: <ShoppingBag size={32} color="#93c5fd" />, value: 'Online Business' },
+    { label: 'Social Media', icon: <Share size={32} color="#93c5fd" />, value: 'Social Media Marketing' },
+    { label: 'Customer Service', icon: <MessageCircle size={32} color="#93c5fd" />, value: 'Customer Support' },
+    { label: 'Inventory', icon: <Package size={32} color="#93c5fd" />, value: 'Inventory Management' },
+    { label: 'Shipping', icon: <Truck size={32} color="#93c5fd" />, value: 'Shipping & Logistics' },
+    { label: 'Data Protection', icon: <Lock size={32} color="#93c5fd" />, value: 'Data Security' },
+    { label: 'Remote Work', icon: <Home size={32} color="#93c5fd" />, value: 'Remote Work Policies' },
+    { label: 'Diversity', icon: <Users size={32} color="#93c5fd" />, value: 'Diversity & Inclusion' },
+    { label: 'Mental Health', icon: <Heart size={32} color="#93c5fd" />, value: 'Employee Wellness' },
+    { label: 'Training', icon: <BookOpen size={32} color="#93c5fd" />, value: 'Employee Training' },
+    { label: 'Equipment', icon: <Settings size={32} color="#93c5fd" />, value: 'Business Equipment' },
+    { label: 'Software', icon: <Monitor size={32} color="#93c5fd" />, value: 'Business Software' },
+    { label: 'Analytics', icon: <BarChart3 size={32} color="#93c5fd" />, value: 'Business Analytics' },
+    { label: 'Partnerships', icon: <Handshake size={32} color="#93c5fd" />, value: 'Business Partnerships' },
+    { label: 'Expansion', icon: <ArrowUpRight size={32} color="#93c5fd" />, value: 'Business Growth' },
+    { label: 'Crisis Management', icon: <AlertCircle size={32} color="#93c5fd" />, value: 'Crisis Planning' },
+    { label: 'Succession', icon: <UserCheck size={32} color="#93c5fd" />, value: 'Succession Planning' },
   ];
 
   // State for quick options
@@ -131,7 +197,7 @@ function FullChatPage() {
           newSet.delete(randomIndex);
           return newSet;
         });
-      }, 2000); // Matrix effect duration
+      }, 2000);
     }, 2010);
     
     return () => {
@@ -165,7 +231,7 @@ function FullChatPage() {
           newSet.delete(randomIndex);
           return newSet;
         });
-      }, 2100); // Matrix effect duration
+      }, 2100);
     }, 2110);
     
     return () => {
@@ -263,14 +329,17 @@ function FullChatPage() {
   }
 
   return (
-    <div className="full-chat-container">
+    <div className="full-chat-container" style={{ background: theme.primaryBg }}>
       {/* Header */}
-      <div className="chat-header">
+      <div className="chat-header" style={{ 
+        background: theme.secondaryBg,
+        borderBottom: `1px solid ${theme.primaryBorder}`
+      }}>
         <div className="header-left">
           <div className="logo-text" style={{
             fontSize: '24px',
             fontWeight: '700',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+            background: theme.logoGradient,
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -278,12 +347,95 @@ function FullChatPage() {
           }}>Oakland AI</div>
         </div>
         <div className="header-right">
-          <div className="user-info">
-            <div className="user-avatar">{user?.name?.charAt(0) || 'U'}</div>
-            <div>
-              <div className="user-name">{user?.name || 'User'}</div>
-              <div className="user-role">Business Owner</div>
-            </div>
+          <div className="user-info" style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '12px',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = theme.tertiaryBg;
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <div className="user-avatar" style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: theme.primaryButton,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: theme.primaryText,
+                fontWeight: '600',
+                fontSize: '16px'
+              }}>{user?.name?.charAt(0) || 'U'}</div>
+              <div>
+                <div className="user-name" style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: theme.primaryText
+                }}>{user?.name || 'User'}</div>
+                <div className="user-role" style={{
+                  fontSize: '14px',
+                  color: theme.tertiaryText
+                }}>Business Owner</div>
+              </div>
+            </button>
+            
+            {/* Profile Menu */}
+            {showProfileMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                background: theme.modalBg,
+                borderRadius: '12px',
+                border: `1px solid ${theme.primaryBorder}`,
+                boxShadow: `0 10px 25px ${theme.primaryShadow}`,
+                minWidth: '200px',
+                zIndex: 1000,
+                overflow: 'hidden'
+              }}>
+                <button
+                  onClick={toggleTheme}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: theme.primaryText,
+                    cursor: 'pointer',
+                    transition: 'background 0.2s ease',
+                    fontSize: '14px'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = theme.tertiaryBg;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  {isDarkTheme ? <Sun size={16} /> : <Moon size={16} />}
+                  {isDarkTheme ? 'Switch to Light' : 'Switch to Dark'}
+                </button>
+
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -303,7 +455,8 @@ function FullChatPage() {
             {/* Quick Options */}
             <div className="quick-options" style={{ 
               display: 'flex', 
-              gap: '16px'
+              gap: '16px',
+              alignItems: 'center'
             }}>
               {quickOptions.map((option, idx) => (
                 <button
@@ -317,12 +470,12 @@ function FullChatPage() {
                     minWidth: '80px', 
                     padding: '12px 8px', 
                     borderRadius: '16px', 
-                    background: changingOptions.has(idx) ? 'rgba(34,197,94,0.2)' : 'rgba(30,41,59,0.8)', 
-                    border: changingOptions.has(idx) ? '1px solid #22c55e' : '1px solid #334155', 
-                    color: changingOptions.has(idx) ? '#22c55e' : '#93c5fd', 
+                    background: changingOptions.has(idx) ? (isDarkTheme ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.15)') : theme.quickOptionBg, 
+                    border: changingOptions.has(idx) ? '1px solid #22c55e' : `1px solid ${theme.quickOptionBorder}`, 
+                    color: changingOptions.has(idx) ? '#22c55e' : theme.quickOptionText, 
                     fontWeight: 600, 
                     fontSize: '12px',
-                    boxShadow: changingOptions.has(idx) ? '0 0 20px rgba(34,197,94,0.3)' : '0 2px 8px rgba(59,130,246,0.10)', 
+                    boxShadow: changingOptions.has(idx) ? (isDarkTheme ? '0 0 20px rgba(34,197,94,0.3)' : '0 0 20px rgba(34,197,94,0.2)') : `0 2px 8px ${theme.accentShadow}`, 
                     transition: changingOptions.has(idx) ? 'all 0.3s ease' : 'background 0.2s',
                     cursor: 'pointer',
                     position: 'relative',
@@ -330,12 +483,12 @@ function FullChatPage() {
                   }}
                   onMouseEnter={e => {
                     if (!changingOptions.has(idx)) {
-                      e.currentTarget.style.background = 'rgba(51,65,85,0.9)';
+                      e.currentTarget.style.background = theme.quickOptionHover;
                     }
                   }}
                   onMouseLeave={e => {
                     if (!changingOptions.has(idx)) {
-                      e.currentTarget.style.background = 'rgba(30,41,59,0.8)';
+                      e.currentTarget.style.background = theme.quickOptionBg;
                     }
                   }}
                 >
@@ -346,7 +499,7 @@ function FullChatPage() {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: 'linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.1) 50%, transparent 70%)',
+                      background: `linear-gradient(45deg, transparent 30%, ${isDarkTheme ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.08)'} 50%, transparent 70%)`,
                       animation: 'matrix-sweep 1s linear infinite',
                       zIndex: 1
                     }} />
@@ -366,48 +519,109 @@ function FullChatPage() {
                   }}>{option.label}</span>
                 </button>
               ))}
+              
+              {/* View All Quick Options Button */}
+              <button
+                onClick={() => setShowQuickOptionsModal(true)}
+                style={{
+                  background: theme.accentButton,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '16px',
+                  padding: '8px 16px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  boxShadow: `0 2px 8px ${theme.accentShadow}`,
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
+                }}
+              >
+                <Plus size={14} />
+                View All
+              </button>
+              
+              {/* Change Business Type Button */}
+              <button
+                onClick={() => setShowBusinessOptionsModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '16px',
+                  padding: '8px 16px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(245, 158, 11, 0.4)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+                }}
+              >
+                <Settings size={14} />
+                Change Business
+              </button>
             </div>
-
-                        {/* New Chat Button */}
+            
+            {/* New Chat Button - Right Side */}
             <button
               onClick={() => {
                 setMessages([]);
                 setInputMessage('');
                 setBusinessType('');
-
+                setShowProfileMenu(false);
                 setRandomBusinessOptions(getRandomBusinessOptions());
                 setQuickOptions(getRandomQuickOptions(false));
               }}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                 color: '#fff',
                 border: 'none',
-                borderRadius: '999px',
-                padding: '0 24px',
-                height: '44px',
-                fontSize: '16px',
-                fontWeight: 600,
+                borderRadius: '16px',
+                padding: '12px 16px',
+                fontSize: '12px',
+                fontWeight: '600',
                 cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(34, 197, 94, 0.10)',
-                transition: 'background 0.2s, box-shadow 0.2s, transform 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                letterSpacing: '0.01em',
-                marginTop: '-40px',
+                boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                marginTop: '-40px'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(34, 197, 94, 0.18)';
-                e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(34, 197, 94, 0.4)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.10)';
-                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.3)';
               }}
             >
-              <Plus size={20} style={{ marginRight: '6px' }} />
+              <Plus size={14} />
               New Chat
             </button>
           </div>
@@ -415,192 +629,294 @@ function FullChatPage() {
 
         {/* Quick Options - When conversation hasn't started */}
         {messages.length === 0 && !businessType && (
-          <div className="quick-options" style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '32px', 
-            margin: '32px 0'
-          }}>
-            {quickOptions.map((option, idx) => (
-              <button
-                key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
-                className="option-pill"
-                onClick={() => handleQuickOption(option.value)}
-                style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  minWidth: '140px', 
-                  padding: '24px 16px', 
-                  borderRadius: '24px', 
-                  background: changingOptions.has(idx) ? 'rgba(34,197,94,0.2)' : 'rgba(30,41,59,0.8)', 
-                  border: changingOptions.has(idx) ? '1px solid #22c55e' : '1px solid #334155', 
-                  color: changingOptions.has(idx) ? '#22c55e' : '#93c5fd', 
-                  fontWeight: 600, 
-                  fontSize: '18px', 
-                  boxShadow: changingOptions.has(idx) ? '0 0 20px rgba(34,197,94,0.3)' : '0 2px 8px rgba(59,130,246,0.10)', 
-                  transition: changingOptions.has(idx) ? 'all 0.3s ease' : 'background 0.2s',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseEnter={e => {
-                  if (!changingOptions.has(idx)) {
-                    e.currentTarget.style.background = 'rgba(51,65,85,0.9)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!changingOptions.has(idx)) {
-                    e.currentTarget.style.background = 'rgba(30,41,59,0.8)';
-                  }
-                }}
-              >
-                {changingOptions.has(idx) && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.1) 50%, transparent 70%)',
-                    animation: 'matrix-sweep 1s linear infinite',
-                    zIndex: 1
-                  }} />
-                )}
-                <div style={{ 
-                  fontSize: '32px', 
-                  marginBottom: '12px',
-                  zIndex: 2,
-                  position: 'relative'
-                }}>{option.icon}</div>
-                <span style={{ 
-                  fontSize: '18px', 
-                  textAlign: 'center', 
-                  lineHeight: '1.2',
-                  zIndex: 2,
-                  position: 'relative'
-                }}>{option.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Business Type Selection */}
-        {messages.length === 0 && !businessType && (
-          <div className="business-type-section" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '340px',
-            margin: '-19px 0',
-            marginTop: '-58px',
-            scale: '0.8',
-          }}>
-            <div style={{
-              background: 'rgba(30,41,59,0.95)',
-              borderRadius: '32px',
-              boxShadow: '0 4px 32px rgba(30,41,59,0.18)',
-              padding: '40px 32px 32px 32px',
-              minWidth: '340px',
-              maxWidth: '90vw',
+          <>
+            <div className="quick-options-row" style={{
               display: 'flex',
-              flexDirection: 'column',
+              justifyContent: 'center',
               alignItems: 'center',
-              border: '1.5px solid #334155',
+              gap: '24px',
+              margin: '32px 0',
+              position: 'relative',
             }}>
-              <div className="business-type-question" style={{
-                fontSize: '2rem',
-                fontWeight: 700,
-                color: '#93c5fd',
-                marginBottom: '32px',
-                textAlign: 'center',
-                letterSpacing: '0.01em',
-                textShadow: '0 2px 12px rgba(59,130,246,0.10)'
-              }}>
-                What type of business do you own?
-              </div>
-              <div className="business-type-buttons" style={{
+              <div className="quick-options" style={{
                 display: 'flex',
-                gap: '32px',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                width: '100%'
+                gap: '20px',
+                alignItems: 'center',
               }}>
-                {randomBusinessOptions.map((option, index) => (
-                  <button 
-                    key={`${option.type}-${index}-${changingBusinessOptions.has(index) ? 'changing' : 'stable'}`}
-                    className="business-type-btn"
+                {quickOptions.map((option, idx) => (
+                  <button
+                    key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
+                    className="option-pill"
+                    onClick={() => handleQuickOption(option.value)}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
-                      minWidth: '200px',
-                      minHeight: '120px',
-                      fontSize: '18px',
-                      padding: '24px',
-                      background: changingBusinessOptions.has(index) ? 'rgba(34,197,94,0.2)' : 'rgba(51,65,85,0.95)',
-                      border: changingBusinessOptions.has(index) ? '1.5px solid #22c55e' : '1.5px solid #334155',
-                      borderRadius: '24px',
-                      color: changingBusinessOptions.has(index) ? '#22c55e' : '#a5b4fc',
+                      minWidth: '120px',
+                      padding: '18px 12px',
+                      borderRadius: '18px',
+                      background: changingOptions.has(idx) ? (isDarkTheme ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.15)') : theme.quickOptionBg,
+                      border: changingOptions.has(idx) ? '1px solid #22c55e' : `1px solid ${theme.quickOptionBorder}`,
+                      color: changingOptions.has(idx) ? '#22c55e' : theme.quickOptionText,
                       fontWeight: 600,
-                      boxShadow: changingBusinessOptions.has(index) ? '0 0 20px rgba(34,197,94,0.3)' : '0 2px 12px rgba(59,130,246,0.08)',
-                      transition: changingBusinessOptions.has(index) ? 'all 0.3s ease' : 'background 0.2s, color 0.2s, box-shadow 0.2s',
+                      fontSize: '15px',
+                      boxShadow: changingOptions.has(idx) ? (isDarkTheme ? '0 0 12px rgba(34,197,94,0.3)' : '0 0 12px rgba(34,197,94,0.2)') : `0 2px 8px ${theme.accentShadow}`,
+                      transition: changingOptions.has(idx) ? 'all 0.3s ease' : 'background 0.2s',
                       cursor: 'pointer',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
                     }}
-                    onClick={() => handleBusinessTypeSelect(option.type)}
                     onMouseEnter={e => {
-                      if (!changingBusinessOptions.has(index)) {
-                        e.currentTarget.style.background = '#1e293b';
-                        e.currentTarget.style.color = '#fff';
-                        e.currentTarget.style.boxShadow = '0 4px 24px rgba(59,130,246,0.18)';
+                      if (!changingOptions.has(idx)) {
+                        e.currentTarget.style.background = theme.quickOptionHover;
                       }
                     }}
                     onMouseLeave={e => {
-                      if (!changingBusinessOptions.has(index)) {
-                        e.currentTarget.style.background = 'rgba(51,65,85,0.95)';
-                        e.currentTarget.style.color = '#a5b4fc';
-                        e.currentTarget.style.boxShadow = '0 2px 12px rgba(59,130,246,0.08)';
+                      if (!changingOptions.has(idx)) {
+                        e.currentTarget.style.background = theme.quickOptionBg;
                       }
                     }}
                   >
-                    {changingBusinessOptions.has(index) && (
+                    {changingOptions.has(idx) && (
                       <div style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.1) 50%, transparent 70%)',
+                        background: `linear-gradient(45deg, transparent 30%, ${isDarkTheme ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.08)'} 50%, transparent 70%)`,
                         animation: 'matrix-sweep 1s linear infinite',
                         zIndex: 1
                       }} />
                     )}
-                    <span style={{
-                      fontSize: '32px', 
-                      marginBottom: '12px',
+                    <div style={{
+                      fontSize: '22px',
+                      marginBottom: '6px',
                       zIndex: 2,
-                      position: 'relative'
-                    }}>{option.icon}</span>
+                      position: 'relative',
+                    }}>{option.icon}</div>
                     <span style={{
+                      fontSize: '15px',
+                      textAlign: 'center',
+                      lineHeight: '1.2',
                       zIndex: 2,
-                      position: 'relative'
+                      position: 'relative',
                     }}>{option.label}</span>
                   </button>
                 ))}
               </div>
+              {/* Mor View More butonu quick options'ın sağında */}
+              <button
+                onClick={() => setShowQuickOptionsModal(true)}
+                style={{
+                  background: 'linear-gradient(90deg, #a78bfa 0%, #6366f1 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '7px 14px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px 0 rgba(99,102,241,0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  borderBottom: '2px solid #7c3aed',
+                  marginLeft: '10px',
+                  height: '34px',
+                  marginTop: '-35px',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px) scale(1.03)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(99,102,241,0.28)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 2px 8px 0 rgba(99,102,241,0.18)';
+                }}
+              >
+                <Plus size={14} />
+                View More
+              </button>
             </div>
-          </div>
-        )}
 
+            {/* Business Type Section + Turuncu View More butonu sağda */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              gap: '20px',
+              marginBottom: '24px',
+              marginTop: '-76px',
+              zIndex: 2,
+              position: 'relative',
+            }}>
+              <div className="business-type-section" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '340px',
+                margin: '0',
+                scale: '0.8',
+              }}>
+                <div style={{
+                  background: theme.modalBg,
+                  borderRadius: '32px',
+                  boxShadow: `0 4px 32px ${theme.primaryShadow}`,
+                  padding: '40px 32px 32px 32px',
+                  minWidth: '340px',
+                  maxWidth: '90vw',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  border: `1.5px solid ${theme.secondaryBorder}`,
+                }}>
+                  <div className="business-type-question" style={{
+                    fontSize: '2rem',
+                    fontWeight: 700,
+                    color: theme.secondaryText,
+                    marginBottom: '32px',
+                    textAlign: 'center',
+                    letterSpacing: '0.01em',
+                    textShadow: `0 2px 12px ${theme.accentShadow}`
+                  }}>
+                    What type of business do you own?
+                  </div>
+                  <div className="business-type-buttons" style={{
+                    display: 'flex',
+                    gap: '32px',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    width: '100%'
+                  }}>
+                    {randomBusinessOptions.map((option, index) => (
+                      <button 
+                        key={`${option.type}-${index}-${changingBusinessOptions.has(index) ? 'changing' : 'stable'}`}
+                        className="business-type-btn"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          minWidth: '160px',
+                          minHeight: '80px',
+                          fontSize: '15px',
+                          padding: '18px',
+                          background: changingBusinessOptions.has(index) ? 'rgba(34,197,94,0.2)' : theme.businessTypeBg,
+                          border: changingBusinessOptions.has(index) ? '1.5px solid #22c55e' : `1.5px solid ${theme.secondaryBorder}`,
+                          borderRadius: '18px',
+                          color: changingBusinessOptions.has(index) ? '#22c55e' : theme.businessTypeText,
+                          fontWeight: 600,
+                          boxShadow: changingBusinessOptions.has(index) ? '0 0 12px rgba(34,197,94,0.3)' : `0 2px 8px ${theme.accentShadow}`,
+                          transition: changingBusinessOptions.has(index) ? 'all 0.3s ease' : 'background 0.2s, color 0.2s, box-shadow 0.2s',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          overflow: 'hidden',
+                        }}
+                        onClick={() => handleBusinessTypeSelect(option.type)}
+                        onMouseEnter={e => {
+                          if (!changingBusinessOptions.has(index)) {
+                            e.currentTarget.style.background = theme.businessTypeHover;
+                            e.currentTarget.style.color = theme.primaryText;
+                            e.currentTarget.style.boxShadow = `0 4px 18px ${theme.accentShadow}`;
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          if (!changingBusinessOptions.has(index)) {
+                            e.currentTarget.style.background = theme.businessTypeBg;
+                            e.currentTarget.style.color = theme.businessTypeText;
+                            e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
+                          }
+                        }}
+                      >
+                        {changingBusinessOptions.has(index) && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.1) 50%, transparent 70%)',
+                            animation: 'matrix-sweep 1s linear infinite',
+                            zIndex: 1
+                          }} />
+                        )}
+                        <span style={{
+                          fontSize: '22px',
+                          marginBottom: '8px',
+                          zIndex: 2,
+                          position: 'relative',
+                        }}>{option.icon}</span>
+                        <span style={{
+                          zIndex: 2,
+                          position: 'relative',
+                        }}>{option.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {/* Turuncu View More butonu business type'ın ALTINDA ortalanmış */}
+                  <button
+                    onClick={() => setShowBusinessOptionsModal(true)}
+                    style={{
+                      background: 'linear-gradient(90deg, #fbbf24 0%, #f59e42 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '14px',
+                      padding: '10px 18px',
+                      fontSize: '15px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 12px 0 rgba(251,191,36,0.18)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      outline: 'none',
+                      borderBottom: '2px solid #f59e42',
+                      margin: '28px auto 0 auto',
+                      height: '44px',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-1px) scale(1.03)';
+                      e.currentTarget.style.boxShadow = '0 4px 18px 0 rgba(251,191,36,0.28)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = '0 2px 12px 0 rgba(251,191,36,0.18)';
+                    }}
+                  >
+                    <Settings size={16} />
+                    View More
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        
         {/* Messages */}
         <div className="chat-messages">
           {messages.length === 0 && !businessType && (
-            <div className="welcome-message">
-              <h2>Welcome to Oakland AI! 👋</h2>
-              <p>I'm here to help you navigate running your business in Oakland. Ask me anything about licenses, permits, regulations, or local business resources.</p>
+            <div className="welcome-message" style={{
+              textAlign: 'center',
+              padding: '8px 20px',
+              color: theme.welcomeText
+            }}>
+              <h2 style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                marginBottom: '16px',
+                color: theme.welcomeText
+              }}>Welcome to Oakland AI! 👋</h2>
+              <p style={{
+                fontSize: '1.1rem',
+                lineHeight: '1.6',
+                color: theme.welcomeSubtext,
+                maxWidth: '600px',
+                margin: '0 auto'
+              }}>I'm here to help you navigate running your business in Oakland. Ask me anything about licenses, permits, regulations, or local business resources.</p>
             </div>
           )}
           
@@ -641,16 +957,43 @@ function FullChatPage() {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="chat-input-form">
-          <div className="message-input-container">
+        <form onSubmit={handleSubmit} className="chat-input-form" style={{
+          position: 'fixed',
+          bottom: '70px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '50vw',
+          maxWidth: '600px',
+          zIndex: 100
+        }}>
+          <div className="message-input-container" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: theme.modalBg,
+            border: `2px solid ${theme.primaryBorder}`,
+            borderRadius: '50px',
+            padding: '8px 8px 8px 20px',
+            boxShadow: `0 8px 32px ${theme.primaryShadow}`,
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.boxShadow = `0 12px 40px ${theme.primaryShadow}`;
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.boxShadow = `0 8px 32px ${theme.primaryShadow}`;
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}>
             <button 
               type="button" 
               className="voice-btn"
               onClick={handleVoiceToggle}
               style={{
                 background: isRecording 
-                  ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' 
-                  : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                  ? theme.voiceButtonRecording
+                  : theme.voiceButtonIdle,
                 border: 'none',
                 color: 'white',
                 padding: '12px',
@@ -664,20 +1007,21 @@ function FullChatPage() {
                 transition: 'all 0.3s ease',
                 boxShadow: isRecording 
                   ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
-                  : '0 2px 8px rgba(59, 130, 246, 0.3)',
+                  : `0 2px 8px ${theme.accentShadow}`,
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                flexShrink: 0
               }}
               onMouseEnter={e => {
                 if (!isRecording) {
                   e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(59, 130, 246, 0.4)';
+                  e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
                 }
               }}
               onMouseLeave={e => {
                 if (!isRecording) {
                   e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
+                  e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
                 }
               }}
             >
@@ -702,11 +1046,56 @@ function FullChatPage() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               disabled={isLoading}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: theme.primaryText,
+                outline: 'none',
+                flex: 1,
+                fontSize: '16px',
+                padding: '12px 0',
+                minWidth: 0
+              }}
+              onFocus={(e) => {
+                e.target.parentElement.style.borderColor = theme.inputFocusBorder;
+              }}
+              onBlur={(e) => {
+                e.target.parentElement.style.borderColor = theme.primaryBorder;
+              }}
             />
             <button 
               type="submit" 
               className="send-btn"
               disabled={isLoading || !inputMessage.trim()}
+              style={{
+                background: theme.primaryButton,
+                border: 'none',
+                color: 'white',
+                padding: '12px',
+                borderRadius: '50%',
+                cursor: isLoading || !inputMessage.trim() ? 'not-allowed' : 'pointer',
+                width: '44px',
+                height: '44px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease',
+                opacity: isLoading || !inputMessage.trim() ? 0.5 : 1,
+                boxShadow: `0 2px 8px ${theme.accentShadow}`,
+                flexShrink: 0
+              }}
+              onMouseEnter={e => {
+                if (!isLoading && inputMessage.trim()) {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isLoading && inputMessage.trim()) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
+                }
+              }}
             >
               <Send size={18} />
             </button>
@@ -715,13 +1104,258 @@ function FullChatPage() {
       </div>
 
       {/* Footer */}
-      <div className="chat-footer">
-        <div className="footer-links">
-          <a href="#privacy">Privacy</a>
-          <a href="#language">Language</a>
-          <a href="#help">Help</a>
+      <div className="chat-footer" style={{
+        background: theme.secondaryBg,
+        borderTop: `1px solid ${theme.primaryBorder}`,
+        padding: '16px 32px',
+        textAlign: 'center'
+      }}>
+        <div className="footer-links" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '24px'
+        }}>
+          <a href="#privacy" style={{
+            color: theme.tertiaryText,
+            textDecoration: 'none',
+            fontSize: '14px',
+            transition: 'color 0.2s ease'
+          }} onMouseEnter={e => e.target.style.color = theme.secondaryText}
+             onMouseLeave={e => e.target.style.color = theme.tertiaryText}>Privacy</a>
+          <a href="#language" style={{
+            color: theme.tertiaryText,
+            textDecoration: 'none',
+            fontSize: '14px',
+            transition: 'color 0.2s ease'
+          }} onMouseEnter={e => e.target.style.color = theme.secondaryText}
+             onMouseLeave={e => e.target.style.color = theme.tertiaryText}>Language</a>
+          <a href="#help" style={{
+            color: theme.tertiaryText,
+            textDecoration: 'none',
+            fontSize: '14px',
+            transition: 'color 0.2s ease'
+          }} onMouseEnter={e => e.target.style.color = theme.secondaryText}
+             onMouseLeave={e => e.target.style.color = theme.tertiaryText}>Help</a>
         </div>
       </div>
+
+      {/* Quick Options Modal */}
+      {showQuickOptionsModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: theme.modalOverlay,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div className="modal-content" style={{
+            background: theme.modalBg,
+            borderRadius: '24px',
+            padding: '32px',
+            maxWidth: '800px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            border: `1px solid ${theme.modalBorder}`,
+            boxShadow: `0 20px 40px ${theme.primaryShadow}`
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px'
+            }}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: theme.primaryText,
+                margin: 0
+              }}>Quick Options</h2>
+              <button
+                onClick={() => setShowQuickOptionsModal(false)}
+                style={{
+                  background: theme.closeButtonBg,
+                  border: `1px solid ${theme.closeButtonBorder}`,
+                  color: theme.closeButtonText,
+                  padding: '8px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = theme.closeButtonHover;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = theme.closeButtonBg;
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: '16px'
+            }}>
+              {allQuickOptions.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    handleQuickOption(option.value);
+                    setShowQuickOptionsModal(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '20px',
+                    background: theme.cardBg,
+                    border: `1px solid ${theme.primaryBorder}`,
+                    borderRadius: '16px',
+                    color: theme.primaryText,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'center'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = theme.cardHoverBg;
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = theme.cardBg;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{ marginBottom: '12px' }}>{option.icon}</div>
+                  <span style={{
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Business Options Modal */}
+      {showBusinessOptionsModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: theme.modalOverlay,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div className="modal-content" style={{
+            background: theme.modalBg,
+            borderRadius: '24px',
+            padding: '32px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            border: `1px solid ${theme.modalBorder}`,
+            boxShadow: `0 20px 40px ${theme.primaryShadow}`
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px'
+            }}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: theme.primaryText,
+                margin: 0
+              }}>Select Business Type</h2>
+              <button
+                onClick={() => setShowBusinessOptionsModal(false)}
+                style={{
+                  background: theme.closeButtonBg,
+                  border: `1px solid ${theme.closeButtonBorder}`,
+                  color: theme.closeButtonText,
+                  padding: '8px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = theme.closeButtonHover;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = theme.closeButtonBg;
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+              gap: '20px'
+            }}>
+              {allBusinessOptions.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    handleBusinessTypeSelect(option.type);
+                    setShowBusinessOptionsModal(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '24px',
+                    background: theme.cardBg,
+                    border: `1px solid ${theme.primaryBorder}`,
+                    borderRadius: '20px',
+                    color: theme.primaryText,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'center',
+                    minHeight: '140px'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = theme.cardHoverBg;
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = theme.cardBg;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{ marginBottom: '16px' }}>{option.icon}</div>
+                  <span style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    lineHeight: '1.3'
+                  }}>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
