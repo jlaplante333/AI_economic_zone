@@ -1,3 +1,5 @@
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config({ path: '../.env' }); 
+// Load .env from the project root (two levels up from config)
+dotenv.config({ path: path.join(__dirname, '../../.env') }); 

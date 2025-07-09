@@ -12,17 +12,30 @@ function FullChatPage() {
   const [showQuickOptionsModal, setShowQuickOptionsModal] = useState(false);
   const [showBusinessOptionsModal, setShowBusinessOptionsModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatMessagesRef = useRef(null);
   
   // Theme context
-  const { theme, isDarkTheme, toggleTheme } = useTheme();
+  const { theme, isDarkTheme, toggleTheme, isToggling } = useTheme();
+  
+  // Debug theme context
+  useEffect(() => {
+    console.log('Theme context loaded:', { isDarkTheme, theme: theme.primaryBg });
+  }, [isDarkTheme, theme]);
+  
+  // Monitor theme changes
+  useEffect(() => {
+    console.log('Theme changed! isDarkTheme:', isDarkTheme);
+    console.log('New theme primaryBg:', theme.primaryBg);
+  }, [isDarkTheme]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   
   // Close profile menu and modals when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showProfileMenu && !event.target.closest('.user-info')) {
+      if (showProfileMenu && !event.target.closest('.user-info') && !event.target.closest('[data-profile-menu]')) {
         setShowProfileMenu(false);
       }
       if (showQuickOptionsModal && !event.target.closest('.modal-content')) {
@@ -38,6 +51,25 @@ function FullChatPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showProfileMenu, showQuickOptionsModal, showBusinessOptionsModal]);
+
+  // Scroll event listener to show/hide scroll button
+  useEffect(() => {
+    const chatMessages = chatMessagesRef.current;
+    if (!chatMessages) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = chatMessages;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 20; // 20px threshold
+      setShowScrollButton(!isAtBottom);
+    };
+
+    // Check initial scroll position
+    handleScroll();
+
+    chatMessages.addEventListener('scroll', handleScroll);
+    return () => chatMessages.removeEventListener('scroll', handleScroll);
+  }, [messages, isLoading]); // Re-run when messages or loading state changes
+
   const [changingOptions, setChangingOptions] = useState(new Set());
   const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
 
@@ -242,6 +274,12 @@ function FullChatPage() {
   }, [randomBusinessOptions]);
 
   const scrollToBottom = () => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTo({
+        top: chatMessagesRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -339,7 +377,7 @@ function FullChatPage() {
           <div className="logo-text" style={{
             fontSize: '24px',
             fontWeight: '700',
-            background: theme.logoGradient,
+            backgroundImage: theme.logoGradient,
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -395,44 +433,80 @@ function FullChatPage() {
             
             {/* Profile Menu */}
             {showProfileMenu && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                right: '0',
-                marginTop: '8px',
-                background: theme.modalBg,
-                borderRadius: '12px',
-                border: `1px solid ${theme.primaryBorder}`,
-                boxShadow: `0 10px 25px ${theme.primaryShadow}`,
-                minWidth: '200px',
-                zIndex: 1000,
-                overflow: 'hidden'
-              }}>
+              <div 
+                data-profile-menu
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: '0',
+                  marginTop: '8px',
+                  background: theme.modalBg,
+                  borderRadius: '12px',
+                  border: `1px solid ${theme.primaryBorder}`,
+                  boxShadow: `0 10px 25px ${theme.primaryShadow}`,
+                  minWidth: '200px',
+                  zIndex: 1000,
+                  overflow: 'hidden'
+                }}
+              >
                 <button
-                  onClick={toggleTheme}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isToggling) return;
+                    console.log('Theme toggle button clicked!');
+                    console.log('Current theme state:', isDarkTheme);
+                    console.log('Current theme object:', theme);
+                    toggleTheme();
+                  }}
+                  disabled={isToggling}
                   style={{
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     padding: '12px 16px',
-                    background: 'transparent',
+                    background: isToggling ? '#9ca3af' : (isDarkTheme ? '#fbbf24' : '#3b82f6'),
                     border: 'none',
-                    color: theme.primaryText,
-                    cursor: 'pointer',
+                    color: 'white',
+                    cursor: isToggling ? 'not-allowed' : 'pointer',
                     transition: 'background 0.2s ease',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    opacity: isToggling ? 0.6 : 1,
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    textAlign: 'left',
+                    justifyContent: 'flex-start',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = theme.tertiaryBg;
+                    if (!isToggling) {
+                      e.currentTarget.style.background = isDarkTheme ? '#f59e0b' : '#2563eb';
+                    }
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = 'transparent';
+                    if (!isToggling) {
+                      e.currentTarget.style.background = isDarkTheme ? '#fbbf24' : '#3b82f6';
+                    }
                   }}
                 >
-                  {isDarkTheme ? <Sun size={16} /> : <Moon size={16} />}
-                  {isDarkTheme ? 'Switch to Light' : 'Switch to Dark'}
+                  {isToggling ? (
+                    <>
+                      <div style={{ width: '16px', height: '16px', border: '2px solid transparent', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                      Switching...
+                    </>
+                  ) : (
+                    <>
+                      {isDarkTheme ? <Sun size={16} /> : <Moon size={16} />}
+                      {isDarkTheme ? 'Switch to Light' : 'Switch to Dark'}
+                    </>
+                  )}
                 </button>
+                
+
 
               </div>
             )}
@@ -441,7 +515,7 @@ function FullChatPage() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="chat-main">
+      <div className="chat-main" style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
         {/* New Chat Button and Quick Options Row - When conversation started */}
         {(messages.length > 0 || businessType) && (
           <div style={{ 
@@ -449,7 +523,6 @@ function FullChatPage() {
             justifyContent: 'space-between', 
             alignItems: 'center',
             padding: '16px 32px 0 32px',
-            borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
             paddingBottom: '12px'
           }}>
             {/* Quick Options */}
@@ -897,7 +970,7 @@ function FullChatPage() {
         )}
         
         {/* Messages */}
-        <div className="chat-messages">
+        <div className="chat-messages" ref={chatMessagesRef}>
           {messages.length === 0 && !businessType && (
             <div className="welcome-message" style={{
               textAlign: 'center',
@@ -956,16 +1029,29 @@ function FullChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Scroll to Bottom Button */}
+        {showScrollButton && (
+          <button
+            onClick={scrollToBottom}
+            className="scroll-to-bottom-btn"
+            style={{
+              background: theme.primaryButton,
+              color: 'white',
+              boxShadow: `0 4px 16px ${theme.primaryShadow}`
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.boxShadow = `0 6px 20px ${theme.primaryShadow}`;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.boxShadow = `0 4px 16px ${theme.primaryShadow}`;
+            }}
+          >
+            <ChevronDown size={20} />
+          </button>
+        )}
+
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="chat-input-form" style={{
-          position: 'fixed',
-          bottom: '70px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '50vw',
-          maxWidth: '600px',
-          zIndex: 100
-        }}>
+        <form onSubmit={handleSubmit} className="chat-input-form">
           <div className="message-input-container" style={{
             display: 'flex',
             alignItems: 'center',
