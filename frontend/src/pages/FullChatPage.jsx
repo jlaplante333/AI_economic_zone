@@ -17,18 +17,18 @@ function FullChatPage() {
   const chatMessagesRef = useRef(null);
   
   // Theme context
-  const { theme, isDarkTheme, toggleTheme, isToggling } = useTheme();
+  const { theme, currentThemeName, toggleTheme, isToggling } = useTheme();
   
   // Debug theme context
   useEffect(() => {
-    console.log('Theme context loaded:', { isDarkTheme, theme: theme.primaryBg });
-  }, [isDarkTheme, theme]);
+    console.log('Theme context loaded:', { currentThemeName, theme: theme.primaryBg });
+  }, [currentThemeName, theme]);
   
   // Monitor theme changes
   useEffect(() => {
-    console.log('Theme changed! isDarkTheme:', isDarkTheme);
+    console.log('Theme changed! currentThemeName:', currentThemeName);
     console.log('New theme primaryBg:', theme.primaryBg);
-  }, [isDarkTheme]);
+  }, [currentThemeName]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   
@@ -454,7 +454,7 @@ function FullChatPage() {
                     e.stopPropagation();
                     if (isToggling) return;
                     console.log('Theme toggle button clicked!');
-                    console.log('Current theme state:', isDarkTheme);
+                    console.log('Current theme state:', currentThemeName);
                     console.log('Current theme object:', theme);
                     toggleTheme();
                   }}
@@ -465,7 +465,7 @@ function FullChatPage() {
                     alignItems: 'center',
                     gap: '12px',
                     padding: '12px 16px',
-                    background: isToggling ? '#9ca3af' : (isDarkTheme ? '#fbbf24' : '#3b82f6'),
+                    background: isToggling ? '#9ca3af' : theme.primaryButton,
                     border: 'none',
                     color: 'white',
                     cursor: isToggling ? 'not-allowed' : 'pointer',
@@ -484,12 +484,12 @@ function FullChatPage() {
                   }}
                   onMouseEnter={e => {
                     if (!isToggling) {
-                      e.currentTarget.style.background = isDarkTheme ? '#f59e0b' : '#2563eb';
+                      e.currentTarget.style.background = theme.primaryButton;
                     }
                   }}
                   onMouseLeave={e => {
                     if (!isToggling) {
-                      e.currentTarget.style.background = isDarkTheme ? '#fbbf24' : '#3b82f6';
+                      e.currentTarget.style.background = theme.primaryButton;
                     }
                   }}
                 >
@@ -500,8 +500,8 @@ function FullChatPage() {
                     </>
                   ) : (
                     <>
-                      {isDarkTheme ? <Sun size={16} /> : <Moon size={16} />}
-                      {isDarkTheme ? 'Switch to Light' : 'Switch to Dark'}
+                      {currentThemeName === 'dark' ? <Sun size={16} /> : currentThemeName === 'beige' ? <Moon size={16} /> : <Sun size={16} />}
+                      {currentThemeName === 'dark' ? 'Switch to Beige' : currentThemeName === 'beige' ? 'Switch to White' : 'Switch to Dark'}
                     </>
                   )}
                 </button>
@@ -543,12 +543,12 @@ function FullChatPage() {
                     minWidth: '80px', 
                     padding: '12px 8px', 
                     borderRadius: '16px', 
-                    background: changingOptions.has(idx) ? (isDarkTheme ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.15)') : theme.quickOptionBg, 
+                    background: changingOptions.has(idx) ? 'rgba(34,197,94,0.15)' : theme.quickOptionBg, 
                     border: changingOptions.has(idx) ? '1px solid #22c55e' : `1px solid ${theme.quickOptionBorder}`, 
                     color: changingOptions.has(idx) ? '#22c55e' : theme.quickOptionText, 
                     fontWeight: 600, 
                     fontSize: '12px',
-                    boxShadow: changingOptions.has(idx) ? (isDarkTheme ? '0 0 20px rgba(34,197,94,0.3)' : '0 0 20px rgba(34,197,94,0.2)') : `0 2px 8px ${theme.accentShadow}`, 
+                    boxShadow: changingOptions.has(idx) ? '0 0 20px rgba(34,197,94,0.2)' : `0 2px 8px ${theme.accentShadow}`, 
                     transition: changingOptions.has(idx) ? 'all 0.3s ease' : 'background 0.2s',
                     cursor: 'pointer',
                     position: 'relative',
@@ -572,7 +572,7 @@ function FullChatPage() {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: `linear-gradient(45deg, transparent 30%, ${isDarkTheme ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.08)'} 50%, transparent 70%)`,
+                      background: `linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.08) 50%, transparent 70%)`,
                       animation: 'matrix-sweep 1s linear infinite',
                       zIndex: 1
                     }} />
@@ -728,12 +728,12 @@ function FullChatPage() {
                       minWidth: '120px',
                       padding: '18px 12px',
                       borderRadius: '18px',
-                      background: changingOptions.has(idx) ? (isDarkTheme ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.15)') : theme.quickOptionBg,
+                      background: changingOptions.has(idx) ? 'rgba(34,197,94,0.15)' : theme.quickOptionBg,
                       border: changingOptions.has(idx) ? '1px solid #22c55e' : `1px solid ${theme.quickOptionBorder}`,
                       color: changingOptions.has(idx) ? '#22c55e' : theme.quickOptionText,
                       fontWeight: 600,
                       fontSize: '15px',
-                      boxShadow: changingOptions.has(idx) ? (isDarkTheme ? '0 0 12px rgba(34,197,94,0.3)' : '0 0 12px rgba(34,197,94,0.2)') : `0 2px 8px ${theme.accentShadow}`,
+                      boxShadow: changingOptions.has(idx) ? '0 0 12px rgba(34,197,94,0.2)' : `0 2px 8px ${theme.accentShadow}`,
                       transition: changingOptions.has(idx) ? 'all 0.3s ease' : 'background 0.2s',
                       cursor: 'pointer',
                       position: 'relative',
@@ -757,7 +757,7 @@ function FullChatPage() {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: `linear-gradient(45deg, transparent 30%, ${isDarkTheme ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.08)'} 50%, transparent 70%)`,
+                        background: `linear-gradient(45deg, transparent 30%, rgba(34,197,94,0.08) 50%, transparent 70%)`,
                         animation: 'matrix-sweep 1s linear infinite',
                         zIndex: 1
                       }} />

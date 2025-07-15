@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { darkTheme, beigeTheme } from '../themes';
+import { darkTheme, beigeTheme, whiteTheme } from '../themes';
 
 const ThemeContext = createContext();
 
@@ -12,38 +12,45 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [currentThemeName, setCurrentThemeName] = useState('dark');
   const [theme, setTheme] = useState(darkTheme);
   const [isToggling, setIsToggling] = useState(false);
+
+  const themes = {
+    dark: darkTheme,
+    beige: beigeTheme,
+    white: whiteTheme
+  };
 
   useEffect(() => {
     // Load theme preference from localStorage
     const savedTheme = localStorage.getItem('oaklandAI-theme');
     console.log('Loading theme from localStorage:', savedTheme);
-    if (savedTheme === 'beige') {
-      console.log('Setting beige theme');
-      setIsDarkTheme(false);
-      setTheme(beigeTheme);
-      document.body.className = 'theme-beige';
+    
+    if (savedTheme && themes[savedTheme]) {
+      console.log('Setting theme:', savedTheme);
+      setCurrentThemeName(savedTheme);
+      setTheme(themes[savedTheme]);
+      document.body.className = savedTheme === 'dark' ? '' : `theme-${savedTheme}`;
     } else {
-      console.log('Setting dark theme');
-      setIsDarkTheme(true);
+      console.log('Setting default dark theme');
+      setCurrentThemeName('dark');
       setTheme(darkTheme);
       document.body.className = '';
     }
   }, []);
 
-  // Ensure theme and isDarkTheme are always in sync
+  // Ensure theme and currentThemeName are always in sync
   useEffect(() => {
-    console.log('Theme state changed - isDarkTheme:', isDarkTheme, 'theme.primaryBg:', theme.primaryBg);
+    console.log('Theme state changed - currentThemeName:', currentThemeName, 'theme.primaryBg:', theme.primaryBg);
     
     // Verify theme consistency
-    const expectedTheme = isDarkTheme ? darkTheme : beigeTheme;
+    const expectedTheme = themes[currentThemeName];
     if (theme.primaryBg !== expectedTheme.primaryBg) {
       console.warn('Theme inconsistency detected, fixing...');
       setTheme(expectedTheme);
     }
-  }, [isDarkTheme, theme]);
+  }, [currentThemeName, theme]);
 
   const toggleTheme = () => {
     // Prevent rapid clicking
@@ -54,35 +61,34 @@ export const ThemeProvider = ({ children }) => {
     
     console.log('=== THEME TOGGLE DEBUG ===');
     console.log('toggleTheme function called');
-    console.log('Current isDarkTheme:', isDarkTheme);
+    console.log('Current theme:', currentThemeName);
     console.log('Current theme.primaryBg:', theme.primaryBg);
     
     setIsToggling(true);
     
     try {
-      // Use a callback approach to ensure state updates are based on current state
-      setIsDarkTheme(prevIsDark => {
-        const updatedIsDark = !prevIsDark;
-        console.log('State update callback - prevIsDark:', prevIsDark, 'updatedIsDark:', updatedIsDark);
-        
-        // Update theme immediately in the same callback context
-        const newTheme = updatedIsDark ? darkTheme : beigeTheme;
-        setTheme(newTheme);
-        
-        console.log('New theme.primaryBg:', newTheme.primaryBg);
-        
+      // Cycle through themes: dark -> beige -> white -> dark
+      const themeOrder = ['dark', 'beige', 'white'];
+      const currentIndex = themeOrder.indexOf(currentThemeName);
+      const nextIndex = (currentIndex + 1) % themeOrder.length;
+      const nextThemeName = themeOrder[nextIndex];
+      
+      console.log('Theme cycle - current:', currentThemeName, 'next:', nextThemeName);
+      
+      setCurrentThemeName(nextThemeName);
+      setTheme(themes[nextThemeName]);
+      
         // Update localStorage
-        const themeName = updatedIsDark ? 'dark' : 'beige';
-        localStorage.setItem('oaklandAI-theme', themeName);
-        console.log('localStorage set to:', themeName);
+        localStorage.setItem('oaklandAI-theme', nextThemeName);
+        console.log('localStorage set to:', nextThemeName);
         
         // Update body class for CSS theme overrides
-        if (updatedIsDark) {
+        if (nextThemeName === 'dark') {
           document.body.className = '';
           console.log('Body class set to empty');
         } else {
-          document.body.className = 'theme-beige';
-          console.log('Body class set to theme-beige');
+          document.body.className = `theme-${nextThemeName}`;
+          console.log('Body class set to theme-' + nextThemeName);
         }
         
         // Reset toggle flag after a short delay
@@ -90,11 +96,8 @@ export const ThemeProvider = ({ children }) => {
           setIsToggling(false);
         }, 100);
         
-        return updatedIsDark;
-      });
-      
-      console.log('Theme toggle completed');
-      console.log('=== END DEBUG ===');
+        console.log('Theme toggle completed');
+        console.log('=== END DEBUG ===');
     } catch (error) {
       console.error('Error during theme toggle:', error);
       setIsToggling(false);
@@ -103,7 +106,7 @@ export const ThemeProvider = ({ children }) => {
 
   const value = {
     theme,
-    isDarkTheme,
+    currentThemeName,
     toggleTheme,
     isToggling
   };

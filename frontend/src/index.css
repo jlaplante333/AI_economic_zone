@@ -775,6 +775,93 @@ body.login-bg {
   }
 }
 
+/* White Theme Thinking Animation Overrides */
+.theme-white .thinking-container {
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.theme-white .thinking-container::before {
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  opacity: 0.4;
+}
+
+.theme-white .nucleus {
+  background: radial-gradient(circle, #3b82f6, #2563eb);
+  box-shadow: 
+    0 0 20px rgba(59, 130, 246, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.theme-white .electron {
+  background: #60a5fa;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.9);
+}
+
+.theme-white .orbit-path {
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.theme-white .thinking-text {
+  color: #475569;
+  text-shadow: 0 0 10px rgba(71, 85, 105, 0.3);
+}
+
+.theme-white .thinking-dot {
+  background: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+}
+
+/* White theme keyframe overrides */
+.theme-white .nucleus {
+  animation: nucleusPulseWhite 3s ease-in-out infinite;
+}
+
+@keyframes nucleusPulseWhite {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 20px rgba(59, 130, 246, 0.8),
+      inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 
+      0 0 30px rgba(59, 130, 246, 1),
+      inset 0 2px 4px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.theme-white .orbit-path {
+  animation: orbitGlowWhite 4s ease-in-out infinite;
+}
+
+@keyframes orbitGlowWhite {
+  0%, 100% {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.theme-white .thinking-text {
+  animation: textGlowWhite 2s ease-in-out infinite;
+}
+
+@keyframes textGlowWhite {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(71, 85, 105, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(71, 85, 105, 0.6);
+  }
+}
+
 @keyframes matrix-sweep {
   0% {
     transform: translateX(-100%) translateY(-100%);
