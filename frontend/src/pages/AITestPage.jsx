@@ -11,17 +11,36 @@ function AITestPage() {
     
     try {
       const response = await fetch('/api/chat/status');
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in first.');
+        } else if (response.status === 404) {
+          throw new Error('API endpoint not found. Please check if the backend server is running.');
+        } else if (response.status >= 500) {
+          throw new Error('Server error. Please try again later.');
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+      
       const data = await response.json();
       setStatus(data);
     } catch (err) {
-      setError(err.message);
+      console.error('AI Status check error:', err);
+      setError(err.message || 'Failed to check AI status. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    checkAIStatus();
+    // Add a small delay to ensure the page is fully loaded
+    const timer = setTimeout(() => {
+      checkAIStatus();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const getStatusColor = (status) => {
@@ -63,6 +82,37 @@ function AITestPage() {
         <div className="error-message">
           <h3>❌ Error</h3>
           <p>{error}</p>
+          <div style={{ marginTop: '16px' }}>
+            <button 
+              onClick={checkAIStatus}
+              style={{
+                padding: '8px 16px',
+                fontSize: '14px',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                marginRight: '8px'
+              }}
+            >
+              Try Again
+            </button>
+            <button 
+              onClick={() => window.location.href = '/fullchat'}
+              style={{
+                padding: '8px 16px',
+                fontSize: '14px',
+                backgroundColor: '#10b981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Go to Chat
+            </button>
+          </div>
         </div>
       )}
 

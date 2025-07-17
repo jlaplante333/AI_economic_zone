@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon } from 'lucide-react';
+import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import path from 'path';
 
 function FullChatPage() {
   const [messages, setMessages] = useState([]);
@@ -366,6 +367,11 @@ function FullChatPage() {
     );
   }
 
+  // Helper to get kebab-case filename for business type
+  function getBusinessPhoto(type) {
+    return `/src/assets/businessPhoto/${type.replace(/\s+/g, '-').toLowerCase()}.jpg`;
+  }
+
   return (
     <div className="full-chat-container" style={{ background: theme.primaryBg }}>
       {/* Header */}
@@ -504,6 +510,40 @@ function FullChatPage() {
                       {currentThemeName === 'dark' ? 'Switch to Beige' : currentThemeName === 'beige' ? 'Switch to White' : 'Switch to Dark'}
                     </>
                   )}
+                </button>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Clear user data and redirect to login
+                    localStorage.removeItem('user');
+                    window.location.href = '/login';
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    background: '#ef4444',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s ease',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    textAlign: 'left',
+                    justifyContent: 'flex-start'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = '#dc2626';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = '#ef4444';
+                  }}
+                >
+                  <LogOut size={16} />
+                  Logout
                 </button>
                 
 
@@ -1430,12 +1470,26 @@ function FullChatPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <div style={{ marginBottom: '16px' }}>{option.icon}</div>
                   <span style={{
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    lineHeight: '1.3'
-                  }}>{option.label}</span>
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#f3f4f6',
+                    marginBottom: 12,
+                    position: 'relative',
+                  }}>
+                    <img
+                      src={getBusinessPhoto(option.type)}
+                      alt={option.label}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                      onError={e => { e.target.style.display = 'none'; e.target.parentNode.appendChild(option.icon); }}
+                    />
+                  </span>
+                  <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.3' }}>{option.label}</span>
                 </button>
               ))}
             </div>

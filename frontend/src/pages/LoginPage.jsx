@@ -3,65 +3,117 @@ import { useNavigate } from 'react-router-dom';
 import '../login.css';
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      
-      if (response.ok) {
-        navigate('/admin');
+      // For now, simulate a login - accept any username and password
+      // In production, this would call your actual API
+      if (username.trim() && password.trim()) {
+        // Store user info in localStorage
+        localStorage.setItem('user', JSON.stringify({ 
+          name: username,
+          email: username + '@example.com',
+          id: Date.now()
+        }));
+        
+        // Redirect directly to full chat
+        navigate('/fullchat');
       } else {
-        alert('Login failed');
+        alert('Please enter both username and password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Login failed');
+      alert('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-section">
-      <div className="login-container">
-        <h1 className="login-title">Admin Login</h1>
-        <p className="login-subtitle">Enter your credentials to access the admin panel</p>
+    <div className="main-container">
+      {/* Left side - Welcome section */}
+      <div className="welcome-section">
+        <div className="logo-section">
+          <div className="logo-text" style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.02em'
+          }}>Oakland AI</div>
+        </div>
         
-        <form onSubmit={handleSubmit}>
-          <label className="form-label">Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="form-input"
-            placeholder="Enter your email"
-            required
-          />
-          
-          <label className="form-label">Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="form-input"
-            placeholder="Enter your password"
-            required
-          />
-          
-          <button type="submit" className="login-button">
-            Login
-          </button>
-        </form>
-        
-        <div className="login-footer">
-          <span>Don't have an account? <a href="/signup" className="signup-link">Sign up</a></span>
-          <span><a href="/forgot-password" className="forgot-password">Forgot password?</a></span>
+        <h1 className="main-heading">
+          Smart help for<br />
+          small businesses<br />
+          in Oakland.
+        </h1>
+        <p className="sub-heading">
+          Speak your language.<br />
+          Get answers. No paperwork.
+        </p>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>
+          Don't have an account? <a href="#" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Sign up</a>
+        </p>
+      </div>
+
+      {/* Right side - Login section */}
+      <div className="login-section">
+        <div className="login-container">
+          <h2 className="login-title">Welcome Back</h2>
+          <p className="login-subtitle">Sign in to access your Oakland AI assistant</p>
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <label htmlFor="username" className="form-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                className="form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={isLoading}
+              style={{
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </button>
+          </form>
+          <div className="login-footer">
+            <p>Don't have an account? <a href="#" className="signup-link">Sign up</a></p>
+            <p><a href="#" className="forgot-password">Forgot password?</a></p>
+          </div>
         </div>
       </div>
     </div>
