@@ -26,25 +26,29 @@ export const LanguageProvider = ({ children }) => {
         welcome: 'Welcome',
         selectLanguage: 'Select your language',
         continue: 'Continue',
-        back: 'Back'
+        back: 'Back',
+        language: 'Language'
       },
       es: {
         welcome: 'Bienvenido',
         selectLanguage: 'Selecciona tu idioma',
         continue: 'Continuar',
-        back: 'Atrás'
+        back: 'Atrás',
+        language: 'Idioma'
       },
       fr: {
         welcome: 'Bienvenue',
         selectLanguage: 'Sélectionnez votre langue',
         continue: 'Continuer',
-        back: 'Retour'
+        back: 'Retour',
+        language: 'Langue'
       },
       de: {
         welcome: 'Willkommen',
         selectLanguage: 'Wählen Sie Ihre Sprache',
         continue: 'Weiter',
-        back: 'Zurück'
+        back: 'Zurück',
+        language: 'Sprache'
       },
       // Add more languages as needed
     };
