@@ -23,6 +23,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/full-chat" element={<FullChatPage />} />
+              <Route path="/fullchat" element={<FullChatPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/ai-test" element={<AITestPage />} />
             </Routes>

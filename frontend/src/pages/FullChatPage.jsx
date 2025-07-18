@@ -4,6 +4,26 @@ import { useTheme } from '../context/ThemeContext';
 import path from 'path';
 
 function FullChatPage() {
+  // Add bounce animation CSS
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-5px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-3px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +93,17 @@ function FullChatPage() {
 
   const [changingOptions, setChangingOptions] = useState(new Set());
   const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [isQuickOptionsAtBottom, setIsQuickOptionsAtBottom] = useState(false);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('Quick Options at bottom changed:', isQuickOptionsAtBottom);
+  }, [isQuickOptionsAtBottom]);
+
+  useEffect(() => {
+    console.log('Business Modal at bottom changed:', isAtBottom);
+  }, [isAtBottom]);
 
   // All available business options
   const allBusinessOptions = [
@@ -199,6 +230,48 @@ function FullChatPage() {
     setQuickOptions(getRandomQuickOptions(false));
   }, []);
 
+  // Monitor scroll position in business modal
+  useEffect(() => {
+    if (!showBusinessOptionsModal) return;
+
+    const modalContent = document.querySelector('.business-modal-content');
+    if (!modalContent) return;
+
+    const handleModalScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = modalContent;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+      console.log('Business Modal Scroll:', { scrollTop, scrollHeight, clientHeight, isAtBottom });
+      setIsAtBottom(isAtBottom);
+    };
+
+    // Check initial scroll position
+    handleModalScroll();
+
+    modalContent.addEventListener('scroll', handleModalScroll);
+    return () => modalContent.removeEventListener('scroll', handleModalScroll);
+  }, [showBusinessOptionsModal]);
+
+  // Monitor scroll position in quick options modal
+  useEffect(() => {
+    if (!showQuickOptionsModal) return;
+
+    const modalContent = document.querySelector('.quick-options-modal-content');
+    if (!modalContent) return;
+
+    const handleQuickOptionsScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = modalContent;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px threshold
+      console.log('Quick Options Scroll:', { scrollTop, scrollHeight, clientHeight, isAtBottom });
+      setIsQuickOptionsAtBottom(isAtBottom);
+    };
+
+    // Check initial scroll position
+    handleQuickOptionsScroll();
+
+    modalContent.addEventListener('scroll', handleQuickOptionsScroll);
+    return () => modalContent.removeEventListener('scroll', handleQuickOptionsScroll);
+  }, [showQuickOptionsModal]);
+
   // Update quick options every time user sends a message or starts a new chat
   useEffect(() => {
     if (messages.length > 0 || businessType) {
@@ -282,6 +355,39 @@ function FullChatPage() {
       });
     }
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Scroll functions for modals
+  const scrollBusinessModal = (direction) => {
+    const modalContent = document.querySelector('.business-modal-content');
+    if (!modalContent) return;
+    
+    const scrollAmount = 300; // Scroll by 300px
+    const currentScroll = modalContent.scrollTop;
+    const newScroll = direction === 'down' 
+      ? currentScroll + scrollAmount 
+      : currentScroll - scrollAmount;
+    
+    modalContent.scrollTo({
+      top: newScroll,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollQuickOptionsModal = (direction) => {
+    const modalContent = document.querySelector('.quick-options-modal-content');
+    if (!modalContent) return;
+    
+    const scrollAmount = 300; // Scroll by 300px
+    const currentScroll = modalContent.scrollTop;
+    const newScroll = direction === 'down' 
+      ? currentScroll + scrollAmount 
+      : currentScroll - scrollAmount;
+    
+    modalContent.scrollTo({
+      top: newScroll,
+      behavior: 'smooth'
+    });
   };
 
 
@@ -1280,94 +1386,156 @@ function FullChatPage() {
           zIndex: 1000,
           padding: '20px'
         }}>
-          <div className="modal-content" style={{
+          <div style={{
             background: theme.modalBg,
             borderRadius: '24px',
-            padding: '32px',
             maxWidth: '800px',
             width: '100%',
             maxHeight: '80vh',
-            overflow: 'auto',
             border: `1px solid ${theme.modalBorder}`,
-            boxShadow: `0 20px 40px ${theme.primaryShadow}`
+            boxShadow: `0 20px 40px ${theme.primaryShadow}`,
+            display: 'flex',
+            flexDirection: 'column'
           }}>
+            {/* Header */}
             <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '24px'
+              padding: '32px 32px 24px 32px',
+              borderBottom: `1px solid ${theme.primaryBorder}`
             }}>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: theme.primaryText,
-                margin: 0
-              }}>Quick Options</h2>
-              <button
-                onClick={() => setShowQuickOptionsModal(false)}
-                style={{
-                  background: theme.closeButtonBg,
-                  border: `1px solid ${theme.closeButtonBorder}`,
-                  color: theme.closeButtonText,
-                  padding: '8px',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = theme.closeButtonHover;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = theme.closeButtonBg;
-                }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '16px'
-            }}>
-              {allQuickOptions.map((option, index) => (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: theme.primaryText,
+                  margin: 0
+                }}>Quick Options</h2>
                 <button
-                  key={index}
-                  onClick={() => {
-                    handleQuickOption(option.value);
-                    setShowQuickOptionsModal(false);
-                  }}
+                  onClick={() => setShowQuickOptionsModal(false)}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '20px',
-                    background: theme.cardBg,
-                    border: `1px solid ${theme.primaryBorder}`,
-                    borderRadius: '16px',
-                    color: theme.primaryText,
+                    background: theme.closeButtonBg,
+                    border: `1px solid ${theme.closeButtonBorder}`,
+                    color: theme.closeButtonText,
+                    padding: '8px',
+                    borderRadius: '50%',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'center'
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = theme.cardHoverBg;
-                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.background = theme.closeButtonHover;
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = theme.cardBg;
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.background = theme.closeButtonBg;
                   }}
                 >
-                  <div style={{ marginBottom: '12px' }}>{option.icon}</div>
-                  <span style={{
-                    fontSize: '14px',
-                    fontWeight: '600'
-                  }}>{option.label}</span>
+                  <X size={20} />
                 </button>
-              ))}
+              </div>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="quick-options-modal-content" style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '32px'
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '16px',
+                marginBottom: '60px'
+              }}>
+                {allQuickOptions.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      handleQuickOption(option.value);
+                      setShowQuickOptionsModal(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '20px',
+                      background: theme.cardBg,
+                      border: `1px solid ${theme.primaryBorder}`,
+                      borderRadius: '16px',
+                      color: theme.primaryText,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'center'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = theme.cardHoverBg;
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = theme.cardBg;
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <div style={{ marginBottom: '12px' }}>{option.icon}</div>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '600'
+                    }}>{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Scroll indicator footer */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '16px 0',
+              position: 'sticky',
+              bottom: 0,
+              background: '#ffffff',
+              borderTop: '1px solid #e5e7eb',
+              marginTop: '20px',
+              borderBottomLeftRadius: '24px',
+              borderBottomRightRadius: '24px',
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+              position: 'relative',
+              minHeight: '60px'
+            }}>
+              <div 
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  animation: 'bounce 2s infinite',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}
+                onClick={() => scrollQuickOptionsModal(isQuickOptionsAtBottom ? 'up' : 'down')}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                }}
+              >
+                {isQuickOptionsAtBottom ? '↑ Scroll up to see more quick options ↑' : '↓ Scroll to see more quick options ↓'}
+                {/* Debug: {isQuickOptionsAtBottom ? 'AT BOTTOM' : 'NOT AT BOTTOM'} */}
+              </div>
             </div>
           </div>
         </div>
@@ -1388,110 +1556,166 @@ function FullChatPage() {
           zIndex: 1000,
           padding: '20px'
         }}>
-          <div className="modal-content" style={{
+          <div style={{
             background: theme.modalBg,
             borderRadius: '24px',
-            padding: '32px',
             maxWidth: '900px',
             width: '100%',
             maxHeight: '80vh',
-            overflow: 'auto',
             border: `1px solid ${theme.modalBorder}`,
-            boxShadow: `0 20px 40px ${theme.primaryShadow}`
+            boxShadow: `0 20px 40px ${theme.primaryShadow}`,
+            display: 'flex',
+            flexDirection: 'column'
           }}>
+            {/* Header */}
             <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '24px'
+              padding: '32px 32px 24px 32px',
+              borderBottom: `1px solid ${theme.primaryBorder}`
             }}>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: theme.primaryText,
-                margin: 0
-              }}>Select Business Type</h2>
-              <button
-                onClick={() => setShowBusinessOptionsModal(false)}
-                style={{
-                  background: theme.closeButtonBg,
-                  border: `1px solid ${theme.closeButtonBorder}`,
-                  color: theme.closeButtonText,
-                  padding: '8px',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = theme.closeButtonHover;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = theme.closeButtonBg;
-                }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-              gap: '20px'
-            }}>
-              {allBusinessOptions.map((option, index) => (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: theme.primaryText,
+                  margin: 0
+                }}>Select Business Type</h2>
                 <button
-                  key={index}
-                  onClick={() => {
-                    handleBusinessTypeSelect(option.type);
-                    setShowBusinessOptionsModal(false);
-                  }}
+                  onClick={() => setShowBusinessOptionsModal(false)}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '24px',
-                    background: theme.cardBg,
-                    border: `1px solid ${theme.primaryBorder}`,
-                    borderRadius: '20px',
-                    color: theme.primaryText,
+                    background: theme.closeButtonBg,
+                    border: `1px solid ${theme.closeButtonBorder}`,
+                    color: theme.closeButtonText,
+                    padding: '8px',
+                    borderRadius: '50%',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'center',
-                    minHeight: '140px'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = theme.cardHoverBg;
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = theme.cardBg;
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div style={{
-                    width: '100%',
-                    height: '120px',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: '#f3f4f6',
-                    marginBottom: 12,
-                    position: 'relative',
-                  }}>
-                    <img
-                      src={getBusinessPhoto(option.type)}
-                      alt={option.label}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={e => { e.target.style.display = 'none'; e.target.parentNode.appendChild(option.icon); }}
-                    />
-                  </div>
-                  <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.3' }}>{option.label}</span>
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = theme.closeButtonHover;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = theme.closeButtonBg;
+                  }}
+                >
+                  <X size={20} />
                 </button>
-              ))}
+              </div>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="business-modal-content" style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '32px'
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: '20px'
+              }}>
+                {allBusinessOptions.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      handleBusinessTypeSelect(option.type);
+                      setShowBusinessOptionsModal(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '24px',
+                      background: theme.cardBg,
+                      border: `1px solid ${theme.primaryBorder}`,
+                      borderRadius: '20px',
+                      color: theme.primaryText,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'center',
+                      minHeight: '140px'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = theme.cardHoverBg;
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = theme.cardBg;
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <div style={{
+                      width: '100%',
+                      height: '120px',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: '#f3f4f6',
+                      marginBottom: 12,
+                      position: 'relative',
+                    }}>
+                      <img
+                        src={getBusinessPhoto(option.type)}
+                        alt={option.label}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={e => { e.target.style.display = 'none'; e.target.parentNode.appendChild(option.icon); }}
+                      />
+                    </div>
+                    <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.3' }}>{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Scroll indicator footer */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '16px 0',
+              background: '#ffffff',
+              borderTop: '1px solid #e5e7eb',
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+              position: 'relative',
+              minHeight: '60px'
+            }}>
+              <div 
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '25px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  animation: 'bounce 2s infinite',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}
+                onClick={() => scrollBusinessModal(isAtBottom ? 'up' : 'down')}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                }}
+              >
+                {isAtBottom ? '↑ Scroll up to see more business types ↑' : '↓ Scroll to see more business types ↓'}
+                {/* Debug: {isAtBottom ? 'AT BOTTOM' : 'NOT AT BOTTOM'} */}
+              </div>
             </div>
           </div>
         </div>
