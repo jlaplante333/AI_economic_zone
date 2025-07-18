@@ -68,32 +68,23 @@ function VoiceInput({ onResult, disabled }) {
   };
 
   return (
-    <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+    <div className="voice-input-container">
       <button
         onClick={startListening}
         disabled={disabled}
-        style={{
-          padding: '15px 30px',
-          fontSize: '16px',
-          backgroundColor: disabled ? '#6c757d' : (listening ? '#dc3545' : '#28a745'),
-          color: 'white',
-          border: 'none',
-          borderRadius: '25px',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          transition: 'background-color 0.3s'
-        }}
+        className={`voice-button ${listening ? 'listening' : ''}`}
       >
         {listening ? '🛑 Stop Listening' : '🎤 Speak'}
       </button>
       
       {listening && (
-        <div style={{ marginTop: '10px', color: '#666' }}>
+        <div className="listening-status">
           🎤 Listening... Speak now!
         </div>
       )}
       
       {error && (
-        <div style={{ marginTop: '10px', color: '#dc3545', fontSize: '14px' }}>
+        <div className="voice-error">
           {error}
         </div>
       )}
@@ -101,16 +92,7 @@ function VoiceInput({ onResult, disabled }) {
       {listening && (
         <button
           onClick={stopListening}
-          style={{
-            marginTop: '10px',
-            padding: '8px 16px',
-            fontSize: '14px',
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '20px',
-            cursor: 'pointer'
-          }}
+          className="stop-button"
         >
           Stop
         </button>

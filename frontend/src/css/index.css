@@ -1,0 +1,12 @@
+/* Global Styles */
+@import './global/index.css';
+
+/* Component Styles */
+@import './components/ChatWindow.css';
+@import './components/VoiceInput.css';
+@import './components/FAQSuggestions.css';
+@import './components/IconDemo.css';
+
+/* Page Styles */
+@import './pages/login.css';
+@import './pages/LanguageSelectionPage.css'; 

@@ -1,0 +1,130 @@
+/* Country Icon Component Styles */
+
+.country-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.country-icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+  filter: brightness(0.9) contrast(1.1);
+}
+
+/* Hover effects */
+.icon-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: #3b82f6;
+}
+
+.icon-circle:hover .country-icon-image {
+  filter: brightness(1) contrast(1.2);
+}
+
+/* Language item specific styling */
+.language-item .country-icon-container {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+
+/* Common languages highlighting */
+.language-item.common .icon-circle {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.language-item.common .country-icon-image {
+  filter: brightness(1) contrast(1.1);
+}
+
+/* Matrix effect highlighting */
+.language-item.highlighted .icon-circle {
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Hover state when language item is hovered */
+.language-item:hover .icon-circle {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+.language-item:hover .country-icon-image {
+  filter: brightness(1) contrast(1.2);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .language-item .country-icon-container {
+    top: 8px;
+    left: 8px;
+  }
+  
+  .icon-circle {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .language-item .country-icon-container {
+    top: 6px;
+    left: 6px;
+  }
+  
+  .icon-circle {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Enhanced visual effects */
+.icon-circle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 14px;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.country-icon-image {
+  position: relative;
+  z-index: 2;
+} 

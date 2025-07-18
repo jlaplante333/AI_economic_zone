@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import '../login.css';
+
 
 function LoginPage() {
   const [username, setUsername] = useState('');

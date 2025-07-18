@@ -19,24 +19,14 @@ function FAQSuggestions({ businessType, onSelect }) {
   const currentFAQs = faqs[businessType] || [];
 
   return (
-    <div style={{ marginTop: '20px' }}>
+    <div className="faq-suggestions">
       <h3>Popular Questions for {businessType} businesses:</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+      <div className="faq-buttons">
         {currentFAQs.map((faq, index) => (
           <button
             key={index}
             onClick={() => onSelect(faq)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #dee2e6',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'background-color 0.3s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#e9ecef'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+            className="faq-button"
           >
             {faq}
           </button>

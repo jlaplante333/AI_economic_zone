@@ -1,0 +1,526 @@
+/* Language Selection Page Styles */
+
+/* Main page container */
+.language-selection-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  position: relative;
+  overflow: auto;
+  padding: 2rem 0;
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Container styles */
+.language-container {
+  text-align: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Logo section */
+.logo-section {
+  margin-bottom: 2rem;
+  animation: logoEntrance 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+/* Welcome text */
+.welcome-text {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Language grid */
+.language-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Language item base styles - Updated to match screenshot */
+.language-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 1;
+  white-space: nowrap;
+  filter: none;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  pointer-events: auto;
+  z-index: 10;
+  user-select: none;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 160px;
+  max-height: 160px;
+  will-change: transform, opacity;
+  backdrop-filter: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 1.1rem;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* Language flag styling is now handled by FlagDisplay component */
+
+/* Language icon styling is now handled by CountryIcon component */
+
+/* Language text below icon */
+.language-text {
+  position: absolute;
+  bottom: 30px;
+  right: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Common languages highlighting */
+.language-item.common {
+  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  color: #1e40af;
+  font-weight: 600;
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Common language icon styling handled by CountryIcon component */
+
+/* Matrix effect highlighting */
+.language-item.highlighted {
+  border: 2px solid #10b981;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  color: #065f46;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3), 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: matrixGlow 2s ease-in-out infinite;
+  transform: scale(1.05);
+  z-index: 20;
+}
+
+/* Highlighted language icon styling handled by CountryIcon component */
+
+/* Hover effects */
+.language-item:hover {
+  opacity: 1;
+  filter: none;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  transform: translateY(-4px) scale(1.05);
+}
+
+.language-item:hover .language-text {
+  color: #ffffff;
+}
+
+/* Hover icon styling handled by CountryIcon component */
+
+.language-item.active .language-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Selection overlay */
+.selection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: none;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.selected-content {
+  text-align: center;
+  color: #1e293b;
+  animation: scaleIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.check-icon {
+  font-size: 4rem;
+  color: #22c55e;
+  margin-bottom: 1rem;
+  animation: bounceIn 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform: translateZ(0);
+}
+
+.selected-title {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.selected-subtitle {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: relative;
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  text-align: center;
+  pointer-events: auto;
+  user-select: none;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  max-width: 280px;
+  width: 280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+}
+
+/* Instruction text */
+.instruction-text {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Animations */
+@keyframes matrixGlow {
+  0%, 100% {
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3), 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+  }
+  50% {
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5), 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes matrixPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes matrixFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1.05);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.08);
+  }
+}
+
+@keyframes logoEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes floatCenter {
+  0%, 100% {
+    transform: scale(1.1) translateY(0);
+  }
+  50% {
+    transform: scale(1.12) translateY(-1px);
+  }
+}
+
+@keyframes floatNear {
+  0%, 100% {
+    transform: scale(0.85) translateY(4px);
+  }
+  50% {
+    transform: scale(0.87) translateY(2px);
+  }
+}
+
+@keyframes floatDistant {
+  0%, 100% {
+    transform: scale(0.6) translateY(15px);
+  }
+  50% {
+    transform: scale(0.62) translateY(13px);
+  }
+}
+
+@keyframes scrollDirectionPulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .welcome-text {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .language-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .language-item {
+    padding: 1.25rem;
+    height: 140px;
+    min-height: 140px;
+    max-height: 140px;
+    font-size: 1rem;
+  }
+  
+  .language-text {
+    font-size: 0.9rem;
+    bottom: 12px;
+    left: 12px;
+  }
+  
+  /* Flag styling handled by FlagDisplay component */
+  
+  /* Icon styling handled by CountryIcon component */
+  
+  .language-item.active .language-text {
+    font-size: 1.1rem;
+  }
+  
+  .selected-content {
+    padding: 2rem;
+  }
+  
+  .selected-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .scroll-indicator {
+    max-width: 90%;
+    width: 90%;
+    margin: 1rem auto 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .language-container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  
+  .welcome-text {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .language-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .language-item {
+    padding: 1rem;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    font-size: 0.9rem;
+  }
+  
+  .language-text {
+    font-size: 0.8rem;
+    bottom: 10px;
+    left: 10px;
+  }
+  
+  /* Flag styling handled by FlagDisplay component */
+  
+  /* Icon styling handled by CountryIcon component */
+  
+  .language-item.active .language-text {
+    font-size: 1rem;
+  }
+  
+  .scroll-indicator {
+    max-width: 95%;
+    width: 95%;
+    margin: 1rem auto 0 auto;
+    padding: 0.8rem;
+  }
+}
+
+/* Prevent layout shifts during scrolling */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize animations */
+.language-item {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+/* Prevent layout shifts during transitions */
+.language-list {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Ensure smooth transitions for all language items */
+.language-item {
+  transform-origin: center center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent any potential flickering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure language list is above any potential overlays */
+.language-list {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure scroll indicator is properly positioned */
+.scroll-indicator {
+  position: relative;
+  z-index: 5;
+  left: 30% !important;
+  transform: translateX(-50%) !important;
+  top: 40px;
+  margin: 0 auto !important;
+} 
