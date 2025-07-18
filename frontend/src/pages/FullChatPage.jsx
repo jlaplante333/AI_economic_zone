@@ -1470,10 +1470,10 @@ function FullChatPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <span style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: '50%',
+                  <div style={{
+                    width: '100%',
+                    height: '120px',
+                    borderRadius: '16px',
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center',
@@ -1485,10 +1485,10 @@ function FullChatPage() {
                     <img
                       src={getBusinessPhoto(option.type)}
                       alt={option.label}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={e => { e.target.style.display = 'none'; e.target.parentNode.appendChild(option.icon); }}
                     />
-                  </span>
+                  </div>
                   <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.3' }}>{option.label}</span>
                 </button>
               ))}

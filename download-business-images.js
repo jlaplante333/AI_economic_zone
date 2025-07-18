@@ -1,185 +1,200 @@
-const https = require('https');
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
-// Business types and their search terms for Unsplash
-const businessTypes = [
-  { type: 'beauty salon', search: 'beauty salon' },
-  { type: 'restaurant', search: 'restaurant interior' },
-  { type: 'retail store', search: 'retail store' },
-  { type: 'coffee shop', search: 'coffee shop' },
-  { type: 'barbershop', search: 'barbershop' },
-  { type: 'bakery', search: 'bakery' },
-  { type: 'gym', search: 'gym equipment' },
-  { type: 'auto repair', search: 'auto repair shop' },
-  { type: 'laundry', search: 'laundry service' },
-  { type: 'pet grooming', search: 'pet grooming' },
-  { type: 'tattoo parlor', search: 'tattoo parlor' },
-  { type: 'nail salon', search: 'nail salon' },
-  { type: 'photography studio', search: 'photography studio' },
-  { type: 'consulting', search: 'business consulting' },
-  { type: 'daycare', search: 'daycare center' },
-  { type: 'cleaning service', search: 'cleaning service' },
-  { type: 'food truck', search: 'food truck' },
-  { type: 'yoga studio', search: 'yoga studio' },
-  { type: 'music school', search: 'music school' },
-  { type: 'dance studio', search: 'dance studio' },
-  { type: 'art gallery', search: 'art gallery' },
-  { type: 'bookstore', search: 'bookstore' },
-  { type: 'florist', search: 'florist shop' },
-  { type: 'jewelry store', search: 'jewelry store' },
-  { type: 'vintage shop', search: 'vintage shop' },
-  { type: 'tech startup', search: 'tech startup office' },
-  { type: 'dental office', search: 'dental office' },
-  { type: 'law firm', search: 'law office' },
-  { type: 'real estate', search: 'real estate office' },
-  { type: 'insurance agency', search: 'insurance office' },
-  { type: 'accounting firm', search: 'accounting office' },
-  { type: 'marketing agency', search: 'marketing agency' },
-  { type: 'web design', search: 'web design office' },
-  { type: 'construction', search: 'construction site' },
-  { type: 'landscaping', search: 'landscaping business' },
-  { type: 'plumbing', search: 'plumbing tools' },
-  { type: 'electrical', search: 'electrical work' },
-  { type: 'HVAC', search: 'HVAC system' },
-  { type: 'roofing', search: 'roofing work' },
-  { type: 'painting', search: 'painting business' },
-  { type: 'carpentry', search: 'carpentry workshop' },
-  { type: 'other', search: 'small business' }
-];
+// Business types and their corresponding search terms
+const businessTypes = {
+  'accounting-firm': 'accounting office',
+  'art-gallery': 'art gallery',
+  'auto-repair': 'auto repair shop',
+  'bakery': 'bakery',
+  'barbershop': 'barbershop',
+  'beauty-salon': 'beauty salon',
+  'bookstore': 'bookstore',
+  'carpentry': 'carpentry workshop',
+  'cleaning-service': 'cleaning service',
+  'coffee-shop': 'coffee shop',
+  'construction': 'construction site',
+  'consulting': 'consulting office',
+  'dance-studio': 'dance studio',
+  'daycare': 'daycare center',
+  'dental-office': 'dental office',
+  'electrical': 'electrical work',
+  'florist': 'florist shop',
+  'food-truck': 'food truck',
+  'gym': 'gym fitness center',
+  'HVAC': 'HVAC technician',
+  'insurance-agency': 'insurance office',
+  'jewelry-store': 'jewelry store',
+  'landscaping': 'landscaping',
+  'laundry': 'laundromat',
+  'law-firm': 'law office',
+  'marketing-agency': 'marketing agency',
+  'music-school': 'music school',
+  'nail-salon': 'nail salon',
+  'other': 'small business',
+  'painting': 'painting contractor',
+  'pet-grooming': 'pet grooming',
+  'photography-studio': 'photography studio',
+  'plumbing': 'plumbing work',
+  'real-estate': 'real estate office',
+  'restaurant': 'restaurant',
+  'retail-store': 'retail store',
+  'roofing': 'roofing work',
+  'tattoo-parlor': 'tattoo parlor',
+  'tech-startup': 'tech startup office',
+  'vintage-shop': 'vintage shop',
+  'web-design': 'web design office',
+  'yoga-studio': 'yoga studio'
+};
 
-const outputDir = 'frontend/src/assets/businessPhoto';
+// Configuration
+const PHOTOS_DIR = './frontend/src/assets/businessPhoto';
 
-// Function to download image with proper redirect handling
-function downloadImage(businessType, index) {
+// Curated high-quality business images from Unsplash (free to use)
+const curatedImages = {
+  'accounting-firm': 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=600&fit=crop',
+  'art-gallery': 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop',
+  'auto-repair': 'https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=800&h=600&fit=crop',
+  'bakery': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop',
+  'barbershop': 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&h=600&fit=crop',
+  'beauty-salon': 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=600&fit=crop',
+  'bookstore': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop',
+  'carpentry': 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop',
+  'cleaning-service': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+  'coffee-shop': 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&h=600&fit=crop',
+  'construction': 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+  'consulting': 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+  'dance-studio': 'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&h=600&fit=crop',
+  'daycare': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+  'dental-office': 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop',
+  'electrical': 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&h=600&fit=crop',
+  'florist': 'https://images.unsplash.com/photo-1562690868-60bbe7293e94?w=800&h=600&fit=crop',
+  'food-truck': 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
+  'gym': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop',
+  'HVAC': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+  'insurance-agency': 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop',
+  'jewelry-store': 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&h=600&fit=crop',
+  'landscaping': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop',
+  'laundry': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+  'law-firm': 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop',
+  'marketing-agency': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop',
+  'music-school': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop',
+  'nail-salon': 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=600&fit=crop',
+  'other': 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
+  'painting': 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=800&h=600&fit=crop',
+  'pet-grooming': 'https://images.unsplash.com/photo-1601758228041-3ca9f8c0f9c6?w=800&h=600&fit=crop',
+  'photography-studio': 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&h=600&fit=crop',
+  'plumbing': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+  'real-estate': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop',
+  'restaurant': 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop',
+  'retail-store': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+  'roofing': 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+  'tattoo-parlor': 'https://images.unsplash.com/photo-1605289355680-75fb41239154?w=800&h=600&fit=crop',
+  'tech-startup': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
+  'vintage-shop': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
+  'web-design': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop',
+  'yoga-studio': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop'
+};
+
+// Alternative URLs for failed downloads
+const alternativeImages = {
+  'food-truck': 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=600&fit=crop',
+  'pet-grooming': 'https://images.unsplash.com/photo-1601758228041-3ca9f8c0f9c6?w=800&h=600&fit=crop'
+};
+
+// Function to download image from URL
+function downloadImage(url, filepath) {
   return new Promise((resolve, reject) => {
-    const fileName = `${businessType.replace(/\s+/g, '-')}.jpg`;
-    const filePath = path.join(outputDir, fileName);
-    
-    // Use a different approach - create simple colored backgrounds with text
-    // This will be more reliable and consistent
-    const canvas = require('canvas');
-    const { createCanvas } = canvas;
-    
-    const width = 400;
-    const height = 400;
-    const canvasInstance = createCanvas(width, height);
-    const ctx = canvasInstance.getContext('2d');
-    
-    // Generate a nice gradient background
-    const colors = [
-      ['#FF6B6B', '#4ECDC4'], // Red to Teal
-      ['#45B7D1', '#96CEB4'], // Blue to Green
-      ['#FFEAA7', '#DDA0DD'], // Yellow to Plum
-      ['#A8E6CF', '#DCEDC8'], // Mint to Light Green
-      ['#FFD93D', '#FF6B6B'], // Yellow to Red
-      ['#6C5CE7', '#A29BFE'], // Purple to Light Purple
-      ['#FD79A8', '#FDCB6E'], // Pink to Orange
-      ['#00B894', '#00CEC9'], // Green to Cyan
-      ['#E17055', '#FDCB6E'], // Orange to Yellow
-      ['#74B9FF', '#0984E3'], // Light Blue to Blue
-      ['#A29BFE', '#6C5CE7'], // Light Purple to Purple
-      ['#FD79A8', '#E84393'], // Pink to Dark Pink
-      ['#00B894', '#00A085'], // Green to Dark Green
-      ['#FDCB6E', '#E17055'], // Yellow to Orange
-      ['#74B9FF', '#55A3FF']  // Light Blue to Blue
-    ];
-    
-    const colorPair = colors[index % colors.length];
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, colorPair[0]);
-    gradient.addColorStop(1, colorPair[1]);
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-    
-    // Add a subtle pattern
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    for (let i = 0; i < 20; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const radius = Math.random() * 30 + 10;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI);
-      ctx.fill();
-    }
-    
-    // Add business type text
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = 'bold 24px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    // Split text into multiple lines if needed
-    const words = businessType.split(' ');
-    const lineHeight = 30;
-    const startY = height / 2 - (words.length - 1) * lineHeight / 2;
-    
-    words.forEach((word, i) => {
-      ctx.fillText(word.charAt(0).toUpperCase() + word.slice(1), width / 2, startY + i * lineHeight);
+    const file = fs.createWriteStream(filepath);
+    https.get(url, (response) => {
+      if (response.statusCode === 200) {
+        response.pipe(file);
+        file.on('finish', () => {
+          file.close();
+          console.log(`✅ Downloaded: ${path.basename(filepath)}`);
+          resolve();
+        });
+      } else {
+        reject(new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`));
+      }
+    }).on('error', (err) => {
+      fs.unlink(filepath, () => {}); // Delete the file if download failed
+      reject(err);
     });
-    
-    // Add a subtle border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, width - 20, height - 20);
-    
-    // Save the canvas as a JPEG file
-    const buffer = canvasInstance.toBuffer('image/jpeg', { quality: 0.9 });
-    fs.writeFileSync(filePath, buffer);
-    
-    console.log(`✅ Created: ${fileName}`);
-    resolve(fileName);
   });
 }
 
-// Main function to create all images
-async function createAllImages() {
-  console.log('🚀 Creating business images...');
-  
-  // Create output directory if it doesn't exist
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+// Function to retry failed downloads
+async function retryFailedDownloads() {
+  console.log('🔄 Starting retry of failed downloads...');
+  let retryCount = 0;
+  const maxRetries = 3;
+  const failedImages = [];
+
+  for (const [filename, imageUrl] of Object.entries(curatedImages)) {
+    try {
+      const filepath = path.join(PHOTOS_DIR, `${filename}.jpg`);
+      await downloadImage(imageUrl, filepath);
+      console.log(`✅ Successfully downloaded ${filename} after retry.`);
+    } catch (error) {
+      console.error(`❌ Failed to download ${filename} after multiple retries:`, error.message);
+      failedImages.push({ filename, imageUrl });
+    }
   }
-  
-  // Check if canvas is available, if not, create simple placeholder files
-  try {
-    require('canvas');
-  } catch (err) {
-    console.log('Canvas not available, creating simple placeholder files...');
-    
-    // Create simple text files as placeholders
-    businessTypes.forEach((business, index) => {
-      const fileName = `${business.type.replace(/\s+/g, '-')}.txt`;
-      const filePath = path.join(outputDir, fileName);
-      const content = `Placeholder for ${business.type} business image.\nIndex: ${index}\nCreated: ${new Date().toISOString()}`;
-      fs.writeFileSync(filePath, content);
-      console.log(`✅ Created placeholder: ${fileName}`);
-    });
-    
-    console.log(`\n📁 Placeholder files created in: ${outputDir}`);
-    console.log('💡 To get actual images, install canvas: npm install canvas');
-    return;
-  }
-  
-  const promises = businessTypes.map((business, index) => 
-    downloadImage(business.type, index)
-      .catch(err => {
-        console.error(`Failed to create ${business.type}:`, err);
-        return null;
-      })
-  );
-  
-  try {
-    const results = await Promise.all(promises);
-    const successful = results.filter(result => result !== null);
-    console.log(`\n🎉 Creation complete! Successfully created ${successful.length}/${businessTypes.length} images.`);
-    console.log(`📁 Images saved to: ${outputDir}`);
-  } catch (err) {
-    console.error('❌ Error during creation:', err);
+
+  if (failedImages.length > 0) {
+    console.log(`\n�� Failed to download ${failedImages.length} images after multiple retries.`);
+    console.log('Attempting to use alternative URLs for these images...');
+
+    for (const { filename, imageUrl } of failedImages) {
+      try {
+        const filepath = path.join(PHOTOS_DIR, `${filename}.jpg`);
+        const alternativeUrl = alternativeImages[filename];
+        if (alternativeUrl) {
+          console.log(`Attempting to download ${filename} from alternative URL: ${alternativeUrl}`);
+          await downloadImage(alternativeUrl, filepath);
+          console.log(`✅ Successfully downloaded ${filename} from alternative URL.`);
+        } else {
+          console.warn(`No alternative URL found for ${filename}. Skipping.`);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to download ${filename} from alternative URL:`, error.message);
+      }
+    }
+  } else {
+    console.log('\n✅ All images downloaded successfully after retries.');
   }
 }
 
-// Run the creation
-createAllImages(); 
+// Main function to download all business images
+async function downloadAllBusinessImages() {
+  console.log('🚀 Starting download of real business images...');
+  
+  // Ensure the directory exists
+  if (!fs.existsSync(PHOTOS_DIR)) {
+    fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+  }
+
+  let successCount = 0;
+  let totalCount = Object.keys(curatedImages).length;
+
+  for (const [filename, imageUrl] of Object.entries(curatedImages)) {
+    try {
+      const filepath = path.join(PHOTOS_DIR, `${filename}.jpg`);
+      await downloadImage(imageUrl, filepath);
+      successCount++;
+      
+      // Add a small delay to be respectful to the server
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error(`❌ Error downloading ${filename}:`, error.message);
+    }
+  }
+  
+  console.log(`\n🎉 Download completed! Successfully downloaded ${successCount}/${totalCount} images.`);
+  console.log(`📁 Images saved to: ${PHOTOS_DIR}`);
+}
+
+// Run the download
+downloadAllBusinessImages().catch(console.error); 
