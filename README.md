@@ -177,6 +177,9 @@ oaklandAI/
 ## 🔧 Configuration
 
 ### Environment Variables (.env)
+
+**Important**: The `.env` file must be placed in the **root directory** of the project. Both frontend and backend are configured to load environment variables from the root directory.
+
 ```env
 # Server Configuration
 PORT=3001
@@ -198,6 +201,34 @@ SPEECH_API_KEY=your_speech_api_key
 # Optional: Translation Service
 TRANSLATION_API_KEY=your_translation_api_key
 ```
+
+### Environment Setup
+
+The project is configured to automatically load environment variables from the root `.env` file. Here's how it works:
+
+1. **Backend**: Uses `dotenv` to load `.env` from the root directory
+2. **Frontend**: Vite is configured to load environment variables from the root directory
+3. **PM2**: Both services are configured to load the `.env` file from the root directory
+
+**Quick Setup**:
+```bash
+# Create .env file in root directory
+cp .env.example .env
+
+# Edit with your configuration
+nano .env
+
+# Test environment loading
+npm run setup
+
+# Start with proper environment loading
+npm run start:all
+```
+
+**Troubleshooting**:
+- If you get environment variable errors, ensure `.env` is in the root directory
+- Use `npm run setup` to verify environment loading
+- Check that all required variables are set in your `.env` file
 
 ### Database Setup (Optional)
 The application works without a database, but for full functionality:

@@ -16,6 +16,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3001
       },
+      // Ensure .env is loaded from root directory
+      env_file: './.env',
       error_file: './logs/backend-error.log',
       out_file: './logs/backend-out.log',
       log_file: './logs/backend-combined.log',
@@ -38,6 +40,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000
       },
+      // Ensure .env is loaded from root directory (relative to frontend cwd)
+      env_file: '../.env',
       error_file: '../logs/frontend-error.log',
       out_file: '../logs/frontend-out.log',
       log_file: '../logs/frontend-combined.log',
