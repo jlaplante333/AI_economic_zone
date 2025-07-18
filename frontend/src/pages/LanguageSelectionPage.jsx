@@ -147,11 +147,30 @@ function LanguageSelectionPage() {
       <div className="language-container">
         <div className="logo-section">
           <div className="logo-text">Oakland AI</div>
+          <div className="logo-subtitle">Multilingual AI Assistant</div>
         </div>
+        
+        {/* Version 2 Button */}
+        {!selectedLanguage && (
+          <div className="version-button-container">
+            <button 
+              className="version-button"
+              onClick={() => navigate('/2')}
+            >
+              Version 2 for Language
+            </button>
+          </div>
+        )}
         
         <div className="welcome-text">
           {selectedLanguage ? selectedLanguage.native : getWelcomeText()}
         </div>
+        
+        {!selectedLanguage && (
+          <div className="welcome-subtitle">
+            Choose your preferred language to get started
+          </div>
+        )}
         
         <div className="language-grid">
           {getVisibleLanguages().map((language, index) => {
