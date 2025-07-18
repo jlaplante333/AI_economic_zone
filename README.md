@@ -27,7 +27,7 @@ A full-stack AI chatbot application built with React frontend and Node.js backen
 1. **Clone the repository**
    ```bash
    git clone https://github.com/alicanacar007/Oakland_AI.git
-   cd oaklandAI
+   cd oakland_AI
    ```
 
 2. **Install dependencies**
