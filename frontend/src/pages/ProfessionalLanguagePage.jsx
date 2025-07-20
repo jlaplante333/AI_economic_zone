@@ -28,21 +28,10 @@ const languages = [
 
 function ProfessionalLanguagePage() {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredLanguages, setFilteredLanguages] = useState(languages);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { changeLanguage } = useLanguage();
   const { theme } = useTheme();
-
-  // Filter languages based on search
-  useEffect(() => {
-    const filtered = languages.filter(lang => 
-      lang.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lang.native.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredLanguages(filtered);
-  }, [searchTerm]);
 
   const handleLanguageSelect = async (language) => {
     setIsLoading(true);
@@ -79,19 +68,10 @@ function ProfessionalLanguagePage() {
       </div>
 
       <div className="container">
-        {/* Header Section */}
-        <header className="header">
-          <div className="logo-section">
-            <div className="logo-icon">🤖</div>
-            <h1 className="logo-text">Oakland AI</h1>
-            <p className="logo-subtitle">Intelligent Multilingual Assistant</p>
-          </div>
-        </header>
-
         {/* Main Content */}
-        <main className="main-content">
+        <main className="main-content" style={{ gap: '1rem' }}>
           <div className="welcome-section">
-            <h2 className="welcome-title">
+            <h2 className="welcome-title" style={{ fontSize: '1.8rem', marginBottom: '0.25rem' }}>
               {selectedLanguage ? `Welcome to ${selectedLanguage.native}` : 'Choose Your Language'}
             </h2>
             <p className="welcome-description">
@@ -101,22 +81,6 @@ function ProfessionalLanguagePage() {
               }
             </p>
           </div>
-
-          {/* Search Bar */}
-          {!selectedLanguage && (
-            <div className="search-section">
-              <div className="search-container">
-                <input
-                  type="text"
-                  placeholder="Search languages..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-                <div className="search-icon">🔍</div>
-              </div>
-            </div>
-          )}
 
           {/* Language Grid */}
           {!selectedLanguage && (
@@ -137,38 +101,19 @@ function ProfessionalLanguagePage() {
               </div>
 
               {/* Other Languages */}
-              {searchTerm === '' && (
-                <div className="other-languages">
-                  <h3 className="section-title">All Languages</h3>
-                  <div className="language-grid">
-                    {getOtherLanguages().map((language) => (
-                      <LanguageCard
-                        key={language.code}
-                        language={language}
-                        onSelect={handleLanguageSelect}
-                        isPriority={false}
-                      />
-                    ))}
-                  </div>
+              <div className="other-languages">
+                <h3 className="section-title">All Languages</h3>
+                <div className="language-grid">
+                  {getOtherLanguages().map((language) => (
+                    <LanguageCard
+                      key={language.code}
+                      language={language}
+                      onSelect={handleLanguageSelect}
+                      isPriority={false}
+                    />
+                  ))}
                 </div>
-              )}
-
-              {/* Search Results */}
-              {searchTerm !== '' && (
-                <div className="search-results">
-                  <h3 className="section-title">Search Results</h3>
-                  <div className="language-grid">
-                    {filteredLanguages.map((language) => (
-                      <LanguageCard
-                        key={language.code}
-                        language={language}
-                        onSelect={handleLanguageSelect}
-                        isPriority={language.priority <= 8}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
 
@@ -180,6 +125,8 @@ function ProfessionalLanguagePage() {
             </div>
           )}
         </main>
+
+
 
         {/* Footer */}
         <footer className="footer">

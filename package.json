@@ -17,7 +17,11 @@
     "pm2:monit": "pm2 monit",
     "dev:all": "npm run start:all && pm2 logs",
     "setup": "node -e \"console.log('Setting up environment...'); require('dotenv').config({ path: require('path').join(__dirname, '.env') }); console.log('Environment loaded successfully');\"",
-    "check-env": "node check-env.js"
+    "check-env": "node check-env.js",
+    "db:migrate": "psql -d oaklandai -f database/schema.sql",
+    "db:reset": "psql -d oaklandai -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\" && npm run db:migrate",
+    "db:setup": "sudo -u postgres psql -f database/setup.sql",
+    "init": "node setup.js"
   },
   "keywords": [],
   "author": "",
@@ -25,12 +29,21 @@
   "description": "",
   "dependencies": {
     "axios": "^1.10.0",
+    "bcryptjs": "^2.4.3",
     "canvas": "^3.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.16.3"
+    "nodemailer": "^6.9.7",
+    "pg": "^8.16.3",
+    "resend": "^2.1.0",
+    "twilio": "^4.19.0",
+    "uuid": "^9.0.1",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

@@ -1684,7 +1684,6 @@ function FullChatPage() {
               background: '#ffffff',
               borderTop: '1px solid #e5e7eb',
               boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
-              position: 'relative',
               minHeight: '60px'
             }}>
               <div 

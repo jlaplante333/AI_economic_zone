@@ -1,356 +1,516 @@
-# Oakland AI Chatbot
+# Oakland AI - Smart Business Assistant
 
-A full-stack AI chatbot application built with React frontend and Node.js backend, designed to provide intelligent responses and FAQ assistance for Oakland, California businesses. The application features multi-language support, business-specific guidance, and a modern, responsive interface.
+A comprehensive AI-powered chatbot designed to help small businesses in Oakland navigate local regulations, permits, and business requirements. Features multi-language support, email/SMS verification, and anonymous analytics for data insights.
 
-## 🌟 Features
+## 🚀 Features
 
-- **Multi-language Support**: Chat in multiple languages with automatic translation
-- **Business-Specific Guidance**: Tailored responses for different business types in Oakland
-- **Voice Input**: Speech-to-text functionality for hands-free interaction
-- **FAQ System**: Dynamic suggestions and intelligent question handling
-- **Responsive Design**: Mobile-first approach with beautiful UI
-- **Real-time Chat**: Instant AI responses with typing indicators
-- **User Authentication**: Secure login/registration system
-- **Analytics Dashboard**: Usage tracking and insights for admins
-- **Business Images**: Visual representation for different business types
+### Core Functionality
+- **Multi-language AI Chatbot** - Support for 50+ languages
+- **Business-Specific Guidance** - Tailored responses for different business types
+- **Voice Input/Output** - Speech-to-text and text-to-speech capabilities
+- **Real-time Translation** - Instant language translation
 
-## 🚀 Quick Start
+### Authentication & Security
+- **User Registration & Login** - Secure JWT-based authentication
+- **Email Verification** - Account verification via email (Resend)
+- **SMS Verification** - Phone number verification (Twilio)
+- **Password Reset** - Secure password recovery system
+- **Admin Panel** - User management and analytics dashboard
+- **Rate Limiting** - Protection against abuse
+- **Security Headers** - Comprehensive security measures
 
-### Prerequisites
-- Node.js (v16 or higher)
-- PostgreSQL database (optional - app works without database)
-- npm or yarn package manager
-- OpenAI API key
+### Analytics & Data
+- **Anonymous Analytics** - Track usage without compromising privacy
+- **User Engagement Metrics** - Detailed user behavior analysis
+- **Business Type Insights** - Industry-specific usage patterns
+- **Language Analytics** - Multi-language usage statistics
+- **Admin Dashboard** - Real-time analytics and user management
 
-### Installation
+## 🛠️ Technology Stack
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/alicanacar007/Oakland_AI.git
-   cd oaklandAI
-   ```
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **PostgreSQL** - Database
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+- **Resend** - Email service
+- **Twilio** - SMS service
+- **OpenAI** - AI chat capabilities
 
-2. **Install dependencies**
-   ```bash
-   # Install root dependencies
-   npm install
-   
-   # Install frontend dependencies
-   cd frontend
-   npm install
-   cd ..
-   ```
+### Frontend
+- **React** - UI framework
+- **Vite** - Build tool
+- **Lucide React** - Icons
+- **Context API** - State management
 
-3. **Set up environment variables**
-   ```bash
-   # Create .env file in root directory
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+## 📋 Prerequisites
 
-4. **Set up database (optional)**
-   ```bash
-   # Run the database schema
-   psql -U your_username -d your_database -f database/schema.sql
-   ```
+- Node.js 18+ 
+- PostgreSQL 12+
+- npm or yarn
+- PM2 (for production)
 
-### Running the Application
+## 🗄️ PostgreSQL Setup
 
-#### Option 1: Run Both Services (Recommended)
+### 1. Install PostgreSQL (macOS)
 ```bash
-# Terminal 1 - Start Backend
-npm start
+# Using Homebrew
+brew install postgresql@15
 
-# Terminal 2 - Start Frontend
+# Start PostgreSQL service
+brew services start postgresql@15
+
+# Verify installation
+psql --version
+```
+
+### 2. Create Database and User
+```bash
+# Connect to PostgreSQL
+psql postgres
+
+# Create database (if it doesn't exist)
+CREATE DATABASE oaklandai;
+
+# Create user
+CREATE USER oaklandai_user WITH PASSWORD 'your_secure_password';
+
+# Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE oaklandai TO oaklandai_user;
+
+# Exit PostgreSQL
+\q
+```
+
+### 3. Run Database Setup
+```bash
+# Option 1: Use the setup script (recommended)
+npm run db:setup
+
+# Option 2: Manual setup
+psql -d oaklandai -f database/schema.sql
+
+# Option 3: Use the automated setup
+sudo -u postgres psql -f database/setup.sql
+```
+
+### 4. Verify Database Setup
+```bash
+# Connect to the database
+psql -U oaklandai_user -d oaklandai
+
+# Check tables
+\dt
+
+# Check if admin user exists
+SELECT email, is_admin FROM users WHERE is_admin = true;
+
+# Exit
+\q
+```
+
+## ⚙️ Environment Configuration
+
+### 1. Create Environment File
+```bash
+# The .env file is already created with template values
+# Update with your actual configuration:
+nano .env
+```
+
+### 2. Required Environment Variables
+
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=oaklandai
+DB_USER=oaklandai_user
+DB_PASSWORD=your_secure_password
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_random
+JWT_EXPIRES_IN=7d
+
+# Email Configuration (Resend - Free Tier)
+EMAIL_SERVICE=resend
+RESEND_API_KEY=your_resend_api_key_here
+EMAIL_FROM=noreply@oaklandai.com
+
+# SMS Configuration (Twilio - Free Trial)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid_here
+TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
+TWILIO_PHONE_NUMBER=your_twilio_phone_number_here
+
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Security
+BCRYPT_ROUNDS=12
+SESSION_SECRET=your_session_secret_here
+
+# Frontend URL
+FRONTEND_URL=http://localhost:3001
+
+# Admin Configuration
+ADMIN_EMAIL=admin@oaklandai.com
+ADMIN_PASSWORD=admin123456
+```
+
+### 3. Third-Party Service Setup
+
+#### Resend (Email Service) - Free Tier
+1. Sign up at [resend.com](https://resend.com)
+2. Get your API key from the dashboard
+3. Add your domain or use the provided sandbox domain
+4. Update `RESEND_API_KEY` in your `.env` file
+
+#### Twilio (SMS Service) - Free Trial
+1. Sign up at [twilio.com](https://twilio.com)
+2. Get your Account SID and Auth Token
+3. Get a phone number for SMS
+4. Update Twilio credentials in your `.env` file
+
+#### OpenAI
+1. Sign up at [openai.com](https://openai.com)
+2. Get your API key
+3. Update `OPENAI_API_KEY` in your `.env` file
+
+## 🚀 Installation & Setup
+
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd oaklandAI
+```
+
+### 2. Install Dependencies
+```bash
+# Install backend dependencies
+npm install
+
+# Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Database Setup
+```bash
+# Run database setup (creates tables, indexes, and admin user)
+npm run db:setup
+
+# Or use the automated setup script
+npm run init
+```
+
+### 4. Initialize Application
+```bash
+# Run the comprehensive setup script
+npm run init
+
+# This will:
+# - Check environment configuration
+# - Verify database connection
+# - Create admin user
+# - Run basic tests
+```
+
+### 5. Start Development Servers
+```bash
+# Start backend server (Terminal 1)
+npm run dev
+
+# Start frontend server (Terminal 2)
 cd frontend
 npm run dev
 ```
 
-#### Option 2: Run with PM2 (Production)
-```bash
-# Start both services with PM2
-npm run pm2:start
+### 6. Access the Application
+- **Frontend**: http://localhost:3001
+- **Backend API**: http://localhost:3000
+- **Health Check**: http://localhost:3000/health
 
-# View logs
-npm run pm2:logs
+### 7. Default Admin Access
+- **Email**: `admin@oaklandai.com`
+- **Password**: `admin123456`
 
-# Monitor processes
-npm run pm2:monit
-```
-
-#### Option 3: Run Services Individually
-```bash
-# Backend only
-npm run dev
-
-# Frontend only
-cd frontend && npm run dev
-```
-
-### Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
-- **Health Check**: http://localhost:3001/health
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 oaklandAI/
-├── backend/                 # Express.js API server
-│   ├── config/             # Configuration files
-│   │   ├── db.js           # Database configuration
-│   │   ├── envLoader.js    # Environment variable loader
-│   │   └── openaiConfig.js # OpenAI configuration
-│   ├── controllers/        # Route controllers
-│   │   ├── authController.js
-│   │   ├── chatController.js
-│   │   └── analyticsController.js
-│   ├── middleware/         # Express middleware
-│   │   └── authMiddleware.js
-│   ├── models/            # Database models
-│   │   ├── User.js
-│   │   ├── ChatLog.js
-│   │   └── FAQInteraction.js
-│   ├── routes/            # API routes
-│   │   ├── authRoutes.js
-│   │   ├── chatRoutes.js
-│   │   └── analyticsRoutes.js
-│   ├── services/          # Business logic services
-│   │   ├── openaiService.js
-│   │   ├── faqService.js
-│   │   ├── speechService.js
-│   │   └── translationService.js
-│   └── index.js           # Server entry point
-├── frontend/              # React application
+├── backend/
+│   ├── config/
+│   │   ├── db.js              # Database configuration
+│   │   ├── envLoader.js       # Environment loader
+│   │   └── openaiConfig.js    # OpenAI configuration
+│   ├── controllers/
+│   │   ├── authController.js  # Authentication logic
+│   │   ├── chatController.js  # Chat functionality
+│   │   └── analyticsController.js # Analytics
+│   ├── middleware/
+│   │   └── authMiddleware.js  # Authentication middleware
+│   ├── models/
+│   │   ├── User.js           # User model
+│   │   ├── ChatLog.js        # Chat logging
+│   │   └── FAQInteraction.js # FAQ tracking
+│   ├── routes/
+│   │   ├── authRoutes.js     # Authentication routes
+│   │   ├── chatRoutes.js     # Chat routes
+│   │   └── analyticsRoutes.js # Analytics routes
+│   ├── services/
+│   │   ├── emailService.js   # Email functionality
+│   │   ├── smsService.js     # SMS functionality
+│   │   ├── openaiService.js  # OpenAI integration
+│   │   └── translationService.js # Translation
+│   └── index.js              # Main server file
+├── frontend/
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   │   ├── ChatWindow.jsx
-│   │   │   ├── FAQSuggestions.jsx
-│   │   │   ├── VoiceInput.jsx
-│   │   │   └── IconDemo.jsx
-│   │   ├── pages/         # Page components
-│   │   │   ├── ChatPage.jsx
-│   │   │   ├── LoginPage.jsx
-│   │   │   ├── AdminPage.jsx
-│   │   │   ├── AITestPage.jsx
-│   │   │   ├── FullChatPage.jsx
-│   │   │   └── LanguageSelectionPage.jsx
-│   │   ├── context/       # React context providers
-│   │   │   ├── LanguageContext.jsx
-│   │   │   └── ThemeContext.jsx
-│   │   ├── themes/        # UI themes
-│   │   │   ├── darkTheme.js
-│   │   │   ├── whiteTheme.js
-│   │   │   ├── beigeTheme.js
-│   │   │   └── index.js
-│   │   ├── language/      # Language files and translations
-│   │   ├── assets/        # Static assets
-│   │   │   └── businessPhoto/ # Business type images (40+ images)
-│   │   ├── App.jsx        # Main application component
-│   │   ├── main.jsx       # App entry point
-│   │   ├── index.css      # Global styles
-│   │   └── login.css      # Login page styles
-│   ├── dist/              # Production build
-│   │   ├── assets/
-│   │   └── index.html
-│   ├── index.html         # HTML template
-│   ├── ICON_GUIDE.md      # Icon usage guide
-│   ├── package.json
-│   ├── package-lock.json
-│   └── vite.config.js
-├── database/              # Database schema and migrations
-│   └── schema.sql
-├── ecosystem.config.js    # PM2 configuration
-├── download-business-images.js # Business image downloader
-├── logs/                  # PM2 log files
-│   ├── backend-combined-0.log
-│   ├── backend-error-0.log
-│   ├── backend-out-0.log
-│   ├── frontend-combined-1.log
-│   ├── frontend-error-1.log
-│   └── frontend-out-1.log
-├── PM2_GUIDE.md          # PM2 deployment guide
-├── RUN.md                # Run instructions
-└── README.md
+│   │   ├── components/       # React components
+│   │   ├── pages/           # Page components
+│   │   ├── context/         # React context
+│   │   ├── css/            # Stylesheets
+│   │   └── main.jsx        # App entry point
+│   └── package.json
+├── database/
+│   ├── schema.sql          # Database schema
+│   └── setup.sql           # Database setup script
+├── .env                    # Environment variables
+├── setup.js               # Setup script
+└── package.json
 ```
 
-## 🔧 Configuration
+## 🔐 Authentication System
 
-### Environment Variables (.env)
+### User Registration Flow
+1. User fills registration form
+2. Account created with email verification token
+3. Verification email sent via Resend
+4. SMS verification code sent (if phone provided)
+5. User verifies email/SMS
+6. Welcome email sent
+7. User can now login
 
-**Important**: The `.env` file must be placed in the **root directory** of the project. Both frontend and backend are configured to load environment variables from the root directory.
+### Login Flow
+1. User enters credentials
+2. Password verified with bcrypt
+3. Account lockout after 5 failed attempts
+4. JWT token generated on success
+5. Last login updated
 
-```env
-# Server Configuration
-PORT=3001
-NODE_ENV=development
+### Password Reset Flow
+1. User requests password reset
+2. Reset token generated and stored
+3. Reset email sent with link
+4. User clicks link and sets new password
+5. Token invalidated after use
 
-# Database Configuration (optional)
-DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+## 📊 Analytics & Data Privacy
 
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
+### Anonymous Analytics
+- Chat logs stored with anonymous IDs for unauthenticated users
+- No personal information collected without consent
+- Business type and language preferences tracked
+- Session-based analytics for insights
 
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-3.5-turbo
+### Admin Dashboard
+- Real-time user statistics
+- Business type distribution
+- Language usage patterns
+- User engagement metrics
+- Recent activity feed
 
-# Optional: Speech Service
-SPEECH_API_KEY=your_speech_api_key
+### Data Retention
+- Chat logs retained for 1 year by default
+- User accounts can be deleted by admins
+- Anonymous data automatically cleaned up
 
-# Optional: Translation Service
-TRANSLATION_API_KEY=your_translation_api_key
-```
+## 🚀 Production Deployment
 
-### Environment Setup
-
-The project is configured to automatically load environment variables from the root `.env` file. Here's how it works:
-
-1. **Backend**: Uses `dotenv` to load `.env` from the root directory
-2. **Frontend**: Vite is configured to load environment variables from the root directory
-3. **PM2**: Both services are configured to load the `.env` file from the root directory
-
-**Quick Setup**:
-```bash
-# Create .env file in root directory
-cp .env.example .env
-
-# Edit with your configuration
-nano .env
-
-# Test environment loading
-npm run setup
-
-# Start with proper environment loading
-npm run start:all
-```
-
-**Troubleshooting**:
-- If you get environment variable errors, ensure `.env` is in the root directory
-- Use `npm run setup` to verify environment loading
-- Check that all required variables are set in your `.env` file
-
-### Database Setup (Optional)
-The application works without a database, but for full functionality:
-1. Install PostgreSQL
-2. Create a database
-3. Run the schema file: `database/schema.sql`
-
-## 🛠️ Development
-
-### Available Scripts
-
-**Root Directory:**
-- `npm start` - Start backend server
-- `npm test` - Run all tests
-- `npm run dev` - Start backend in development mode
-- `npm run pm2:start` - Start both services with PM2
-- `npm run pm2:stop` - Stop PM2 services
-- `npm run pm2:restart` - Restart PM2 services
-- `npm run pm2:logs` - View PM2 logs
-- `npm run pm2:status` - Check PM2 status
-- `npm run pm2:monit` - Monitor PM2 processes
-
-**Frontend:**
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-
-### API Endpoints
-
-#### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
-
-#### Chat
-- `POST /api/chat/message` - Send chat message
-- `GET /api/chat/history` - Get chat history
-
-#### Analytics
-- `GET /api/analytics/usage` - Get usage analytics (admin)
-
-#### Health
-- `GET /health` - Health check
-- `GET /api/ai/status` - AI service status
-
-## 🎨 UI Features
-
-### Multi-language Support
-- Language selection page
-- Automatic translation
-- Support for multiple languages
-- Context-aware responses
-
-### Business-Specific Features
-- 40+ business type images
-- Tailored responses for different business types
-- Oakland-specific business guidance
-- Certification and licensing information
-
-### Modern UI Components
-- Responsive design
-- Dark/light/beige themes
-- Voice input with visual feedback
-- FAQ suggestions
-- Real-time chat interface
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run frontend tests
-cd frontend && npm test
-
-# Run backend tests
-cd backend && npm test
-```
-
-## 📦 Deployment
-
-### Frontend Deployment
-```bash
-cd frontend
-npm run build
-# Deploy the dist/ folder to your hosting service
-```
-
-### Backend Deployment
-```bash
-# Install production dependencies
-npm install --production
-
-# Start with PM2
-npm run pm2:start
-
-# Or deploy to your server (Heroku, AWS, etc.)
-```
-
-### PM2 Deployment
+### Using PM2
 ```bash
 # Install PM2 globally
 npm install -g pm2
 
-# Start the application
-pm2 start ecosystem.config.js
+# Start all services
+npm run pm2:start
 
-# Monitor the application
-pm2 monit
+# Monitor processes
+npm run pm2:monit
 
 # View logs
-pm2 logs
+npm run pm2:logs
+```
+
+### Environment Setup
+```bash
+# Set production environment
+NODE_ENV=production
+
+# Use production database
+DB_HOST=your_production_db_host
+DB_PASSWORD=your_production_db_password
+
+# Configure production URLs
+FRONTEND_URL=https://yourdomain.com
+```
+
+### Security Checklist
+- [ ] Change default admin password
+- [ ] Use strong JWT secret
+- [ ] Configure HTTPS
+- [ ] Set up proper CORS origins
+- [ ] Enable rate limiting
+- [ ] Configure firewall rules
+- [ ] Set up monitoring and logging
+
+## 🧪 Testing
+
+### Manual Testing
+```bash
+# Test database connection
+psql -U oaklandai_user -d oaklandai -c "SELECT 1;"
+
+# Test backend health
+curl http://localhost:3000/health
+
+# Test registration
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123","firstName":"Test","lastName":"User"}'
+```
+
+### Automated Testing
+```bash
+# Run backend tests
+npm test
+
+# Run specific test files
+npm test -- authController.test.js
+```
+
+## 📝 API Documentation
+
+### Authentication Endpoints
+
+#### POST /api/auth/register
+Register a new user account
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "language": "en",
+  "businessType": "restaurant"
+}
+```
+
+#### POST /api/auth/login
+Login to existing account
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123"
+}
+```
+
+#### GET /api/auth/verify-email/:token
+Verify email address
+
+#### POST /api/auth/forgot-password
+Request password reset
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+#### POST /api/auth/reset-password
+Reset password with token
+```json
+{
+  "token": "reset_token_here",
+  "password": "newpassword123"
+}
+```
+
+### Chat Endpoints
+
+#### POST /api/chat/message
+Send a chat message
+```json
+{
+  "message": "How do I get a business license?",
+  "businessType": "restaurant",
+  "language": "en"
+}
+```
+
+### Analytics Endpoints (Admin Only)
+
+#### GET /api/analytics/stats
+Get analytics statistics
+
+#### GET /api/analytics/users
+Get user management data
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Database Connection
+```bash
+# Check PostgreSQL status
+brew services list | grep postgresql
+
+# Test connection
+psql -U oaklandai_user -d oaklandai -c "SELECT 1;"
+
+# Restart PostgreSQL if needed
+brew services restart postgresql@15
+```
+
+#### Port Conflicts
+```bash
+# Check what's using port 3000
+lsof -i :3000
+
+# Kill process if needed
+kill -9 <PID>
+```
+
+#### Environment Variables
+```bash
+# Check if .env is loaded
+npm run check-env
+
+# Verify environment setup
+npm run setup
+```
+
+### Logs
+```bash
+# Backend logs
+npm run pm2:logs
+
+# Database logs
+tail -f /opt/homebrew/var/log/postgresql@15.log
 ```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch
 3. Make your changes
 4. Add tests if applicable
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+5. Submit a pull request
 
 ## 📄 License
 
@@ -358,17 +518,27 @@ This project is licensed under the ISC License.
 
 ## 🆘 Support
 
-For issues and questions:
-1. Check the documentation
-2. Search existing issues
-3. Create a new issue with detailed information
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
 
-## 🔗 Links
+## 🔄 Updates & Maintenance
 
-- **Repository**: https://github.com/alicanacar007/Oakland_AI
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
+### Regular Maintenance Tasks
+- Monitor database performance
+- Clean up old chat logs
+- Update dependencies
+- Review security settings
+- Backup database regularly
+
+### Monitoring
+- Server health checks
+- Database connection monitoring
+- API response times
+- Error rate tracking
+- User engagement metrics
 
 ---
 
-**Note**: Make sure both frontend and backend are running for the full application to work properly. The application can run without a database for basic functionality. 
+**Note**: This project is now fully configured with a complete authentication system, PostgreSQL database, and production-ready setup. The FullChatPage requires login, and you have comprehensive admin functionality for user management and analytics. 
