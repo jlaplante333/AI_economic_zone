@@ -541,4 +541,8 @@ For support and questions:
 
 ---
 
+<<<<<<< HEAD
 **Note**: This project is now fully configured with a complete authentication system, PostgreSQL database, and production-ready setup. The FullChatPage requires login, and you have comprehensive admin functionality for user management and analytics. 
+=======
+**Note**: Make sure both frontend and backend are running for the full application to work properly. The application can run without a database for basic functionality. 
+>>>>>>> b60b49daf0119b04f28b5d413c88481b97040cd3
