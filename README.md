@@ -110,6 +110,287 @@ SELECT email, is_admin FROM users WHERE is_admin = true;
 \q
 ```
 
+## 🗄️ Database Blueprint
+
+### Database Architecture Overview
+
+The Oakland AI database is designed as a comprehensive PostgreSQL system supporting user authentication, chat functionality, analytics, and admin management while maintaining user privacy through anonymous tracking.
+
+### 📋 Core Tables Structure
+
+```
+┌─────────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+│     users       │    │ email_verifications │    │ sms_verifications   │
+├─────────────────┤    ├─────────────────────┤    ├─────────────────────┤
+│ id (PK)         │    │ id (PK)             │    │ id (PK)             │
+│ email (UQ)      │◄───┤ user_id (FK)        │    │ user_id (FK)        │
+│ password_hash   │    │ email               │    │ phone               │
+│ first_name      │    │ token               │    │ code                │
+│ last_name       │    │ expires_at          │    │ expires_at          │
+│ phone           │    │ verified_at         │    │ verified_at         │
+│ language        │    │ created_at          │    │ created_at          │
+│ business_type   │    └─────────────────────┘    └─────────────────────┘
+│ is_verified     │
+│ is_admin        │
+│ ...             │
+└─────────────────┘
+        │
+        ▼
+┌─────────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+│   chat_logs     │    │ faq_interactions    │    │  user_sessions      │
+├─────────────────┤    ├─────────────────────┤    ├─────────────────────┤
+│ id (PK)         │    │ id (PK)             │    │ id (PK)             │
+│ user_id (FK)    │    │ user_id (FK)        │    │ user_id (FK)        │
+│ anonymous_id    │    │ anonymous_id        │    │ session_token (UQ)  │
+│ message         │    │ faq_question        │    │ ip_address          │
+│ response        │    │ business_type       │    │ user_agent          │
+│ business_type   │    │ language            │    │ expires_at          │
+│ language        │    │ session_id          │    │ created_at          │
+│ session_id      │    │ clicked_at          │    └─────────────────────┘
+│ ip_address      │    └─────────────────────┘
+│ user_agent      │
+│ created_at      │
+└─────────────────┘
+        │
+        ▼
+┌─────────────────┐    ┌─────────────────────┐
+│analytics_events │    │  admin_audit_log    │
+├─────────────────┤    ├─────────────────────┤
+│ id (PK)         │    │ id (PK)             │
+│ user_id (FK)    │    │ admin_user_id (FK)  │
+│ anonymous_id    │    │ action              │
+│ event_type      │    │ target_type         │
+│ event_data      │    │ target_id           │
+│ business_type   │    │ details             │
+│ language        │    │ ip_address          │
+│ session_id      │    │ created_at          │
+│ ip_address      │    └─────────────────────┘
+│ user_agent      │
+│ created_at      │
+└─────────────────┘
+```
+
+### 🗂️ Table Details
+
+#### 1. Users Table (`users`)
+**Purpose**: Core user account management with authentication and profile data
+
+**Key Features**:
+- **Email-based authentication** with unique constraint
+- **Password hashing** using bcrypt (12 rounds)
+- **Multi-language support** with default 'en'
+- **Business type categorization** for targeted responses
+- **Admin flag** for role-based access control
+- **Account verification** system
+- **Security features**: login attempts, account locking, password reset
+
+#### 2. Email Verifications (`email_verifications`)
+**Purpose**: Email verification workflow management
+- **Token-based verification** with expiration
+- **Cascade deletion** when user is deleted
+- **Audit trail** of verification attempts
+
+#### 3. SMS Verifications (`sms_verifications`)
+**Purpose**: Phone number verification via SMS
+- **Code-based verification** (6-digit codes)
+- **Expiration handling** for security
+- **Multiple attempts tracking**
+
+#### 4. Chat Logs (`chat_logs`)
+**Purpose**: Store chat interactions with anonymous analytics support
+- **Dual tracking**: authenticated users + anonymous users
+- **Business context**: business_type for targeted analytics
+- **Language tracking**: for multi-language analytics
+- **Session management**: session_id for conversation flow
+- **Privacy protection**: anonymous_id for unauthenticated users
+
+#### 5. FAQ Interactions (`faq_interactions`)
+**Purpose**: Track FAQ usage and effectiveness
+- **Click tracking** for FAQ suggestions
+- **Business-specific** FAQ analytics
+- **Anonymous user** support
+
+#### 6. User Sessions (`user_sessions`)
+**Purpose**: Active session management for security
+- **JWT token storage** for session validation
+- **IP tracking** for security monitoring
+- **Automatic expiration** handling
+- **Device fingerprinting** via user_agent
+
+#### 7. Analytics Events (`analytics_events`)
+**Purpose**: Comprehensive user behavior tracking
+- **JSONB storage** for flexible event data
+- **Anonymous tracking** for privacy compliance
+- **Business context** for targeted insights
+
+#### 8. Admin Audit Log (`admin_audit_log`)
+**Purpose**: Admin action tracking for security and compliance
+- **Action logging** for all admin operations
+- **Target tracking** for specific operations
+- **IP and timestamp** recording
+
+### 🔗 Relationships & Constraints
+
+#### Foreign Key Relationships
+```sql
+-- Email verifications → Users
+email_verifications.user_id → users.id (CASCADE)
+
+-- SMS verifications → Users  
+sms_verifications.user_id → users.id (CASCADE)
+
+-- Chat logs → Users
+chat_logs.user_id → users.id (SET NULL)
+
+-- FAQ interactions → Users
+faq_interactions.user_id → users.id (SET NULL)
+
+-- User sessions → Users
+user_sessions.user_id → users.id (CASCADE)
+
+-- Analytics events → Users
+analytics_events.user_id → users.id (SET NULL)
+
+-- Admin audit log → Users
+admin_audit_log.admin_user_id → users.id (SET NULL)
+```
+
+#### Unique Constraints
+- `users.email` - Email uniqueness
+- `user_sessions.session_token` - Session token uniqueness
+
+### 📈 Performance Optimization
+
+#### Indexes Strategy
+```sql
+-- User lookup optimization
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_is_verified ON users(is_verified);
+CREATE INDEX idx_users_is_admin ON users(is_admin);
+
+-- Chat analytics optimization
+CREATE INDEX idx_chat_logs_user_id ON chat_logs(user_id);
+CREATE INDEX idx_chat_logs_anonymous_id ON chat_logs(anonymous_id);
+CREATE INDEX idx_chat_logs_created_at ON chat_logs(created_at);
+CREATE INDEX idx_chat_logs_business_type ON chat_logs(business_type);
+CREATE INDEX idx_chat_logs_language ON chat_logs(language);
+
+-- FAQ analytics optimization
+CREATE INDEX idx_faq_interactions_user_id ON faq_interactions(user_id);
+CREATE INDEX idx_faq_interactions_anonymous_id ON faq_interactions(anonymous_id);
+CREATE INDEX idx_faq_interactions_clicked_at ON faq_interactions(clicked_at);
+
+-- Session management optimization
+CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX idx_user_sessions_token ON user_sessions(session_token);
+
+-- Analytics optimization
+CREATE INDEX idx_analytics_events_user_id ON analytics_events(user_id);
+CREATE INDEX idx_analytics_events_anonymous_id ON analytics_events(anonymous_id);
+CREATE INDEX idx_analytics_events_event_type ON analytics_events(event_type);
+CREATE INDEX idx_analytics_events_created_at ON analytics_events(created_at);
+
+-- Admin audit optimization
+CREATE INDEX idx_admin_audit_log_admin_user_id ON admin_audit_log(admin_user_id);
+CREATE INDEX idx_admin_audit_log_created_at ON admin_audit_log(created_at);
+```
+
+### 🔒 Security & Privacy Design
+
+#### Privacy Protection
+1. **Anonymous Tracking**: Unauthenticated users tracked via `anonymous_id`
+2. **Data Anonymization**: Personal data separated from analytics
+3. **Session Isolation**: Each session has unique identifier
+4. **Audit Trail**: All admin actions logged for compliance
+
+#### Security Features
+1. **Password Security**: bcrypt hashing with 12 rounds
+2. **Account Lockout**: After 5 failed login attempts
+3. **Token Expiration**: All verification tokens expire
+4. **Session Management**: Secure session tokens with expiration
+5. **IP Tracking**: Monitor for suspicious activity
+
+#### Data Retention
+- **Chat logs**: 1 year retention (configurable)
+- **Sessions**: Automatic cleanup of expired sessions
+- **Verification tokens**: Immediate cleanup after use
+- **Analytics**: Anonymous data retained for insights
+
+### 📊 Analytics & Reporting
+
+#### Key Metrics Tracked
+1. **User Engagement**
+   - Daily/Monthly active users
+   - Session duration
+   - Chat frequency
+
+2. **Business Insights**
+   - Popular questions by business type
+   - Language preferences
+   - FAQ effectiveness
+
+3. **System Performance**
+   - Response times
+   - Error rates
+   - User satisfaction
+
+#### Sample Analytics Queries
+
+##### User Analytics
+```sql
+-- Daily active users
+SELECT 
+    DATE(created_at) as date,
+    COUNT(DISTINCT user_id) as authenticated_users,
+    COUNT(DISTINCT anonymous_id) as anonymous_users
+FROM analytics_events 
+WHERE event_type = 'chat_start'
+GROUP BY DATE(created_at)
+ORDER BY date DESC;
+```
+
+##### Business Type Analysis
+```sql
+-- Popular questions by business type
+SELECT 
+    business_type,
+    COUNT(*) as question_count,
+    COUNT(DISTINCT user_id) as unique_users
+FROM chat_logs 
+WHERE business_type IS NOT NULL
+GROUP BY business_type
+ORDER BY question_count DESC;
+```
+
+##### Language Usage
+```sql
+-- Language distribution
+SELECT 
+    language,
+    COUNT(*) as usage_count,
+    COUNT(DISTINCT user_id) as unique_users
+FROM chat_logs 
+GROUP BY language
+ORDER BY usage_count DESC;
+```
+
+### 🚀 Scalability Considerations
+
+#### Horizontal Scaling
+- **Read Replicas**: Analytics queries on separate instances
+- **Sharding**: Business type-based sharding for large datasets
+- **Caching**: Redis for session management and frequent queries
+
+#### Vertical Scaling
+- **Connection Pooling**: pgBouncer for connection management
+- **Query Optimization**: Regular query analysis and optimization
+- **Index Maintenance**: Regular index rebuilding and statistics updates
+
+#### Data Archiving
+- **Partitioning**: Time-based partitioning for large tables
+- **Archiving**: Move old data to cheaper storage
+- **Compression**: Compress historical data
+
 ## ⚙️ Environment Configuration
 
 ### 1. Create Environment File
