@@ -42,13 +42,7 @@ function ProfessionalLanguagePage() {
     }, 500);
   };
 
-  const getPriorityLanguages = () => {
-    return languages.filter(lang => lang.priority <= 5);
-  };
 
-  const getOtherLanguages = () => {
-    return languages.filter(lang => lang.priority > 5);
-  };
 
   return (
     <div className="professional-language-page">
@@ -79,31 +73,14 @@ function ProfessionalLanguagePage() {
           {/* Language Grid */}
           {!selectedLanguage && (
             <div className="language-section">
-              {/* Priority Languages */}
-              <div className="priority-languages">
-                <h3 className="section-title">Most Common Languages</h3>
-                <div className="language-grid priority-grid">
-                  {getPriorityLanguages().map((language) => (
-                    <LanguageCard
-                      key={language.code}
-                      language={language}
-                      onSelect={handleLanguageSelect}
-                      isPriority={true}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Other Languages */}
-              <div className="other-languages">
-                <h3 className="section-title">Additional Languages</h3>
+              <div className="all-languages">
+                <h3 className="section-title">Select Your Language</h3>
                 <div className="language-grid">
-                  {getOtherLanguages().map((language) => (
+                  {languages.map((language) => (
                     <LanguageCard
                       key={language.code}
                       language={language}
                       onSelect={handleLanguageSelect}
-                      isPriority={false}
                     />
                   ))}
                 </div>
@@ -134,12 +111,12 @@ function ProfessionalLanguagePage() {
 }
 
 // Language Card Component
-function LanguageCard({ language, onSelect, isPriority }) {
+function LanguageCard({ language, onSelect }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className={`language-card ${isPriority ? 'priority' : ''} ${isHovered ? 'hovered' : ''}`}
+      className={`language-card ${isHovered ? 'hovered' : ''}`}
       onClick={() => onSelect(language)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

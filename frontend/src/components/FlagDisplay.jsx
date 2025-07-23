@@ -3,12 +3,20 @@ import React from 'react';
 const FlagDisplay = ({ countryCode, className = '' }) => {
   // Flag image mapping - using realistic flag PNGs with higher resolution
   const flagImages = {
+    // Oakland-specific languages
     'en': 'https://flagcdn.com/w320/us.png',
+    'vi': 'https://flagcdn.com/w320/vn.png',
+    'ar': 'https://flagcdn.com/w320/sa.png',
+    'mam': 'https://flagcdn.com/w320/gt.png', // Mam is spoken in Guatemala
     'es': 'https://flagcdn.com/w320/es.png',
     'zh': 'https://flagcdn.com/w320/cn.png',
-    'vi': 'https://flagcdn.com/w320/vn.png',
+    'prs': 'https://flagcdn.com/w320/af.png', // Dari is spoken in Afghanistan
+    'lo': 'https://flagcdn.com/w320/la.png', // Lao is the official language of Laos
+    'ti': 'https://flagcdn.com/w320/er.png', // Tigrinya is spoken in Eritrea
+    'km': 'https://flagcdn.com/w320/kh.png', // Khmer is spoken in Cambodia
+    
+    // Additional languages for fallback
     'tl': 'https://flagcdn.com/w320/ph.png',
-    'ar': 'https://flagcdn.com/w320/sa.png',
     'ko': 'https://flagcdn.com/w320/kr.png',
     'hi': 'https://flagcdn.com/w320/in.png',
     'th': 'https://flagcdn.com/w320/th.png',
