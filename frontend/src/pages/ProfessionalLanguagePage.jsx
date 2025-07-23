@@ -6,24 +6,18 @@ import FlagDisplay from '../components/FlagDisplay';
 import '../css/pages/ProfessionalLanguagePage.css';
 import '../css/components/FlagDisplay.css';
 
-// Curated language data with AI-optimized selection
+// Updated language data with Oakland-specific selection
 const languages = [
   { code: 'en', name: 'English', native: 'English', priority: 1 },
-  { code: 'es', name: 'Spanish', native: 'Español', priority: 2 },
-  { code: 'zh', name: 'Chinese', native: '中文', priority: 3 },
-  { code: 'ar', name: 'Arabic', native: 'العربية', priority: 4 },
-  { code: 'hi', name: 'Hindi', native: 'हिन्दी', priority: 5 },
-  { code: 'fr', name: 'French', native: 'Français', priority: 6 },
-  { code: 'de', name: 'German', native: 'Deutsch', priority: 7 },
-  { code: 'ja', name: 'Japanese', native: '日本語', priority: 8 },
-  { code: 'ko', name: 'Korean', native: '한국어', priority: 9 },
-  { code: 'pt', name: 'Portuguese', native: 'Português', priority: 10 },
-  { code: 'ru', name: 'Russian', native: 'Русский', priority: 11 },
-  { code: 'it', name: 'Italian', native: 'Italiano', priority: 12 },
-  { code: 'tr', name: 'Turkish', native: 'Türkçe', priority: 13 },
-  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt', priority: 14 },
-  { code: 'th', name: 'Thai', native: 'ไทย', priority: 15 },
-  { code: 'nl', name: 'Dutch', native: 'Nederlands', priority: 16 },
+  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt', priority: 2 },
+  { code: 'ar', name: 'Arabic', native: 'العربية', priority: 3 },
+  { code: 'mam', name: 'Mam', native: 'Mam', priority: 4 },
+  { code: 'es', name: 'Spanish', native: 'Español', priority: 5 },
+  { code: 'zh', name: 'Chinese', native: '中文', priority: 6 },
+  { code: 'prs', name: 'Dari', native: 'دری', priority: 7 },
+  { code: 'lo', name: 'Laos', native: 'ລາວ', priority: 8 },
+  { code: 'ti', name: 'Tigrinya', native: 'ትግርኛ', priority: 9 },
+  { code: 'km', name: 'Khmer', native: 'ខ្មែរ', priority: 10 },
 ];
 
 function ProfessionalLanguagePage() {
@@ -49,11 +43,11 @@ function ProfessionalLanguagePage() {
   };
 
   const getPriorityLanguages = () => {
-    return languages.filter(lang => lang.priority <= 8);
+    return languages.filter(lang => lang.priority <= 5);
   };
 
   const getOtherLanguages = () => {
-    return languages.filter(lang => lang.priority > 8);
+    return languages.filter(lang => lang.priority > 5);
   };
 
   return (
@@ -87,7 +81,7 @@ function ProfessionalLanguagePage() {
             <div className="language-section">
               {/* Priority Languages */}
               <div className="priority-languages">
-                <h3 className="section-title">Popular Languages</h3>
+                <h3 className="section-title">Most Common Languages</h3>
                 <div className="language-grid priority-grid">
                   {getPriorityLanguages().map((language) => (
                     <LanguageCard
@@ -102,7 +96,7 @@ function ProfessionalLanguagePage() {
 
               {/* Other Languages */}
               <div className="other-languages">
-                <h3 className="section-title">All Languages</h3>
+                <h3 className="section-title">Additional Languages</h3>
                 <div className="language-grid">
                   {getOtherLanguages().map((language) => (
                     <LanguageCard
