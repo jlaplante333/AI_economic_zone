@@ -45,45 +45,59 @@ function ProfessionalLanguagePage() {
 
 
   return (
-    <div className="professional-language-page">
-      {/* Animated Background */}
-      <div className="background-animation">
-        <div className="floating-shapes">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className={`shape shape-${i + 1}`}></div>
-          ))}
+    <div className="main-container">
+      {/* Left side - Welcome section */}
+      <div className="welcome-section">
+        <div className="logo-section">
+          <div className="logo-text" style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #22c55e 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.02em'
+          }}>Oakland AI</div>
         </div>
+        
+        <h1 className="main-heading">
+          Smart help for<br />
+          small businesses<br />
+          in Oakland.
+        </h1>
+        <p className="sub-heading">
+          Speak your language.<br />
+          Get answers. No paperwork.
+        </p>
+        <p style={{ color: '#64748b', fontSize: '16px' }}>
+          Choose your preferred language to get started
+        </p>
       </div>
 
-      <div className="container">
-        {/* Main Content */}
-        <main className="main-content" style={{ gap: '1rem' }}>
-          <div className="welcome-section">
-            <h2 className="welcome-title" style={{ fontSize: '1.8rem', marginBottom: '0.25rem' }}>
-              {selectedLanguage ? `Welcome to ${selectedLanguage.native}` : 'Choose Your Language'}
-            </h2>
-            <p className="welcome-description">
-              {selectedLanguage 
-                ? 'Preparing your personalized AI experience...' 
-                : 'Select your preferred language to begin your AI-powered journey'
-              }
-            </p>
-          </div>
+      {/* Right side - Language selection section */}
+      <div className="login-section">
+        <div className="login-container">
+          <h2 className="login-title">
+            {selectedLanguage ? `Welcome to ${selectedLanguage.native}` : 'Choose Your Language'}
+          </h2>
+          <p className="login-subtitle">
+            {selectedLanguage 
+              ? 'Preparing your personalized AI experience...' 
+              : 'Select your preferred language to begin your AI-powered journey'
+            }
+          </p>
 
           {/* Language Grid */}
           {!selectedLanguage && (
-            <div className="language-section">
-              <div className="all-languages">
-                <h3 className="section-title">Select Your Language</h3>
-                <div className="language-grid">
-                  {languages.map((language) => (
-                    <LanguageCard
-                      key={language.code}
-                      language={language}
-                      onSelect={handleLanguageSelect}
-                    />
-                  ))}
-                </div>
+            <div className="language-grid-container">
+              <div className="language-grid">
+                {languages.map((language) => (
+                  <LanguageCard
+                    key={language.code}
+                    language={language}
+                    onSelect={handleLanguageSelect}
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -95,16 +109,7 @@ function ProfessionalLanguagePage() {
               <p className="loading-text">Configuring AI for {selectedLanguage?.native}...</p>
             </div>
           )}
-        </main>
-
-
-
-        {/* Footer */}
-        <footer className="footer">
-          <p className="footer-text">
-            Powered by Advanced AI Technology • Secure & Private
-          </p>
-        </footer>
+        </div>
       </div>
     </div>
   );
@@ -116,22 +121,51 @@ function LanguageCard({ language, onSelect }) {
 
   return (
     <div
-      className={`language-card ${isHovered ? 'hovered' : ''}`}
+      className="language-card"
       onClick={() => onSelect(language)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{
+        background: isHovered ? 'rgba(59, 130, 246, 0.1)' : 'rgba(15, 23, 42, 0.8)',
+        border: isHovered ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(148, 163, 184, 0.15)',
+        borderRadius: '12px',
+        padding: '16px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        marginBottom: '8px'
+      }}
     >
-      <div className="card-content">
-        <div className="flag-section">
-          <FlagDisplay countryCode={language.code} />
-        </div>
-        <div className="language-info">
-          <h4 className="language-name">{language.native}</h4>
-          <p className="language-english">{language.name}</p>
-        </div>
-        <div className="select-indicator">
-          <div className="arrow">→</div>
-        </div>
+      <div style={{ flexShrink: 0 }}>
+        <FlagDisplay countryCode={language.code} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <h4 style={{ 
+          margin: 0, 
+          fontSize: '16px', 
+          fontWeight: '600', 
+          color: '#f1f5f9',
+          marginBottom: '4px'
+        }}>
+          {language.native}
+        </h4>
+        <p style={{ 
+          margin: 0, 
+          fontSize: '14px', 
+          color: '#94a3b8'
+        }}>
+          {language.name}
+        </p>
+      </div>
+      <div style={{ 
+        color: isHovered ? '#3b82f6' : '#64748b',
+        fontSize: '18px',
+        fontWeight: '600',
+        transition: 'color 0.2s ease'
+      }}>
+        →
       </div>
     </div>
   );
