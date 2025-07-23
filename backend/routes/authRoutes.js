@@ -16,6 +16,12 @@ router.post('/register',
   authController.register
 );
 
+router.post('/signup', 
+  registerRateLimit,
+  authController.registerValidation,
+  authController.register
+);
+
 router.post('/login', 
   authRateLimit,
   authController.loginValidation,

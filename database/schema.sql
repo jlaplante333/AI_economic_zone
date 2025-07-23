@@ -1,6 +1,6 @@
 -- Oakland AI Chatbot Database Schema
 
--- Users table with enhanced authentication
+-- Users table with enhanced authentication and comprehensive business profile
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
@@ -10,6 +10,30 @@ CREATE TABLE users (
   phone TEXT,
   language TEXT DEFAULT 'en',
   business_type TEXT,
+  
+  -- Address fields (optional)
+  address_line1 TEXT,
+  address_line2 TEXT,
+  city TEXT,
+  state TEXT,
+  zip_code TEXT,
+  
+  -- Demographics (optional)
+  age INTEGER,
+  ethnicity TEXT,
+  gender TEXT,
+  
+  -- Business details (optional)
+  employee_count INTEGER,
+  years_in_business INTEGER,
+  corporation_type TEXT,
+  
+  -- Financial information (optional)
+  annual_revenue_2022 DECIMAL(15,2),
+  annual_revenue_2023 DECIMAL(15,2),
+  annual_revenue_2024 DECIMAL(15,2),
+  
+  -- Authentication and verification
   is_verified BOOLEAN DEFAULT FALSE,
   is_admin BOOLEAN DEFAULT FALSE,
   email_verification_token TEXT,

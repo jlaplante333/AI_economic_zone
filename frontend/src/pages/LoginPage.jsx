@@ -30,22 +30,27 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
     try {
-      // For now, simulate a login - accept any username and password
-      // In production, this would call your actual API
-      if (username.trim() && password.trim()) {
-        // Store user info in localStorage
-        localStorage.setItem('user', JSON.stringify({ 
-          name: username,
-          email: username + '@example.com',
-          id: Date.now()
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Store real user info in localStorage
+        localStorage.setItem('user', JSON.stringify({
+          id: data.user.id,
+          email: data.user.email,
+          name: `${data.user.firstName} ${data.user.lastName}`,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          isAdmin: data.user.isAdmin
         }));
-        
-        // Redirect directly to full chat
         navigate('/fullchat');
       } else {
-        alert('Please enter both username and password');
+        const errorData = await response.json();
+        alert(errorData.message || 'Login failed. Please try again.');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -85,7 +90,7 @@ function LoginPage() {
           Get answers. No paperwork.
         </p>
         <p style={{ color: '#64748b', fontSize: '16px' }}>
-          Don't have an account? <a href="#" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Sign up</a>
+          Don't have an account? <a href="/signup" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Sign up</a>
         </p>
       </div>
 
@@ -173,7 +178,7 @@ function LoginPage() {
             </button>
           </form>
           <div className="login-footer">
-            <p>Don't have an account? <a href="#" className="signup-link">Sign up</a></p>
+            <p>Don't have an account? <a href="/signup" className="signup-link">Sign up</a></p>
             <p><a href="#" className="forgot-password">Forgot password?</a></p>
           </div>
         </div>

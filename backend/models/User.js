@@ -3,7 +3,33 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
 // Create a new user
-const createUser = async ({ email, password, firstName, lastName, phone, language, businessType }) => {
+const createUser = async ({ 
+  email, 
+  password, 
+  firstName, 
+  lastName, 
+  phone, 
+  language, 
+  businessType,
+  // Address fields
+  addressLine1,
+  addressLine2,
+  city,
+  state,
+  zipCode,
+  // Demographics
+  age,
+  ethnicity,
+  gender,
+  // Business details
+  employeeCount,
+  yearsInBusiness,
+  corporationType,
+  // Financial information
+  annualRevenue2022,
+  annualRevenue2023,
+  annualRevenue2024
+}) => {
   try {
     const pool = getPool();
     if (!pool) {
@@ -20,11 +46,21 @@ const createUser = async ({ email, password, firstName, lastName, phone, languag
     
     const result = await pool.query(
       `INSERT INTO users (
-        email, password_hash, first_name, last_name, phone, language, business_type, 
+        email, password_hash, first_name, last_name, phone, language, business_type,
+        address_line1, address_line2, city, state, zip_code,
+        age, ethnicity, gender,
+        employee_count, years_in_business, corporation_type,
+        annual_revenue_2022, annual_revenue_2023, annual_revenue_2024,
         email_verification_token, email_verification_expires
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [email, passwordHash, firstName, lastName, phone, language, businessType, 
-       emailVerificationToken, emailVerificationExpires]
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) RETURNING *`,
+      [
+        email, passwordHash, firstName, lastName, phone, language, businessType,
+        addressLine1, addressLine2, city, state, zipCode,
+        age, ethnicity, gender,
+        employeeCount, yearsInBusiness, corporationType,
+        annualRevenue2022, annualRevenue2023, annualRevenue2024,
+        emailVerificationToken, emailVerificationExpires
+      ]
     );
     
     return {
