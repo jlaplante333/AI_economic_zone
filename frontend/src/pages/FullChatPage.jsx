@@ -411,12 +411,25 @@ function FullChatPage() {
         body: JSON.stringify({ message, language: 'en', businessType, userId: 1 })
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      
+      if (!data || !data.response) {
+        throw new Error('Invalid response format from server');
+      }
+      
       const botMessage = { type: 'answer', content: data.response, timestamp: new Date() };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      const errorMessage = { type: 'answer', content: 'Sorry, I\'m having trouble connecting. Please try again.', timestamp: new Date() };
+      const errorMessage = { 
+        type: 'answer', 
+        content: 'Sorry, I\'m having trouble connecting. Please try again.', 
+        timestamp: new Date() 
+      };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -1666,7 +1679,19 @@ function FullChatPage() {
                         src={getBusinessPhoto(option.type)}
                         alt={option.label}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={e => { e.target.style.display = 'none'; e.target.parentNode.appendChild(option.icon); }}
+                        onError={e => { 
+                          e.target.style.display = 'none'; 
+                          // Create a fallback div with the icon
+                          const fallbackDiv = document.createElement('div');
+                          fallbackDiv.style.display = 'flex';
+                          fallbackDiv.style.alignItems = 'center';
+                          fallbackDiv.style.justifyContent = 'center';
+                          fallbackDiv.style.width = '100%';
+                          fallbackDiv.style.height = '100%';
+                          fallbackDiv.style.background = '#f3f4f6';
+                          fallbackDiv.innerHTML = '🏢'; // Fallback emoji
+                          e.target.parentNode.appendChild(fallbackDiv);
+                        }}
                       />
                     </div>
                     <span style={{ fontSize: '16px', fontWeight: '600', lineHeight: '1.3' }}>{option.label}</span>

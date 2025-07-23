@@ -2,15 +2,30 @@ const twilio = require('twilio');
 
 class SMSService {
   constructor() {
-    this.client = twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
-    this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
+    // Only initialize Twilio client if credentials are properly configured
+    if (process.env.TWILIO_ACCOUNT_SID && 
+        process.env.TWILIO_ACCOUNT_SID.startsWith('AC') && 
+        process.env.TWILIO_AUTH_TOKEN && 
+        process.env.TWILIO_PHONE_NUMBER) {
+      this.client = twilio(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN
+      );
+      this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
+      this.enabled = true;
+    } else {
+      this.enabled = false;
+      console.log('SMS service disabled - Twilio credentials not properly configured');
+    }
   }
 
   // Send verification code via SMS
   async sendVerificationCode(phoneNumber, code) {
+    if (!this.enabled) {
+      console.log('SMS service disabled - verification code would be:', code);
+      return { success: true, message: 'SMS service disabled' };
+    }
+    
     try {
       const message = await this.client.messages.create({
         body: `Your Oakland AI verification code is: ${code}. This code will expire in 10 minutes.`,
@@ -27,6 +42,11 @@ class SMSService {
 
   // Send welcome SMS
   async sendWelcomeSMS(phoneNumber, firstName = 'User') {
+    if (!this.enabled) {
+      console.log('SMS service disabled - welcome SMS would be sent to:', phoneNumber);
+      return { success: true, message: 'SMS service disabled' };
+    }
+    
     try {
       const message = await this.client.messages.create({
         body: `Welcome to Oakland AI, ${firstName}! Your account has been verified. Start getting smart help for your business at ${process.env.FRONTEND_URL}/fullchat`,
