@@ -128,14 +128,13 @@ function LanguageCard({ language, onSelect }) {
       style={{
         background: isHovered ? 'rgba(59, 130, 246, 0.1)' : 'rgba(15, 23, 42, 0.8)',
         border: isHovered ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(148, 163, 184, 0.15)',
-        borderRadius: '12px',
-        padding: '16px',
+        borderRadius: '10px',
+        padding: '8px',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
-        marginBottom: '8px'
+        gap: '6px'
       }}
     >
       <div style={{ flexShrink: 0 }}>
@@ -144,16 +143,16 @@ function LanguageCard({ language, onSelect }) {
       <div style={{ flex: 1 }}>
         <h4 style={{ 
           margin: 0, 
-          fontSize: '16px', 
+          fontSize: '13px', 
           fontWeight: '600', 
           color: '#f1f5f9',
-          marginBottom: '4px'
+          marginBottom: '1px'
         }}>
           {language.native}
         </h4>
         <p style={{ 
           margin: 0, 
-          fontSize: '14px', 
+          fontSize: '11px', 
           color: '#94a3b8'
         }}>
           {language.name}
