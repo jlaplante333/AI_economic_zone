@@ -1,4 +1,5 @@
 import React from 'react';
+import { getLanguageByCode } from '../language/languages';
 
 const FlagDisplay = ({ countryCode, className = '' }) => {
   // Flag image mapping - using realistic flag PNGs with higher resolution
@@ -7,26 +8,21 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
     'en': 'https://flagcdn.com/w320/us.png',
     'vi': 'https://flagcdn.com/w320/vn.png',
     'ar': 'https://flagcdn.com/w320/sa.png',
-    'mam': 'https://flagcdn.com/w320/gt.png', // Mam is spoken in Guatemala
     'es': 'https://flagcdn.com/w320/es.png',
     'zh': 'https://flagcdn.com/w320/cn.png',
-    'prs': 'https://flagcdn.com/w320/af.png', // Dari is spoken in Afghanistan
-    'lo': 'https://flagcdn.com/w320/la.png', // Lao is the official language of Laos
-    'ti': 'https://flagcdn.com/w320/er.png', // Tigrinya is spoken in Eritrea
-    'km': 'https://flagcdn.com/w320/kh.png', // Khmer is spoken in Cambodia
-    
-    // Additional languages for fallback
     'tl': 'https://flagcdn.com/w320/ph.png',
     'ko': 'https://flagcdn.com/w320/kr.png',
     'hi': 'https://flagcdn.com/w320/in.png',
     'th': 'https://flagcdn.com/w320/th.png',
     'ja': 'https://flagcdn.com/w320/jp.png',
+    
+    // Additional languages
+    'tr': 'https://flagcdn.com/w320/tr.png',
     'ru': 'https://flagcdn.com/w320/ru.png',
     'fr': 'https://flagcdn.com/w320/fr.png',
     'pt': 'https://flagcdn.com/w320/pt.png',
     'de': 'https://flagcdn.com/w320/de.png',
     'it': 'https://flagcdn.com/w320/it.png',
-    'tr': 'https://flagcdn.com/w320/tr.png',
     'nl': 'https://flagcdn.com/w320/nl.png',
     'sv': 'https://flagcdn.com/w320/se.png',
     'no': 'https://flagcdn.com/w320/no.png',

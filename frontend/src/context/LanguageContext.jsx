@@ -50,6 +50,62 @@ export const LanguageProvider = ({ children }) => {
         back: 'Zurück',
         language: 'Sprache'
       },
+      vi: {
+        welcome: 'Chào mừng',
+        selectLanguage: 'Chọn ngôn ngữ của bạn',
+        continue: 'Tiếp tục',
+        back: 'Quay lại',
+        language: 'Ngôn ngữ'
+      },
+      ar: {
+        welcome: 'مرحباً',
+        selectLanguage: 'اختر لغتك',
+        continue: 'متابعة',
+        back: 'رجوع',
+        language: 'لغة'
+      },
+      zh: {
+        welcome: '欢迎',
+        selectLanguage: '选择您的语言',
+        continue: '继续',
+        back: '返回',
+        language: '语言'
+      },
+      tl: {
+        welcome: 'Maligayang pagdating',
+        selectLanguage: 'Piliin ang iyong wika',
+        continue: 'Magpatuloy',
+        back: 'Bumalik',
+        language: 'Wika'
+      },
+      ko: {
+        welcome: '환영합니다',
+        selectLanguage: '언어를 선택하세요',
+        continue: '계속',
+        back: '뒤로',
+        language: '언어'
+      },
+      hi: {
+        welcome: 'स्वागत है',
+        selectLanguage: 'अपनी भाषा चुनें',
+        continue: 'जारी रखें',
+        back: 'वापस',
+        language: 'भाषा'
+      },
+      th: {
+        welcome: 'ยินดีต้อนรับ',
+        selectLanguage: 'เลือกภาษาของคุณ',
+        continue: 'ดำเนินการต่อ',
+        back: 'กลับ',
+        language: 'ภาษา'
+      },
+      ja: {
+        welcome: 'ようこそ',
+        selectLanguage: '言語を選択してください',
+        continue: '続行',
+        back: '戻る',
+        language: '言語'
+      },
       // Add more languages as needed
     };
 

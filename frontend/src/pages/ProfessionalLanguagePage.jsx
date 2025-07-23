@@ -3,22 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import FlagDisplay from '../components/FlagDisplay';
+import { oaklandLanguages } from '../language/languages';
 import '../css/pages/ProfessionalLanguagePage.css';
 import '../css/components/FlagDisplay.css';
 
-// Updated language data with Oakland-specific selection
-const languages = [
-  { code: 'en', name: 'English', native: 'English', priority: 1 },
-  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt', priority: 2 },
-  { code: 'ar', name: 'Arabic', native: 'العربية', priority: 3 },
-  { code: 'mam', name: 'Mam', native: 'Mam', priority: 4 },
-  { code: 'es', name: 'Spanish', native: 'Español', priority: 5 },
-  { code: 'zh', name: 'Chinese', native: '中文', priority: 6 },
-  { code: 'prs', name: 'Dari', native: 'دری', priority: 7 },
-  { code: 'lo', name: 'Laos', native: 'ລາວ', priority: 8 },
-  { code: 'ti', name: 'Tigrinya', native: 'ትግርኛ', priority: 9 },
-  { code: 'km', name: 'Khmer', native: 'ខ្មែរ', priority: 10 },
-];
+// Use Oakland-specific languages from centralized file
+const languages = oaklandLanguages;
 
 function ProfessionalLanguagePage() {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
