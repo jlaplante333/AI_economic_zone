@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-import LanguageSelectionPage from './pages/LanguageSelectionPage';
 import ProfessionalLanguagePage from './pages/ProfessionalLanguagePage';
 import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
@@ -18,8 +17,7 @@ function App() {
         <Router>
           <div className="App">
             <Routes>
-              <Route path="/" element={<LanguageSelectionPage />} />
-              <Route path="/2" element={<ProfessionalLanguagePage />} />
+              <Route path="/" element={<ProfessionalLanguagePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/full-chat" element={<FullChatPage />} />
