@@ -573,7 +573,7 @@ function FullChatPage() {
       </div>
       <div className="full-chat-container" style={{ 
         background: theme.primaryBg,
-        marginRight: showProfileMenu ? '220px' : '0',
+        marginRight: showProfileMenu ? '220px' : '60px',
         transition: 'margin-right 0.3s ease',
         maxWidth: '100vw',
         overflowX: 'hidden'
@@ -1075,7 +1075,11 @@ function FullChatPage() {
           {/* Messages */}
           <div className="chat-messages" ref={chatMessagesRef} style={{
             paddingRight: '20px',
-            paddingLeft: '20px'
+            paddingLeft: '20px',
+            maxWidth: 'calc(100vw - 280px)',
+            minWidth: '600px',
+            marginRight: 'auto',
+            marginLeft: 'auto'
           }}>
             {messages.length === 0 && !businessType && (
               <div className="welcome-message" style={{

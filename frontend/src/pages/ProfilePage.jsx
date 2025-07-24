@@ -350,7 +350,7 @@ function ProfilePage() {
               ? '0 4px 16px rgba(139, 69, 19, 0.2)'
               : '0 4px 16px rgba(59, 130, 246, 0.2)'
           }}>
-            {user.first_name?.charAt(0) || user.firstName?.charAt(0) || 'U'}
+            {user.first_name?.charAt(0) || 'U'}
           </div>
           <div>
             <h1 style={{ 
@@ -363,7 +363,7 @@ function ProfilePage() {
                 ? '#5d4037'
                 : '#111827'
             }}>
-              {`${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || 'User Profile'}
+              {`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User Profile'}
             </h1>
             <p style={{ 
               fontSize: 16, 
@@ -374,7 +374,7 @@ function ProfilePage() {
                 : '#6b7280',
               margin: 0
             }}>
-              {user.business_type || user.businessType || 'Business Owner'} • {user.city || 'Oakland'}, {user.state || 'CA'}
+              {user.business_type || 'Business Owner'} • {user.city || 'Oakland'}, {user.state || 'CA'}
             </p>
           </div>
         </div>
@@ -390,7 +390,7 @@ function ProfilePage() {
           <ProfileField 
             icon={User} 
             label="Full Name" 
-            value={`${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || 'N/A'}
+            value={`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
             color="#3b82f6"
           />
           <ProfileField 
@@ -442,7 +442,7 @@ function ProfilePage() {
           <ProfileField 
             icon={Building2} 
             label="Business Type" 
-            value={user.business_type || user.businessType}
+            value={user.business_type}
             color="#ef4444"
           />
           <ProfileField 
@@ -544,14 +544,14 @@ function ProfilePage() {
           <ProfileField 
             icon={Shield} 
             label="Admin Status" 
-            value={user.is_admin || user.isAdmin ? 'Administrator' : 'Regular User'}
-            color={user.is_admin || user.isAdmin ? '#10b981' : '#6b7280'}
+            value={user.is_admin ? 'Administrator' : 'Regular User'}
+            color={user.is_admin ? '#10b981' : '#6b7280'}
           />
           <ProfileField 
             icon={CheckCircle} 
             label="Email Verification" 
-            value={user.is_verified || user.isVerified ? 'Verified' : 'Not Verified'}
-            color={user.is_verified || user.isVerified ? '#10b981' : '#f59e0b'}
+            value={user.is_verified ? 'Verified' : 'Not Verified'}
+            color={user.is_verified ? '#10b981' : '#f59e0b'}
           />
           <ProfileField 
             icon={Clock} 
