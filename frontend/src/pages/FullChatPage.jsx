@@ -603,11 +603,11 @@ function FullChatPage() {
           <div className="header-right">
             <div className="user-info" style={{ cursor: 'pointer' }} onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <div className="user-avatar">
-                {user?.firstName?.charAt(0) || 'U'}
+                {(user?.firstName || user?.first_name)?.charAt(0) || 'U'}
               </div>
               <div>
                 <div className="user-name" style={{ color: theme.primaryText }}>
-                  {user?.firstName || 'User'}
+                  {user?.firstName || user?.first_name || 'User'}
                 </div>
                 <div className="user-role" style={{ color: theme.secondaryText }}>
                   {user?.role || 'Business Owner'}
@@ -626,7 +626,8 @@ function FullChatPage() {
               justifyContent: 'space-between', 
               alignItems: 'center',
               padding: '16px 32px 0 32px',
-              paddingBottom: '12px'
+              paddingBottom: '12px',
+              marginTop: '40px' // Increased from 20px to 40px for more space
             }}>
               {/* Quick Options */}
               <div className="quick-options" style={{ 
@@ -1076,6 +1077,7 @@ function FullChatPage() {
           <div className="chat-messages" ref={chatMessagesRef} style={{
             paddingRight: '20px',
             paddingLeft: '20px',
+            paddingTop: '80px', // Increased from 40px to 80px to move chat further from menu
             maxWidth: 'calc(100vw - 280px)',
             minWidth: '600px',
             marginRight: 'auto',
@@ -1104,13 +1106,32 @@ function FullChatPage() {
             )}
             
             {messages.map((message, index) => (
-              <div key={index} className={`message ${message.type === 'question' ? 'chat-question' : message.type === 'answer' ? 'chat-answer' : 'user-message'}`}>
+              <div key={index} className={`message ${message.type === 'question' ? 'chat-question' : message.type === 'answer' ? 'chat-answer' : 'user-message'}`} style={{
+                display: 'flex',
+                justifyContent: message.type === 'question' ? 'flex-start' : 'flex-end', // User questions on left, AI answers on right
+                marginBottom: '16px',
+                padding: '0 8px'
+              }}>
                 {message.type === 'answer' ? (
-                  <div className="bubble">{formatAnswer(message.content, index)}</div>
+                  <div className="bubble" style={{
+                    background: theme.primary,
+                    color: 'white', // White text on blue background
+                    maxWidth: '70%'
+                  }}>{formatAnswer(message.content, index)}</div>
                 ) : message.type === 'question' ? (
-                  <div className="bubble">{message.content}</div>
+                  <div className="bubble" style={{
+                    background: theme.cardBg,
+                    color: currentThemeName === 'dark' ? 'white' : '#1f2937', // White text in dark theme, dark text in light themes
+                    border: `1px solid ${theme.border}`,
+                    maxWidth: '70%'
+                  }}>{message.content}</div>
                 ) : (
-                  <div className="bubble">{message.content}</div>
+                  <div className="bubble" style={{
+                    background: theme.cardBg,
+                    color: currentThemeName === 'dark' ? 'white' : '#1f2937', // White text in dark theme, dark text in light themes
+                    border: `1px solid ${theme.border}`,
+                    maxWidth: '70%'
+                  }}>{message.content}</div>
                 )}
               </div>
             ))}
@@ -1468,7 +1489,6 @@ function FullChatPage() {
                 borderBottomLeftRadius: '24px',
                 borderBottomRightRadius: '24px',
                 boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
-                position: 'relative',
                 minHeight: '60px'
               }}>
                 <div 
@@ -1657,8 +1677,13 @@ function FullChatPage() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: '16px 0',
+                position: 'sticky',
+                bottom: 0,
                 background: '#ffffff',
                 borderTop: '1px solid #e5e7eb',
+                marginTop: '20px',
+                borderBottomLeftRadius: '24px',
+                borderBottomRightRadius: '24px',
                 boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
                 minHeight: '60px'
               }}>

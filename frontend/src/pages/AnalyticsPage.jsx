@@ -489,7 +489,11 @@ function AnalyticsPage() {
               <div className="logo-text" style={{
                 fontSize: 24,
                 fontWeight: 600,
-                color: theme.text
+                color: currentThemeName === 'dark' 
+                  ? 'white' 
+                  : currentThemeName === 'beige'
+                  ? '#5d4037'
+                  : '#1f2937'
               }}>
                 Oakland AI
               </div>

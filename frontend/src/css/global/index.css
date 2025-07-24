@@ -249,15 +249,19 @@ body.login-bg {
 }
 
 .user-message {
-  justify-content: flex-end;
+  justify-content: flex-start !important; /* User messages on the left */
   background: none;
   box-shadow: none;
 }
 
 .chat-answer, .chat-question {
-  justify-content: flex-start;
+  justify-content: flex-end !important; /* AI messages on the right */
   background: none;
   box-shadow: none;
+}
+
+.chat-question {
+  justify-content: flex-start !important; /* User questions on the left */
 }
 
 .bubble {
@@ -273,18 +277,18 @@ body.login-bg {
 }
 
 .user-message .bubble {
-  background-color: #010101;
-  color: #fff;
+  background-color: #f8fafc;
+  color: #1f2937;
 }
 
 .chat-answer .bubble {
-  background: #f8fafc;
-  color: #22223b;
+  background: #3b82f6;
+  color: #ffffff;
 }
 
 .chat-question .bubble {
-  background: #e0e7ef;
-  color: #334155;
+  background: #f8fafc;
+  color: #1f2937;
 }
 
 /* Message input */

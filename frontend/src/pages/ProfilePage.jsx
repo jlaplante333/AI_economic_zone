@@ -384,21 +384,6 @@ function ProfilePage() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Background gradient */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '300px',
-        background: currentThemeName === 'dark'
-          ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%)'
-          : currentThemeName === 'beige'
-          ? 'linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(160, 82, 45, 0.08) 100%)'
-          : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%)',
-        zIndex: 0
-      }} />
-
       <div style={{ 
         maxWidth: 800, 
         margin: '0 auto', 
@@ -411,24 +396,7 @@ function ProfilePage() {
           alignItems: 'center',
           gap: 20,
           marginBottom: 40,
-          padding: '24px',
-          background: currentThemeName === 'dark'
-            ? 'rgba(30, 41, 59, 0.8)'
-            : currentThemeName === 'beige'
-            ? 'rgba(245, 245, 220, 0.9)'
-            : 'rgba(255, 255, 255, 0.95)',
-          border: currentThemeName === 'dark'
-            ? '1px solid rgba(59, 130, 246, 0.2)'
-            : currentThemeName === 'beige'
-            ? '1px solid rgba(139, 69, 19, 0.15)'
-            : '1px solid rgba(59, 130, 246, 0.1)',
-          borderRadius: 20,
-          boxShadow: currentThemeName === 'dark'
-            ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)'
-            : currentThemeName === 'beige'
-            ? '0 8px 32px rgba(139, 69, 19, 0.1), 0 0 0 1px rgba(139, 69, 19, 0.05)'
-            : '0 8px 32px rgba(59, 130, 246, 0.08), 0 0 0 1px rgba(59, 130, 246, 0.05)',
-          backdropFilter: 'blur(10px)',
+          padding: '24px 0',
           position: 'relative',
           overflow: 'hidden'
         }}>
