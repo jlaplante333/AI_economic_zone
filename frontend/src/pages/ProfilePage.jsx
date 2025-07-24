@@ -14,7 +14,7 @@ function ProfilePage() {
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Always fetch fresh user data from the backend
+    // Fetch user data from backend, fallback to localStorage if needed
     const fetchProfile = async () => {
       const localUser = localStorage.getItem('user');
       console.log('Local user from localStorage:', localUser);
@@ -27,7 +27,6 @@ function ProfilePage() {
         const userData = JSON.parse(localUser);
         console.log('Parsed user data:', userData);
         console.log('Token:', userData.token);
-        console.log('Token length:', userData.token ? userData.token.length : 'No token');
         
         if (!userData.token) {
           console.log('No token found in localStorage');
@@ -51,13 +50,15 @@ function ProfilePage() {
           console.log('Profile data from backend:', data);
           setUser(data.user);
         } else {
-          const errorData = await response.json();
-          console.log('Profile fetch failed with error:', errorData);
-          setUser(null);
+          console.log('Profile fetch failed, using localStorage data');
+          // Fallback to localStorage data
+          setUser(userData);
         }
       } catch (error) {
         console.log('Error fetching profile:', error);
-        setUser(null);
+        // Fallback to localStorage data
+        const localUserData = JSON.parse(localUser);
+        setUser(localUserData);
       } finally {
         setLoading(false);
       }
@@ -106,8 +107,7 @@ function ProfilePage() {
         color: theme.text,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20
+        justifyContent: 'center'
       }}>
         <div style={{ 
           background: currentThemeName === 'dark'
@@ -127,58 +127,25 @@ function ProfilePage() {
             : currentThemeName === 'beige'
             ? '0 8px 32px rgba(139, 69, 19, 0.1)'
             : '0 8px 32px rgba(59, 130, 246, 0.08)',
-          textAlign: 'center',
-          maxWidth: 500,
-          backdropFilter: 'blur(10px)'
+          textAlign: 'center'
         }}>
-          <h2 style={{ 
-            marginBottom: 16, 
-            color: currentThemeName === 'dark' 
-              ? '#fca5a5' 
-              : currentThemeName === 'beige'
-              ? '#dc2626'
-              : '#dc2626'
-          }}>
-            🔐 Authentication Required
-          </h2>
-          <p style={{ 
-            marginBottom: 24, 
-            color: currentThemeName === 'dark' 
-              ? '#d1d5db' 
-              : currentThemeName === 'beige'
-              ? '#8b4513'
-              : '#6b7280'
-          }}>
-            Your profile data couldn't be loaded. This usually means your login session has expired.
+          <h2 style={{ marginBottom: 16 }}>No User Data Found</h2>
+          <p style={{ marginBottom: 24, color: '#6b7280' }}>
+            Please log in to view your profile.
           </p>
           <button 
-            onClick={() => {
-              localStorage.removeItem('user');
-              localStorage.removeItem('token');
-              navigate('/login');
-            }}
+            onClick={() => navigate('/login')}
             style={{
               padding: '12px 24px',
               borderRadius: 8,
-              background: currentThemeName === 'dark'
-                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
-                : currentThemeName === 'beige'
-                ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
-                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              background: '#3b82f6',
               color: 'white',
               border: 'none',
               fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
+              cursor: 'pointer'
             }}
           >
-            Log In Again
+            Go to Login
           </button>
         </div>
       </div>
@@ -659,54 +626,108 @@ function ProfilePage() {
         </div>
 
         {/* Back Button */}
-        <button 
-          onClick={() => navigate('/fullchat')} 
-          style={{ 
-            marginTop: 32,
-            padding: '16px 32px', 
-            borderRadius: 12, 
-            background: currentThemeName === 'dark'
-              ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
-              : currentThemeName === 'beige'
-              ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
-              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            color: 'white', 
-            border: 'none', 
-            fontWeight: 600, 
-            fontSize: 16, 
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            transition: 'all 0.3s ease',
-            boxShadow: currentThemeName === 'dark'
-              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-              : currentThemeName === 'beige'
-              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-              : '0 4px 16px rgba(59, 130, 246, 0.2)',
-            position: 'relative',
-            zIndex: 1
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-              ? '0 6px 20px rgba(59, 130, 246, 0.4)'
-              : currentThemeName === 'beige'
-              ? '0 6px 20px rgba(139, 69, 19, 0.3)'
-              : '0 6px 20px rgba(59, 130, 246, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-              : currentThemeName === 'beige'
-              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-              : '0 4px 16px rgba(59, 130, 246, 0.2)';
-          }}
-        >
-          <ArrowLeft size={20} />
-          Back to Chat
-        </button>
+        <div style={{ 
+          display: 'flex', 
+          gap: 16, 
+          marginTop: 32,
+          justifyContent: 'center'
+        }}>
+          <button 
+            onClick={() => navigate('/fullchat')} 
+            style={{ 
+              padding: '16px 32px', 
+              borderRadius: 12, 
+              background: currentThemeName === 'dark'
+                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+                : currentThemeName === 'beige'
+                ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
+                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: 'white', 
+              border: 'none', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.3s ease',
+              boxShadow: currentThemeName === 'dark'
+                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+                : currentThemeName === 'beige'
+                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+                : '0 4px 16px rgba(59, 130, 246, 0.2)',
+              position: 'relative',
+              zIndex: 1
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+                ? '0 6px 20px rgba(59, 130, 246, 0.4)'
+                : currentThemeName === 'beige'
+                ? '0 6px 20px rgba(139, 69, 19, 0.3)'
+                : '0 6px 20px rgba(59, 130, 246, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+                : currentThemeName === 'beige'
+                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+                : '0 4px 16px rgba(59, 130, 246, 0.2)';
+            }}
+          >
+            <ArrowLeft size={20} />
+            Back to Chat
+          </button>
+          
+          <button 
+            onClick={() => window.location.reload()}
+            style={{ 
+              padding: '16px 32px', 
+              borderRadius: 12, 
+              background: currentThemeName === 'dark'
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : currentThemeName === 'beige'
+                ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
+                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white', 
+              border: 'none', 
+              fontWeight: 600, 
+              fontSize: 16, 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.3s ease',
+              boxShadow: currentThemeName === 'dark'
+                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
+                : currentThemeName === 'beige'
+                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
+                : '0 4px 16px rgba(16, 185, 129, 0.2)',
+              position: 'relative',
+              zIndex: 1
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+                ? '0 6px 20px rgba(16, 185, 129, 0.4)'
+                : currentThemeName === 'beige'
+                ? '0 6px 20px rgba(5, 150, 105, 0.3)'
+                : '0 6px 20px rgba(16, 185, 129, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
+                : currentThemeName === 'beige'
+                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
+                : '0 4px 16px rgba(16, 185, 129, 0.2)';
+            }}
+          >
+            <User size={20} />
+            Refresh Data
+          </button>
+        </div>
       </div>
     </div>
   );
