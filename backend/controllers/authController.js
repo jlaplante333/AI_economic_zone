@@ -160,6 +160,8 @@ exports.register = async (req, res) => {
         language: user.language,
         business_type: user.business_type,
         is_verified: user.is_verified,
+        last_login: user.last_login,
+        created_at: user.created_at,
         // Address fields
         address_line1: user.address_line1,
         address_line2: user.address_line2,
@@ -263,6 +265,8 @@ exports.login = async (req, res) => {
         business_type: user.business_type,
         is_admin: user.is_admin,
         is_verified: user.is_verified,
+        last_login: user.last_login,
+        created_at: user.created_at,
         // Address fields
         address_line1: user.address_line1,
         address_line2: user.address_line2,
@@ -531,7 +535,27 @@ exports.updateProfile = async (req, res) => {
         language: user.language,
         business_type: user.business_type,
         is_admin: user.is_admin,
-        is_verified: user.is_verified
+        is_verified: user.is_verified,
+        last_login: user.last_login,
+        created_at: user.created_at,
+        // Address fields
+        address_line1: user.address_line1,
+        address_line2: user.address_line2,
+        city: user.city,
+        state: user.state,
+        zip_code: user.zip_code,
+        // Demographics
+        age: user.age,
+        ethnicity: user.ethnicity,
+        gender: user.gender,
+        // Business details
+        employee_count: user.employee_count,
+        years_in_business: user.years_in_business,
+        corporation_type: user.corporation_type,
+        // Financial information
+        annual_revenue_2022: user.annual_revenue_2022,
+        annual_revenue_2023: user.annual_revenue_2023,
+        annual_revenue_2024: user.annual_revenue_2024
       }
     });
 

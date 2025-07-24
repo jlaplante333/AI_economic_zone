@@ -14,61 +14,24 @@ function ProfilePage() {
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Get user data from localStorage and fetch complete data from backend
-    const fetchUserData = async () => {
-      const localUser = localStorage.getItem('user');
-      console.log('Local user from localStorage:', localUser);
-      
-      if (localUser) {
-        try {
-          const userData = JSON.parse(localUser);
-          console.log('Parsed user data:', userData);
-          
-          // Set initial data from localStorage
-          setUser(userData);
-          
-          // Try to fetch complete data from backend
-          if (userData.token) {
-            try {
-              console.log('Attempting to fetch from backend with token:', userData.token.substring(0, 20) + '...');
-              
-              const response = await fetch('/api/auth/profile', {
-                headers: {
-                  'Authorization': `Bearer ${userData.token}`,
-                },
-                credentials: 'include',
-              });
-              
-              console.log('Profile response status:', response.status);
-              console.log('Profile response headers:', response.headers);
-              
-              if (response.ok) {
-                const data = await response.json();
-                console.log('Complete profile data from backend:', data);
-                setUser(data.user);
-              } else {
-                const errorData = await response.json();
-                console.log('Backend fetch failed with error:', errorData);
-                console.log('Using localStorage data as fallback');
-              }
-            } catch (error) {
-              console.log('Error fetching from backend:', error);
-            }
-          } else {
-            console.log('No token found in userData');
-          }
-        } catch (error) {
-          console.log('Error parsing localStorage data:', error);
-          setUser(null);
-        }
-      } else {
+    // Get user data from localStorage - ALL data should be there now
+    const localUser = localStorage.getItem('user');
+    console.log('Local user from localStorage:', localUser);
+    
+    if (localUser) {
+      try {
+        const userData = JSON.parse(localUser);
+        console.log('Parsed user data:', userData);
+        setUser(userData);
+      } catch (error) {
+        console.log('Error parsing localStorage data:', error);
         setUser(null);
       }
-      
-      setLoading(false);
-    };
+    } else {
+      setUser(null);
+    }
     
-    fetchUserData();
+    setLoading(false);
   }, []);
 
   // Debug: Log user state changes
@@ -76,31 +39,8 @@ function ProfilePage() {
     console.log('User state updated:', user);
   }, [user]);
 
-  const handleRefreshData = async () => {
-    const localUser = localStorage.getItem('user');
-    if (localUser) {
-      try {
-        const userData = JSON.parse(localUser);
-        if (userData.token) {
-          const response = await fetch('/api/auth/profile', {
-            headers: {
-              'Authorization': `Bearer ${userData.token}`,
-            },
-            credentials: 'include',
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Refreshed profile data:', data);
-            setUser(data.user);
-          } else {
-            console.log('Refresh failed');
-          }
-        }
-      } catch (error) {
-        console.log('Error refreshing data:', error);
-      }
-    }
+  const handleRefreshData = () => {
+    window.location.reload();
   };
 
   if (loading) {
