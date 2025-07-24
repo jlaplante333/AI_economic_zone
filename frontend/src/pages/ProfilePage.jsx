@@ -39,7 +39,10 @@ function ProfilePage() {
                 const data = await response.json();
                 if (data.success) {
                   console.log('Got complete data from database:', data.user);
-                  setUser(data.user);
+                  // Store complete data in localStorage
+                  const completeUserData = { ...data.user, token: userData.token };
+                  localStorage.setItem('user', JSON.stringify(completeUserData));
+                  setUser(completeUserData);
                   setLoading(false);
                   return;
                 }
@@ -707,7 +710,32 @@ function ProfilePage() {
           </button>
           
           <button 
-            onClick={handleRefreshData}
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/auth/get-user-by-email', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ email: 'jonathanlaplante@gmail.com' })
+                });
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  if (data.success) {
+                    console.log('Force fetched complete data:', data.user);
+                    // Store complete data in localStorage
+                    const localUser = localStorage.getItem('user');
+                    const userData = localUser ? JSON.parse(localUser) : {};
+                    const completeUserData = { ...data.user, token: userData.token };
+                    localStorage.setItem('user', JSON.stringify(completeUserData));
+                    setUser(completeUserData);
+                  }
+                }
+              } catch (error) {
+                console.log('Force fetch error:', error);
+              }
+            }}
             style={{ 
               padding: '16px 32px', 
               borderRadius: 12, 
@@ -751,7 +779,7 @@ function ProfilePage() {
             }}
           >
             <User size={20} />
-            Refresh Data
+            Force Load All Data
           </button>
         </div>
       </div>
