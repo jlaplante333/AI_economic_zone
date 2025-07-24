@@ -10,12 +10,11 @@ import {
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [refreshNeeded, setRefreshNeeded] = useState(false);
   const navigate = useNavigate();
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Try to fetch the latest user info from the backend
+    // Always fetch fresh user data from the backend
     const fetchProfile = async () => {
       const localUser = localStorage.getItem('user');
       console.log('Local user from localStorage:', localUser);
@@ -28,6 +27,14 @@ function ProfilePage() {
         const userData = JSON.parse(localUser);
         console.log('Parsed user data:', userData);
         console.log('Token:', userData.token);
+        console.log('Token length:', userData.token ? userData.token.length : 'No token');
+        
+        if (!userData.token) {
+          console.log('No token found in localStorage');
+          setUser(null);
+          setLoading(false);
+          return;
+        }
         
         const response = await fetch('/api/auth/profile', {
           headers: {
@@ -44,15 +51,13 @@ function ProfilePage() {
           console.log('Profile data from backend:', data);
           setUser(data.user);
         } else {
-          console.log('Profile fetch failed, using localStorage data');
-          // Fallback to localStorage data
-          setUser(userData);
+          const errorData = await response.json();
+          console.log('Profile fetch failed with error:', errorData);
+          setUser(null);
         }
       } catch (error) {
         console.log('Error fetching profile:', error);
-        // Fallback to localStorage data
-        const localUserData = JSON.parse(localUser);
-        setUser(localUserData);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -64,20 +69,7 @@ function ProfilePage() {
   // Debug: Log user state changes
   useEffect(() => {
     console.log('User state updated:', user);
-    
-    // Check if we need to refresh the data (old camelCase format)
-    if (user && (user.firstName || user.lastName || user.businessType)) {
-      console.log('Detected old camelCase format, refresh needed');
-      setRefreshNeeded(true);
-    }
   }, [user]);
-
-  const handleRefreshData = () => {
-    // Clear localStorage and redirect to login
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
 
   if (loading) {
     return (
@@ -106,20 +98,88 @@ function ProfilePage() {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: theme.bg, 
+        background: currentThemeName === 'dark'
+          ? '#0f172a'
+          : currentThemeName === 'beige'
+          ? '#f5f5dc'
+          : '#ffffff',
         color: theme.text,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        padding: 20
       }}>
         <div style={{ 
-          background: theme.cardBg,
-          border: `1px solid ${theme.border}`,
+          background: currentThemeName === 'dark'
+            ? 'rgba(30, 41, 59, 0.9)'
+            : currentThemeName === 'beige'
+            ? 'rgba(245, 245, 220, 0.95)'
+            : 'rgba(255, 255, 255, 0.95)',
+          border: currentThemeName === 'dark'
+            ? '1px solid rgba(59, 130, 246, 0.2)'
+            : currentThemeName === 'beige'
+            ? '1px solid rgba(139, 69, 19, 0.15)'
+            : '1px solid rgba(59, 130, 246, 0.1)',
           borderRadius: 16,
           padding: 40,
-          boxShadow: theme.shadow
+          boxShadow: currentThemeName === 'dark'
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+            : currentThemeName === 'beige'
+            ? '0 8px 32px rgba(139, 69, 19, 0.1)'
+            : '0 8px 32px rgba(59, 130, 246, 0.08)',
+          textAlign: 'center',
+          maxWidth: 500,
+          backdropFilter: 'blur(10px)'
         }}>
-          No user info found.
+          <h2 style={{ 
+            marginBottom: 16, 
+            color: currentThemeName === 'dark' 
+              ? '#fca5a5' 
+              : currentThemeName === 'beige'
+              ? '#dc2626'
+              : '#dc2626'
+          }}>
+            🔐 Authentication Required
+          </h2>
+          <p style={{ 
+            marginBottom: 24, 
+            color: currentThemeName === 'dark' 
+              ? '#d1d5db' 
+              : currentThemeName === 'beige'
+              ? '#8b4513'
+              : '#6b7280'
+          }}>
+            Your profile data couldn't be loaded. This usually means your login session has expired.
+          </p>
+          <button 
+            onClick={() => {
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+              navigate('/login');
+            }}
+            style={{
+              padding: '12px 24px',
+              borderRadius: 8,
+              background: currentThemeName === 'dark'
+                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+                : currentThemeName === 'beige'
+                ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
+                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: 'white',
+              border: 'none',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            Log In Again
+          </button>
         </div>
       </div>
     );
@@ -330,86 +390,7 @@ function ProfilePage() {
         zIndex: 1 
       }}>
         {/* Refresh Notification */}
-        {refreshNeeded && (
-          <div style={{
-            marginBottom: 20,
-            padding: '16px 20px',
-            background: currentThemeName === 'dark'
-              ? 'rgba(239, 68, 68, 0.1)'
-              : currentThemeName === 'beige'
-              ? 'rgba(220, 38, 38, 0.1)'
-              : 'rgba(239, 68, 68, 0.1)',
-            border: currentThemeName === 'dark'
-              ? '1px solid rgba(239, 68, 68, 0.3)'
-              : currentThemeName === 'beige'
-              ? '1px solid rgba(220, 38, 38, 0.3)'
-              : '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 12,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16
-          }}>
-            <div>
-              <div style={{ 
-                fontSize: 16, 
-                fontWeight: 600,
-                color: currentThemeName === 'dark' 
-                  ? '#fca5a5' 
-                  : currentThemeName === 'beige'
-                  ? '#dc2626'
-                  : '#dc2626',
-                marginBottom: 4
-              }}>
-                Data Format Update Required
-              </div>
-              <div style={{ 
-                fontSize: 14,
-                color: currentThemeName === 'dark' 
-                  ? '#fecaca' 
-                  : currentThemeName === 'beige'
-                  ? '#991b1b'
-                  : '#991b1b'
-              }}>
-                Your profile data needs to be refreshed to display correctly. Please log in again.
-              </div>
-            </div>
-            <button 
-              onClick={handleRefreshData}
-              style={{
-                padding: '8px 16px',
-                borderRadius: 8,
-                background: currentThemeName === 'dark'
-                  ? '#dc2626'
-                  : currentThemeName === 'beige'
-                  ? '#b91c1c'
-                  : '#dc2626',
-                color: 'white',
-                border: 'none',
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = currentThemeName === 'dark'
-                  ? '#b91c1c'
-                  : currentThemeName === 'beige'
-                  ? '#991b1b'
-                  : '#b91c1c';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = currentThemeName === 'dark'
-                  ? '#dc2626'
-                  : currentThemeName === 'beige'
-                  ? '#b91c1c'
-                  : '#dc2626';
-              }}
-            >
-              Refresh Data
-            </button>
-          </div>
-        )}
+        {/* Removed refresh notification */}
 
         {/* Header */}
         <div style={{
@@ -678,108 +659,54 @@ function ProfilePage() {
         </div>
 
         {/* Back Button */}
-        <div style={{ 
-          display: 'flex', 
-          gap: 16, 
-          marginTop: 32,
-          justifyContent: 'center'
-        }}>
-          <button 
-            onClick={() => navigate('/fullchat')} 
-            style={{ 
-              padding: '16px 32px', 
-              borderRadius: 12, 
-              background: currentThemeName === 'dark'
-                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
-                : currentThemeName === 'beige'
-                ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
-                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              color: 'white', 
-              border: 'none', 
-              fontWeight: 600, 
-              fontSize: 16, 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.3s ease',
-              boxShadow: currentThemeName === 'dark'
-                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-                : '0 4px 16px rgba(59, 130, 246, 0.2)',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 6px 20px rgba(59, 130, 246, 0.4)'
-                : currentThemeName === 'beige'
-                ? '0 6px 20px rgba(139, 69, 19, 0.3)'
-                : '0 6px 20px rgba(59, 130, 246, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-                : '0 4px 16px rgba(59, 130, 246, 0.2)';
-            }}
-          >
-            <ArrowLeft size={20} />
-            Back to Chat
-          </button>
-          
-          <button 
-            onClick={handleRefreshData}
-            style={{ 
-              padding: '16px 32px', 
-              borderRadius: 12, 
-              background: currentThemeName === 'dark'
-                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                : currentThemeName === 'beige'
-                ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: 'white', 
-              border: 'none', 
-              fontWeight: 600, 
-              fontSize: 16, 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.3s ease',
-              boxShadow: currentThemeName === 'dark'
-                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
-                : '0 4px 16px rgba(16, 185, 129, 0.2)',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 6px 20px rgba(16, 185, 129, 0.4)'
-                : currentThemeName === 'beige'
-                ? '0 6px 20px rgba(5, 150, 105, 0.3)'
-                : '0 6px 20px rgba(16, 185, 129, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
-                : '0 4px 16px rgba(16, 185, 129, 0.2)';
-            }}
-          >
-            <User size={20} />
-            Refresh Profile Data
-          </button>
-        </div>
+        <button 
+          onClick={() => navigate('/fullchat')} 
+          style={{ 
+            marginTop: 32,
+            padding: '16px 32px', 
+            borderRadius: 12, 
+            background: currentThemeName === 'dark'
+              ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+              : currentThemeName === 'beige'
+              ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
+              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            color: 'white', 
+            border: 'none', 
+            fontWeight: 600, 
+            fontSize: 16, 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            transition: 'all 0.3s ease',
+            boxShadow: currentThemeName === 'dark'
+              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+              : currentThemeName === 'beige'
+              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+              : '0 4px 16px rgba(59, 130, 246, 0.2)',
+            position: 'relative',
+            zIndex: 1
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+              ? '0 6px 20px rgba(59, 130, 246, 0.4)'
+              : currentThemeName === 'beige'
+              ? '0 6px 20px rgba(139, 69, 19, 0.3)'
+              : '0 6px 20px rgba(59, 130, 246, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+              : currentThemeName === 'beige'
+              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+              : '0 4px 16px rgba(59, 130, 246, 0.2)';
+          }}
+        >
+          <ArrowLeft size={20} />
+          Back to Chat
+        </button>
       </div>
     </div>
   );
