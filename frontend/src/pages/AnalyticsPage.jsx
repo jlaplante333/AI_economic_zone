@@ -965,10 +965,6 @@ function AnalyticsPage() {
                     strokeDasharray="3 3" 
                     stroke={currentThemeName === 'dark' ? 'rgba(255, 255, 255, 0.1)' : theme.border} 
                   />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke={currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary} 
-                  />
                   <YAxis 
                     stroke={currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary} 
                   />
