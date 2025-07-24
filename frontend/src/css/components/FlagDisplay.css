@@ -174,7 +174,7 @@
 /* Vietnamese flag specific styling to ensure correct colors */
 .flag-container[data-country="vi"] .flag-image {
   filter: none !important;
-  background: #da251d; /* Vietnamese red */
+  background: #ffff00; /* South Vietnamese yellow background */
 }
 
 /* Ensure Vietnamese flag displays correctly */
@@ -202,9 +202,9 @@
 }
 
 .vietnamese-stripe.red {
-  background-color: #da251d; /* Vietnamese red */
+  background-color: #da251d; /* South Vietnamese red */
 }
 
 .vietnamese-stripe.yellow {
-  background-color: #ffff00; /* Vietnamese yellow */
+  background-color: #ffff00; /* South Vietnamese yellow */
 } 

@@ -80,9 +80,11 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
         <div className="flag-pole"></div>
         <div className="flag-wrapper">
           <div className="vietnamese-flag">
+            <div className="vietnamese-stripe yellow"></div>
             <div className="vietnamese-stripe red"></div>
             <div className="vietnamese-stripe yellow"></div>
             <div className="vietnamese-stripe red"></div>
+            <div className="vietnamese-stripe yellow"></div>
           </div>
         </div>
       </div>
