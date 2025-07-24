@@ -17,26 +17,35 @@ function ProfilePage() {
     // Try to fetch the latest user info from the backend
     const fetchProfile = async () => {
       const localUser = localStorage.getItem('user');
+      console.log('Local user from localStorage:', localUser);
       if (!localUser) {
         setLoading(false);
         return;
       }
       
       try {
+        const userData = JSON.parse(localUser);
+        console.log('Parsed user data:', userData);
+        console.log('Token:', userData.token);
+        
         const response = await fetch('/api/auth/profile', {
           headers: {
-            'Authorization': `Bearer ${JSON.parse(localUser).token}`,
+            'Authorization': `Bearer ${userData.token}`,
           },
           credentials: 'include',
         });
         
+        console.log('Profile response status:', response.status);
+        console.log('Profile response ok:', response.ok);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('Profile data from backend:', data);
           setUser(data.user);
         } else {
+          console.log('Profile fetch failed, using localStorage data');
           // Fallback to localStorage data
-          const localUserData = JSON.parse(localUser);
-          setUser(localUserData);
+          setUser(userData);
         }
       } catch (error) {
         console.log('Error fetching profile:', error);
@@ -50,6 +59,11 @@ function ProfilePage() {
     
     fetchProfile();
   }, []);
+
+  // Debug: Log user state changes
+  useEffect(() => {
+    console.log('User state updated:', user);
+  }, [user]);
 
   if (loading) {
     return (

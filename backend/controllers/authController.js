@@ -256,12 +256,31 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        isAdmin: user.is_admin,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
         language: user.language,
-        businessType: user.business_type,
-        isVerified: user.is_verified
+        business_type: user.business_type,
+        is_admin: user.is_admin,
+        is_verified: user.is_verified,
+        // Address fields
+        address_line1: user.address_line1,
+        address_line2: user.address_line2,
+        city: user.city,
+        state: user.state,
+        zip_code: user.zip_code,
+        // Demographics
+        age: user.age,
+        ethnicity: user.ethnicity,
+        gender: user.gender,
+        // Business details
+        employee_count: user.employee_count,
+        years_in_business: user.years_in_business,
+        corporation_type: user.corporation_type,
+        // Financial information
+        annual_revenue_2022: user.annual_revenue_2022,
+        annual_revenue_2023: user.annual_revenue_2023,
+        annual_revenue_2024: user.annual_revenue_2024
       }
     });
 
@@ -506,13 +525,13 @@ exports.updateProfile = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         phone: user.phone,
         language: user.language,
-        businessType: user.business_type,
-        isAdmin: user.is_admin,
-        isVerified: user.is_verified
+        business_type: user.business_type,
+        is_admin: user.is_admin,
+        is_verified: user.is_verified
       }
     });
 
