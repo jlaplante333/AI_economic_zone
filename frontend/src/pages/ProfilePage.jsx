@@ -14,24 +14,55 @@ function ProfilePage() {
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Get user data from localStorage - ALL data should be there now
-    const localUser = localStorage.getItem('user');
-    console.log('Local user from localStorage:', localUser);
-    
-    if (localUser) {
-      try {
-        const userData = JSON.parse(localUser);
-        console.log('Parsed user data:', userData);
-        setUser(userData);
-      } catch (error) {
-        console.log('Error parsing localStorage data:', error);
+    // Get user data and populate fields
+    const loadUserData = async () => {
+      const localUser = localStorage.getItem('user');
+      console.log('Local user from localStorage:', localUser);
+      
+      if (localUser) {
+        try {
+          const userData = JSON.parse(localUser);
+          console.log('Parsed user data:', userData);
+          
+          // If we have a token, try to get complete data from database
+          if (userData.token) {
+            try {
+              const response = await fetch('/api/auth/get-user-by-email', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: userData.email })
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                  console.log('Got complete data from database:', data.user);
+                  setUser(data.user);
+                  setLoading(false);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.log('Database fetch failed, using localStorage:', error);
+            }
+          }
+          
+          // Use localStorage data
+          setUser(userData);
+        } catch (error) {
+          console.log('Error parsing localStorage data:', error);
+          setUser(null);
+        }
+      } else {
         setUser(null);
       }
-    } else {
-      setUser(null);
-    }
+      
+      setLoading(false);
+    };
     
-    setLoading(false);
+    loadUserData();
   }, []);
 
   // Debug: Log user state changes
@@ -124,18 +155,19 @@ function ProfilePage() {
   }
 
   const ProfileField = ({ icon: Icon, label, value, color = '#3b82f6' }) => {
-    // Handle both camelCase and snake_case field names
+    // Try to find the value in user object with different field name formats
     let displayValue = value;
     
     if (value === undefined || value === null) {
-      // Try to find the value in user object with different field name formats
-      const snakeCaseKey = label.toLowerCase().replace(/\s+/g, '_');
-      const camelCaseKey = label.toLowerCase().replace(/\s+/g, '').replace(/^[a-z]/, (c) => c.toUpperCase());
+      // Try different field name formats
+      const fieldName = label.toLowerCase().replace(/\s+/g, '_');
+      const camelCaseName = label.toLowerCase().replace(/\s+/g, '').replace(/^[a-z]/, (c) => c.toUpperCase());
       
-      if (user[snakeCaseKey] !== undefined) {
-        displayValue = user[snakeCaseKey];
-      } else if (user[camelCaseKey] !== undefined) {
-        displayValue = user[camelCaseKey];
+      // Check for the value in user object
+      if (user[fieldName] !== undefined && user[fieldName] !== null) {
+        displayValue = user[fieldName];
+      } else if (user[camelCaseName] !== undefined && user[camelCaseName] !== null) {
+        displayValue = user[camelCaseName];
       } else {
         // Handle special cases
         if (label === 'Full Name') {
@@ -163,7 +195,7 @@ function ProfilePage() {
         } else if (label === 'Account Created') {
           displayValue = user.created_at || user.createdAt ? formatDate(user.created_at || user.createdAt) : 'N/A';
         } else if (label.includes('Annual Revenue')) {
-          const revenue = user[snakeCaseKey] || user[camelCaseKey];
+          const revenue = user[fieldName] || user[camelCaseName];
           displayValue = revenue ? formatCurrency(revenue) : 'N/A';
         } else {
           displayValue = 'N/A';
@@ -376,82 +408,6 @@ function ProfilePage() {
         position: 'relative', 
         zIndex: 1 
       }}>
-        {/* Debug Section - Remove this after fixing */}
-        <div style={{
-          marginBottom: 20,
-          padding: '16px 20px',
-          background: '#fef3c7',
-          border: '1px solid #f59e0b',
-          borderRadius: 12,
-          fontFamily: 'monospace',
-          fontSize: 12
-        }}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#92400e' }}>🔍 DEBUG INFO:</h4>
-          <div style={{ marginBottom: 8 }}>
-            <strong>localStorage user data:</strong>
-            <pre style={{ margin: '4px 0', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-              {JSON.stringify(user, null, 2)}
-            </pre>
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <strong>Token exists:</strong> {user?.token ? 'YES' : 'NO'}
-          </div>
-          <div style={{ marginBottom: 8 }}>
-            <strong>Token preview:</strong> {user?.token ? user.token.substring(0, 30) + '...' : 'NONE'}
-          </div>
-          <button 
-            onClick={() => {
-              localStorage.removeItem('user');
-              localStorage.removeItem('token');
-              navigate('/login');
-            }}
-            style={{
-              padding: '8px 16px',
-              background: '#dc2626',
-              color: 'white',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              fontSize: 12,
-              marginRight: 8
-            }}
-          >
-            Clear localStorage & Go to Login
-          </button>
-          <button 
-            onClick={async () => {
-              try {
-                // Direct fetch by email to bypass auth
-                const response = await fetch('/api/auth/get-user-by-email', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ email: 'jonathanlaplante@gmail.com' })
-                });
-                const data = await response.json();
-                console.log('Direct fetch result:', data);
-                if (data.success) {
-                  setUser(data.user);
-                }
-              } catch (error) {
-                console.log('Direct fetch error:', error);
-              }
-            }}
-            style={{
-              padding: '8px 16px',
-              background: '#059669',
-              color: 'white',
-              border: 'none',
-              borderRadius: 6,
-              cursor: 'pointer',
-              fontSize: 12
-            }}
-          >
-            Test Direct Fetch
-          </button>
-        </div>
-
         {/* Header */}
         <div style={{
           display: 'flex',
