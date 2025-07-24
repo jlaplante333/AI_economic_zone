@@ -169,4 +169,42 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, transparent 50%, rgba(0, 0, 0, 0.05) 100%);
   border-radius: 2px;
   pointer-events: none;
+}
+
+/* Vietnamese flag specific styling to ensure correct colors */
+.flag-container[data-country="vi"] .flag-image {
+  filter: none !important;
+  background: #da251d; /* Vietnamese red */
+}
+
+/* Ensure Vietnamese flag displays correctly */
+.flag-container[data-country="vi"] .flag-wrapper::after {
+  background: none;
+}
+
+.flag-container[data-country="vi"] .flag-container::before {
+  background: none;
+}
+
+/* Custom Vietnamese flag implementation */
+.vietnamese-flag {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.vietnamese-stripe {
+  flex: 1;
+  width: 100%;
+}
+
+.vietnamese-stripe.red {
+  background-color: #da251d; /* Vietnamese red */
+}
+
+.vietnamese-stripe.yellow {
+  background-color: #ffff00; /* Vietnamese yellow */
 } 

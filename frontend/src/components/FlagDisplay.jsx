@@ -73,8 +73,24 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
 
   const flagUrl = flagImages[countryCode] || 'https://flagcdn.com/w320/un.png';
 
+  // Custom Vietnamese flag implementation
+  if (countryCode === 'vi') {
+    return (
+      <div className={`flag-container ${className}`} data-country={countryCode}>
+        <div className="flag-pole"></div>
+        <div className="flag-wrapper">
+          <div className="vietnamese-flag">
+            <div className="vietnamese-stripe red"></div>
+            <div className="vietnamese-stripe yellow"></div>
+            <div className="vietnamese-stripe red"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`flag-container ${className}`}>
+    <div className={`flag-container ${className}`} data-country={countryCode}>
       <div className="flag-pole"></div>
       <div className="flag-wrapper">
         <img 
