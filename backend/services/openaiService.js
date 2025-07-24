@@ -1,10 +1,12 @@
 const { apiKey, apiUrl } = require('../config/openaiConfig');
 const axios = require('axios');
 
-async function getOpenAIResponse(prompt, businessType) {
+async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null) {
   console.log('=== getOpenAIResponse called ===');
   console.log('Prompt:', prompt);
   console.log('Business Type:', businessType);
+  console.log('Revenue:', revenue);
+  console.log('Postal Code:', postalCode);
   // Debug: Log API key status
   console.log('API Key configured:', !!apiKey);
   console.log('API Key starts with sk-:', apiKey ? apiKey.startsWith('sk-') : false);
@@ -23,9 +25,26 @@ async function getOpenAIResponse(prompt, businessType) {
   }
 
   try {
+    // Build context information
+    let contextInfo = `Business Type: ${businessType}`;
+    
+    if (revenue) {
+      const formattedRevenue = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(revenue);
+      contextInfo += `\nAnnual Revenue: ${formattedRevenue}`;
+    }
+    
+    if (postalCode) {
+      contextInfo += `\nPostal Code: ${postalCode}`;
+    }
+
     const systemPrompt = `You are an Oakland, California local small business expert. You help immigrant-owned businesses navigate Oakland-specific regulations, permits, and business requirements.
 
-Business Type: ${businessType}
+${contextInfo}
 
 CRITICAL: All responses must be SPECIFIC to Oakland, California, and US regulations. Never give generic advice - always focus on:
 - Oakland city requirements and procedures
@@ -50,6 +69,11 @@ ALWAYS MENTION OAKLAND SPECIFICALLY:
 - "Oakland's [department name] handles..."
 - "For Oakland businesses..."
 - "Oakland city regulations..."
+
+CONTEXTUAL ADVICE: Use the business revenue and postal code information to provide more targeted advice:
+- For revenue-based questions (grants, loans, tax breaks), consider the business size and income level
+- For location-specific questions, consider the postal code area within Oakland
+- Tailor recommendations based on the business's financial capacity and location
 
 Provide helpful, accurate, and practical advice specific to Oakland, California. Be friendly, supportive, and explain things clearly. If you don't know something specific about Oakland, suggest contacting the relevant Oakland city department or the Oakland Business Assistance Center.`;
 
