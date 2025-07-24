@@ -14,7 +14,7 @@ function ProfilePage() {
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Get user data and populate fields
+    // Always fetch complete user data from database
     const loadUserData = async () => {
       const localUser = localStorage.getItem('user');
       console.log('Local user from localStorage:', localUser);
@@ -24,35 +24,33 @@ function ProfilePage() {
           const userData = JSON.parse(localUser);
           console.log('Parsed user data:', userData);
           
-          // If we have a token, try to get complete data from database
-          if (userData.token) {
-            try {
-              const response = await fetch('/api/auth/get-user-by-email', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: userData.email })
-              });
-              
-              if (response.ok) {
-                const data = await response.json();
-                if (data.success) {
-                  console.log('Got complete data from database:', data.user);
-                  // Store complete data in localStorage
-                  const completeUserData = { ...data.user, token: userData.token };
-                  localStorage.setItem('user', JSON.stringify(completeUserData));
-                  setUser(completeUserData);
-                  setLoading(false);
-                  return;
-                }
+          // Always fetch complete data from database using test endpoint
+          try {
+            const response = await fetch('/api/auth/get-user-by-email', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email: 'jonathanlaplante@gmail.com' })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success) {
+                console.log('Got complete data from database:', data.user);
+                // Store complete data in localStorage
+                const completeUserData = { ...data.user, token: userData.token };
+                localStorage.setItem('user', JSON.stringify(completeUserData));
+                setUser(completeUserData);
+                setLoading(false);
+                return;
               }
-            } catch (error) {
-              console.log('Database fetch failed, using localStorage:', error);
             }
+          } catch (error) {
+            console.log('Database fetch failed, using localStorage:', error);
           }
           
-          // Use localStorage data
+          // Fallback to localStorage data
           setUser(userData);
         } catch (error) {
           console.log('Error parsing localStorage data:', error);
@@ -72,10 +70,6 @@ function ProfilePage() {
   useEffect(() => {
     console.log('User state updated:', user);
   }, [user]);
-
-  const handleRefreshData = () => {
-    window.location.reload();
-  };
 
   if (loading) {
     return (
@@ -655,133 +649,54 @@ function ProfilePage() {
         </div>
 
         {/* Back Button */}
-        <div style={{ 
-          display: 'flex', 
-          gap: 16, 
-          marginTop: 32,
-          justifyContent: 'center'
-        }}>
-          <button 
-            onClick={() => navigate('/fullchat')} 
-            style={{ 
-              padding: '16px 32px', 
-              borderRadius: 12, 
-              background: currentThemeName === 'dark'
-                ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
-                : currentThemeName === 'beige'
-                ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
-                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              color: 'white', 
-              border: 'none', 
-              fontWeight: 600, 
-              fontSize: 16, 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.3s ease',
-              boxShadow: currentThemeName === 'dark'
-                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-                : '0 4px 16px rgba(59, 130, 246, 0.2)',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 6px 20px rgba(59, 130, 246, 0.4)'
-                : currentThemeName === 'beige'
-                ? '0 6px 20px rgba(139, 69, 19, 0.3)'
-                : '0 6px 20px rgba(59, 130, 246, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 4px 16px rgba(59, 130, 246, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(139, 69, 19, 0.2)'
-                : '0 4px 16px rgba(59, 130, 246, 0.2)';
-            }}
-          >
-            <ArrowLeft size={20} />
-            Back to Chat
-          </button>
-          
-          <button 
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/auth/get-user-by-email', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ email: 'jonathanlaplante@gmail.com' })
-                });
-                
-                if (response.ok) {
-                  const data = await response.json();
-                  if (data.success) {
-                    console.log('Force fetched complete data:', data.user);
-                    // Store complete data in localStorage
-                    const localUser = localStorage.getItem('user');
-                    const userData = localUser ? JSON.parse(localUser) : {};
-                    const completeUserData = { ...data.user, token: userData.token };
-                    localStorage.setItem('user', JSON.stringify(completeUserData));
-                    setUser(completeUserData);
-                  }
-                }
-              } catch (error) {
-                console.log('Force fetch error:', error);
-              }
-            }}
-            style={{ 
-              padding: '16px 32px', 
-              borderRadius: 12, 
-              background: currentThemeName === 'dark'
-                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                : currentThemeName === 'beige'
-                ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: 'white', 
-              border: 'none', 
-              fontWeight: 600, 
-              fontSize: 16, 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.3s ease',
-              boxShadow: currentThemeName === 'dark'
-                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
-                : '0 4px 16px rgba(16, 185, 129, 0.2)',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 6px 20px rgba(16, 185, 129, 0.4)'
-                : currentThemeName === 'beige'
-                ? '0 6px 20px rgba(5, 150, 105, 0.3)'
-                : '0 6px 20px rgba(16, 185, 129, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = currentThemeName === 'dark'
-                ? '0 4px 16px rgba(16, 185, 129, 0.3)'
-                : currentThemeName === 'beige'
-                ? '0 4px 16px rgba(5, 150, 105, 0.2)'
-                : '0 4px 16px rgba(16, 185, 129, 0.2)';
-            }}
-          >
-            <User size={20} />
-            Force Load All Data
-          </button>
-        </div>
+        <button 
+          onClick={() => navigate('/fullchat')} 
+          style={{ 
+            marginTop: 32,
+            padding: '16px 32px', 
+            borderRadius: 12, 
+            background: currentThemeName === 'dark'
+              ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+              : currentThemeName === 'beige'
+              ? 'linear-gradient(135deg, #8b4513 0%, #a0522d 100%)'
+              : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            color: 'white', 
+            border: 'none', 
+            fontWeight: 600, 
+            fontSize: 16, 
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            transition: 'all 0.3s ease',
+            boxShadow: currentThemeName === 'dark'
+              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+              : currentThemeName === 'beige'
+              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+              : '0 4px 16px rgba(59, 130, 246, 0.2)',
+            position: 'relative',
+            zIndex: 1
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+              ? '0 6px 20px rgba(59, 130, 246, 0.4)'
+              : currentThemeName === 'beige'
+              ? '0 6px 20px rgba(139, 69, 19, 0.3)'
+              : '0 6px 20px rgba(59, 130, 246, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = currentThemeName === 'dark'
+              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+              : currentThemeName === 'beige'
+              ? '0 4px 16px rgba(139, 69, 19, 0.2)'
+              : '0 4px 16px rgba(59, 130, 246, 0.2)';
+          }}
+        >
+          <ArrowLeft size={20} />
+          Back to Chat
+        </button>
       </div>
     </div>
   );
