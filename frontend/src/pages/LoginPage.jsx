@@ -42,10 +42,10 @@ function LoginPage() {
         localStorage.setItem('user', JSON.stringify({
           id: data.user.id,
           email: data.user.email,
-          name: `${data.user.firstName} ${data.user.lastName}`,
-          firstName: data.user.firstName,
-          lastName: data.user.lastName,
-          isAdmin: data.user.isAdmin
+          name: `${data.user.first_name} ${data.user.last_name}`,
+          firstName: data.user.first_name,
+          lastName: data.user.last_name,
+          isAdmin: data.user.is_admin
         }));
         navigate('/fullchat');
       } else {
