@@ -14,57 +14,24 @@ function ProfilePage() {
   const { theme, currentThemeName } = useTheme();
 
   useEffect(() => {
-    // Fetch user data from backend, fallback to localStorage if needed
-    const fetchProfile = async () => {
-      const localUser = localStorage.getItem('user');
-      console.log('Local user from localStorage:', localUser);
-      if (!localUser) {
-        setLoading(false);
-        return;
-      }
-      
+    // Get user data from localStorage and display it
+    const localUser = localStorage.getItem('user');
+    console.log('Local user from localStorage:', localUser);
+    
+    if (localUser) {
       try {
         const userData = JSON.parse(localUser);
         console.log('Parsed user data:', userData);
-        console.log('Token:', userData.token);
-        
-        if (!userData.token) {
-          console.log('No token found in localStorage');
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-        
-        const response = await fetch('/api/auth/profile', {
-          headers: {
-            'Authorization': `Bearer ${userData.token}`,
-          },
-          credentials: 'include',
-        });
-        
-        console.log('Profile response status:', response.status);
-        console.log('Profile response ok:', response.ok);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Profile data from backend:', data);
-          setUser(data.user);
-        } else {
-          console.log('Profile fetch failed, using localStorage data');
-          // Fallback to localStorage data
-          setUser(userData);
-        }
+        setUser(userData);
       } catch (error) {
-        console.log('Error fetching profile:', error);
-        // Fallback to localStorage data
-        const localUserData = JSON.parse(localUser);
-        setUser(localUserData);
-      } finally {
-        setLoading(false);
+        console.log('Error parsing localStorage data:', error);
+        setUser(null);
       }
-    };
+    } else {
+      setUser(null);
+    }
     
-    fetchProfile();
+    setLoading(false);
   }, []);
 
   // Debug: Log user state changes
@@ -152,90 +119,139 @@ function ProfilePage() {
     );
   }
 
-  const ProfileField = ({ icon: Icon, label, value, color = '#3b82f6' }) => (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 16,
-      padding: '16px 20px',
-      background: currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
-        : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.08)'
-        : 'rgba(59, 130, 246, 0.08)',
-      border: currentThemeName === 'dark'
-        ? '1px solid rgba(255, 255, 255, 0.15)'
-        : currentThemeName === 'beige'
-        ? '1px solid rgba(139, 69, 19, 0.15)'
-        : '1px solid rgba(59, 130, 246, 0.15)',
-      borderRadius: 12,
-      marginBottom: 12,
-      transition: 'all 0.2s ease'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateX(4px)';
-      e.currentTarget.style.background = currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.12)'
-        : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.12)'
-        : 'rgba(59, 130, 246, 0.12)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateX(0)';
-      e.currentTarget.style.background = currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
-        : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.08)'
-        : 'rgba(59, 130, 246, 0.08)';
-    }}>
+  const ProfileField = ({ icon: Icon, label, value, color = '#3b82f6' }) => {
+    // Handle both camelCase and snake_case field names
+    let displayValue = value;
+    
+    if (value === undefined || value === null) {
+      // Try to find the value in user object with different field name formats
+      const snakeCaseKey = label.toLowerCase().replace(/\s+/g, '_');
+      const camelCaseKey = label.toLowerCase().replace(/\s+/g, '').replace(/^[a-z]/, (c) => c.toUpperCase());
+      
+      if (user[snakeCaseKey] !== undefined) {
+        displayValue = user[snakeCaseKey];
+      } else if (user[camelCaseKey] !== undefined) {
+        displayValue = user[camelCaseKey];
+      } else {
+        // Handle special cases
+        if (label === 'Full Name') {
+          const firstName = user.first_name || user.firstName || '';
+          const lastName = user.last_name || user.lastName || '';
+          displayValue = `${firstName} ${lastName}`.trim() || 'N/A';
+        } else if (label === 'Email Address') {
+          displayValue = user.email || 'N/A';
+        } else if (label === 'Phone Number') {
+          displayValue = user.phone || 'N/A';
+        } else if (label === 'Language') {
+          displayValue = user.language ? user.language.toUpperCase() : 'N/A';
+        } else if (label === 'Age') {
+          displayValue = user.age ? `${user.age} years old` : 'N/A';
+        } else if (label === 'Employee Count') {
+          displayValue = user.employee_count || user.employeeCount ? `${user.employee_count || user.employeeCount} employees` : 'N/A';
+        } else if (label === 'Years in Business') {
+          displayValue = user.years_in_business || user.yearsInBusiness ? `${user.years_in_business || user.yearsInBusiness} years` : 'N/A';
+        } else if (label === 'Admin Status') {
+          displayValue = user.is_admin || user.isAdmin ? 'Administrator' : 'Regular User';
+        } else if (label === 'Email Verification') {
+          displayValue = user.is_verified || user.isVerified ? 'Verified' : 'Not Verified';
+        } else if (label === 'Last Login') {
+          displayValue = user.last_login || user.lastLogin ? formatDate(user.last_login || user.lastLogin) : 'N/A';
+        } else if (label === 'Account Created') {
+          displayValue = user.created_at || user.createdAt ? formatDate(user.created_at || user.createdAt) : 'N/A';
+        } else if (label.includes('Annual Revenue')) {
+          const revenue = user[snakeCaseKey] || user[camelCaseKey];
+          displayValue = revenue ? formatCurrency(revenue) : 'N/A';
+        } else {
+          displayValue = 'N/A';
+        }
+      }
+    }
+    
+    return (
       <div style={{
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        background: currentThemeName === 'dark'
-          ? 'rgba(59, 130, 246, 0.25)'
-          : currentThemeName === 'beige'
-          ? 'rgba(139, 69, 19, 0.25)'
-          : 'rgba(59, 130, 246, 0.15)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        color: color,
-        border: currentThemeName === 'dark'
-          ? '1px solid rgba(59, 130, 246, 0.4)'
+        gap: 16,
+        padding: '16px 20px',
+        background: currentThemeName === 'dark'
+          ? 'rgba(255, 255, 255, 0.08)'
           : currentThemeName === 'beige'
-          ? '1px solid rgba(139, 69, 19, 0.4)'
-          : '1px solid rgba(59, 130, 246, 0.25)'
+          ? 'rgba(139, 69, 19, 0.08)'
+          : 'rgba(59, 130, 246, 0.08)',
+        border: currentThemeName === 'dark'
+          ? '1px solid rgba(255, 255, 255, 0.15)'
+          : currentThemeName === 'beige'
+          ? '1px solid rgba(139, 69, 19, 0.15)'
+          : '1px solid rgba(59, 130, 246, 0.15)',
+        borderRadius: 12,
+        marginBottom: 12,
+        transition: 'all 0.2s ease'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateX(4px)';
+        e.currentTarget.style.background = currentThemeName === 'dark'
+          ? 'rgba(255, 255, 255, 0.12)'
+          : currentThemeName === 'beige'
+          ? 'rgba(139, 69, 19, 0.12)'
+          : 'rgba(59, 130, 246, 0.12)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateX(0)';
+        e.currentTarget.style.background = currentThemeName === 'dark'
+          ? 'rgba(255, 255, 255, 0.08)'
+          : currentThemeName === 'beige'
+          ? 'rgba(139, 69, 19, 0.08)'
+          : 'rgba(59, 130, 246, 0.08)';
       }}>
-        <Icon size={20} />
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ 
-          fontSize: 14, 
-          color: currentThemeName === 'dark' 
-            ? '#d1d5db' 
+        <div style={{
+          width: 40,
+          height: 40,
+          borderRadius: 10,
+          background: currentThemeName === 'dark'
+            ? 'rgba(59, 130, 246, 0.25)'
             : currentThemeName === 'beige'
-            ? '#8b4513'
-            : '#374151',
-          marginBottom: 4,
-          fontWeight: 500
-        }}>
-          {label}
-        </div>
-        <div style={{ 
-          fontSize: 16, 
-          fontWeight: 600,
-          color: currentThemeName === 'dark' 
-            ? '#ffffff' 
+            ? 'rgba(139, 69, 19, 0.25)'
+            : 'rgba(59, 130, 246, 0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: color,
+          border: currentThemeName === 'dark'
+            ? '1px solid rgba(59, 130, 246, 0.4)'
             : currentThemeName === 'beige'
-            ? '#5d4037'
-            : '#111827'
+            ? '1px solid rgba(139, 69, 19, 0.4)'
+            : '1px solid rgba(59, 130, 246, 0.25)'
         }}>
-          {value || 'N/A'}
+          <Icon size={20} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ 
+            fontSize: 14, 
+            color: currentThemeName === 'dark' 
+              ? '#d1d5db' 
+              : currentThemeName === 'beige'
+              ? '#8b4513'
+              : '#374151',
+            marginBottom: 4,
+            fontWeight: 500
+          }}>
+            {label}
+          </div>
+          <div style={{ 
+            fontSize: 16, 
+            fontWeight: 600,
+            color: currentThemeName === 'dark' 
+              ? '#ffffff' 
+              : currentThemeName === 'beige'
+              ? '#5d4037'
+              : '#111827'
+          }}>
+            {displayValue || 'N/A'}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const SectionHeader = ({ icon: Icon, title, subtitle, color = '#3b82f6' }) => (
     <div style={{
@@ -448,43 +464,36 @@ function ProfilePage() {
           <ProfileField 
             icon={User} 
             label="Full Name" 
-            value={`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
             color="#3b82f6"
           />
           <ProfileField 
             icon={Mail} 
             label="Email Address" 
-            value={user.email}
             color="#10b981"
           />
           <ProfileField 
             icon={Phone} 
             label="Phone Number" 
-            value={user.phone}
             color="#f59e0b"
           />
           <ProfileField 
             icon={Globe} 
             label="Language" 
-            value={user.language ? user.language.toUpperCase() : 'N/A'}
             color="#8b5cf6"
           />
           <ProfileField 
             icon={Heart} 
             label="Age" 
-            value={user.age ? `${user.age} years old` : 'N/A'}
             color="#ec4899"
           />
           <ProfileField 
             icon={Star} 
             label="Ethnicity" 
-            value={user.ethnicity}
             color="#06b6d4"
           />
           <ProfileField 
             icon={User} 
             label="Gender" 
-            value={user.gender}
             color="#8b5cf6"
           />
         </div>
@@ -500,25 +509,21 @@ function ProfilePage() {
           <ProfileField 
             icon={Building2} 
             label="Business Type" 
-            value={user.business_type}
             color="#ef4444"
           />
           <ProfileField 
             icon={Users} 
             label="Employee Count" 
-            value={user.employee_count ? `${user.employee_count} employees` : 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={TrendingUp} 
             label="Years in Business" 
-            value={user.years_in_business ? `${user.years_in_business} years` : 'N/A'}
             color="#f59e0b"
           />
           <ProfileField 
             icon={Award} 
             label="Corporation Type" 
-            value={user.corporation_type}
             color="#8b5cf6"
           />
         </div>
@@ -534,31 +539,26 @@ function ProfilePage() {
           <ProfileField 
             icon={Home} 
             label="Address Line 1" 
-            value={user.address_line1}
             color="#10b981"
           />
           <ProfileField 
             icon={Home} 
             label="Address Line 2" 
-            value={user.address_line2}
             color="#10b981"
           />
           <ProfileField 
             icon={MapPin} 
             label="City" 
-            value={user.city}
             color="#f59e0b"
           />
           <ProfileField 
             icon={MapPin} 
             label="State" 
-            value={user.state}
             color="#8b5cf6"
           />
           <ProfileField 
             icon={MapPin} 
             label="ZIP Code" 
-            value={user.zip_code}
             color="#06b6d4"
           />
         </div>
@@ -574,19 +574,16 @@ function ProfilePage() {
           <ProfileField 
             icon={DollarSign} 
             label="Annual Revenue 2022" 
-            value={formatCurrency(user.annual_revenue_2022)}
             color="#10b981"
           />
           <ProfileField 
             icon={DollarSign} 
             label="Annual Revenue 2023" 
-            value={formatCurrency(user.annual_revenue_2023)}
             color="#f59e0b"
           />
           <ProfileField 
             icon={DollarSign} 
             label="Annual Revenue 2024" 
-            value={formatCurrency(user.annual_revenue_2024)}
             color="#3b82f6"
           />
         </div>
@@ -602,25 +599,21 @@ function ProfilePage() {
           <ProfileField 
             icon={Shield} 
             label="Admin Status" 
-            value={user.is_admin ? 'Administrator' : 'Regular User'}
             color={user.is_admin ? '#10b981' : '#6b7280'}
           />
           <ProfileField 
             icon={CheckCircle} 
             label="Email Verification" 
-            value={user.is_verified ? 'Verified' : 'Not Verified'}
             color={user.is_verified ? '#10b981' : '#f59e0b'}
           />
           <ProfileField 
             icon={Clock} 
             label="Last Login" 
-            value={user.last_login ? formatDate(user.last_login) : 'N/A'}
             color="#06b6d4"
           />
           <ProfileField 
             icon={Calendar} 
             label="Account Created" 
-            value={user.created_at ? formatDate(user.created_at) : 'N/A'}
             color="#8b5cf6"
           />
         </div>
