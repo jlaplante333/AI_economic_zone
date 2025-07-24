@@ -571,7 +571,13 @@ function FullChatPage() {
           onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >Logout</a>
       </div>
-      <div className="full-chat-container" style={{ background: theme.primaryBg }}>
+      <div className="full-chat-container" style={{ 
+        background: theme.primaryBg,
+        marginRight: showProfileMenu ? '220px' : '0',
+        transition: 'margin-right 0.3s ease',
+        maxWidth: '100vw',
+        overflowX: 'hidden'
+      }}>
         {/* Header */}
         <header className="chat-header" style={{ background: theme.modalBg, borderBottom: `1px solid ${theme.primaryBorder}` }}>
           <div className="header-left">
@@ -1067,7 +1073,10 @@ function FullChatPage() {
           )}
           
           {/* Messages */}
-          <div className="chat-messages" ref={chatMessagesRef}>
+          <div className="chat-messages" ref={chatMessagesRef} style={{
+            paddingRight: '20px',
+            paddingLeft: '20px'
+          }}>
             {messages.length === 0 && !businessType && (
               <div className="welcome-message" style={{
                 textAlign: 'center',
