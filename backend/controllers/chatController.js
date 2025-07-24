@@ -1,25 +1,47 @@
 const { getOpenAIResponse } = require('../services/openaiService');
 const { translate } = require('../services/translationService');
 const { logChat } = require('../models/ChatLog');
+const { findById } = require('../models/User');
 
 exports.handleChat = async (req, res) => {
   console.log('=== handleChat called ===');
   console.log('Request body:', req.body);
-  const { message, language = 'en', businessType = 'restaurant', userId = 1 } = req.body;
+  const { message, language = 'en', businessType: requestBusinessType = '', userId = 1 } = req.body;
   
   try {
+    // Fetch user's business type from database if userId is provided
+    let userBusinessType = requestBusinessType;
+    if (userId && userId !== 1) { // Skip for default user ID 1
+      try {
+        const user = await findById(userId);
+        if (user && user.business_type) {
+          userBusinessType = user.business_type;
+          console.log('User business type from database:', userBusinessType);
+        }
+      } catch (userError) {
+        console.log('Could not fetch user business type, using request business type:', userError.message);
+      }
+    }
+    
+    // Use the business type from user profile, fallback to request business type, then default
+    const finalBusinessType = userBusinessType || requestBusinessType || 'restaurant';
+    console.log('Final business type being used:', finalBusinessType);
+    
     console.log('Calling translate...');
     const englishMessage = await translate(message, language, 'en');
     console.log('English message:', englishMessage);
-    console.log('Calling getOpenAIResponse...');
-    const openaiResponse = await getOpenAIResponse(englishMessage, businessType);
+    console.log('Calling getOpenAIResponse with business type:', finalBusinessType);
+    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType);
     console.log('OpenAI response:', openaiResponse);
     console.log('Calling translate for response...');
     const translatedResponse = await translate(openaiResponse, 'en', language);
     
     // Try to log to database, but don't fail if it doesn't work
     try {
-      await logChat(userId, message, translatedResponse);
+      await logChat(userId, message, translatedResponse, {
+        businessType: finalBusinessType,
+        language: language
+      });
     } catch (dbError) {
       console.log('Database logging failed (this is OK for testing):', dbError.message);
     }

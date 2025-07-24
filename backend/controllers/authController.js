@@ -11,9 +11,9 @@ const registerValidation = [
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
   body('firstName').trim().isLength({ min: 1 }).withMessage('First name is required'),
   body('lastName').trim().isLength({ min: 1 }).withMessage('Last name is required'),
-  body('phone').optional().isMobilePhone().withMessage('Please enter a valid phone number'),
+  body('phone').optional({ checkFalsy: true }).isMobilePhone().withMessage('Please enter a valid phone number'),
   body('language').optional().isLength({ min: 2, max: 5 }).withMessage('Language code must be 2-5 characters'),
-  body('businessType').optional().isLength({ min: 1 }).withMessage('Business type is required')
+  body('businessType').trim().isLength({ min: 1 }).withMessage('Business type is required')
 ];
 
 const loginValidation = [
@@ -41,10 +41,13 @@ const generateToken = (userId, isAdmin = false) => {
 
 // Register new user
 exports.register = async (req, res) => {
+  console.log('Register endpoint called');
+  console.log('Request body:', req.body);
   try {
     // Validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -52,7 +55,33 @@ exports.register = async (req, res) => {
       });
     }
 
-    const { email, password, firstName, lastName, phone, language, businessType } = req.body;
+    const { 
+      email, 
+      password, 
+      firstName, 
+      lastName, 
+      phone, 
+      language, 
+      businessType,
+      // Address fields
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      zipCode,
+      // Demographics
+      age,
+      ethnicity,
+      gender,
+      // Business details
+      employeeCount,
+      yearsInBusiness,
+      corporationType,
+      // Financial information
+      annualRevenue2022,
+      annualRevenue2023,
+      annualRevenue2024
+    } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -71,7 +100,25 @@ exports.register = async (req, res) => {
       lastName,
       phone,
       language: language || 'en',
-      businessType
+      businessType,
+      // Address fields
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      zipCode,
+      // Demographics
+      age: age ? parseInt(age) : null,
+      ethnicity,
+      gender,
+      // Business details
+      employeeCount: employeeCount ? parseInt(employeeCount) : null,
+      yearsInBusiness: yearsInBusiness ? parseInt(yearsInBusiness) : null,
+      corporationType,
+      // Financial information
+      annualRevenue2022: annualRevenue2022 ? parseFloat(annualRevenue2022) : null,
+      annualRevenue2023: annualRevenue2023 ? parseFloat(annualRevenue2023) : null,
+      annualRevenue2024: annualRevenue2024 ? parseFloat(annualRevenue2024) : null
     });
 
     // Send verification email

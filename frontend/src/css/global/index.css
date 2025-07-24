@@ -433,7 +433,7 @@ body.login-bg {
   right: 0;
   bottom: 0;
   background: none;
-  pointer-events: none;
+  /* pointer-events: none; */
 }
 
 /* --- Sci-Fi Atom Animation Enhancements --- */

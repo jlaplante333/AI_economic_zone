@@ -6,20 +6,28 @@ export default defineConfig(({ mode }) => {
   // Load env file from root directory
   const env = loadEnv(mode, path.resolve(__dirname, '../'), '');
   
+  // Only expose VITE_ prefixed variables to the client for security
+  const clientEnv = {};
+  Object.keys(env).forEach(key => {
+    if (key.startsWith('VITE_')) {
+      clientEnv[key] = env[key];
+    }
+  });
+  
   return {
     plugins: [react()],
     server: {
-      port: 3000,
+      port: 3001, // Frontend on 3001
       proxy: {
         '/api': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:3000', // Backend on 3000
           changeOrigin: true,
         },
       },
     },
-    // Make environment variables available to the client
+    // Make only VITE_ prefixed environment variables available to the client
     define: {
-      'process.env': env
+      'process.env': clientEnv
     },
     // Ensure Vite looks for .env in root directory
     envDir: path.resolve(__dirname, '../'),
