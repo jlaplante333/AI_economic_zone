@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import { 
   Users, MessageCircle, Clock, TrendingUp, 
-  Activity, BarChart3, PieChart as PieChartIcon 
+  Activity, BarChart3, PieChart as PieChartIcon, Loader
 } from 'lucide-react';
 
 // Custom tooltip component for bar chart
