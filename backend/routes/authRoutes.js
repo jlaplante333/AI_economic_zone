@@ -9,6 +9,11 @@ const {
   passwordResetRateLimit
 } = require('../middleware/authMiddleware');
 
+// Test route (no authentication required)
+router.post('/get-user-by-email', 
+  authController.getUserByEmail
+);
+
 // Public routes (no authentication required)
 router.post('/register', 
   registerRateLimit,

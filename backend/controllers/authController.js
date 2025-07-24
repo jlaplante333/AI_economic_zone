@@ -653,6 +653,70 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
+// Test endpoint to get user data by email (for debugging)
+exports.getUserByEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    const user = await User.findByEmail(email);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        language: user.language,
+        business_type: user.business_type,
+        is_admin: user.is_admin,
+        is_verified: user.is_verified,
+        last_login: user.last_login,
+        created_at: user.created_at,
+        // Address fields
+        address_line1: user.address_line1,
+        address_line2: user.address_line2,
+        city: user.city,
+        state: user.state,
+        zip_code: user.zip_code,
+        // Demographics
+        age: user.age,
+        ethnicity: user.ethnicity,
+        gender: user.gender,
+        // Business details
+        employee_count: user.employee_count,
+        years_in_business: user.years_in_business,
+        corporation_type: user.corporation_type,
+        // Financial information
+        annual_revenue_2022: user.annual_revenue_2022,
+        annual_revenue_2023: user.annual_revenue_2023,
+        annual_revenue_2024: user.annual_revenue_2024
+      }
+    });
+
+  } catch (error) {
+    console.error('Get user by email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user data. Please try again.'
+    });
+  }
+};
+
 // Export validation rules
 exports.registerValidation = registerValidation;
 exports.loginValidation = loginValidation;
