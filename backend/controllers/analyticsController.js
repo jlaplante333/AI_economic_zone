@@ -130,20 +130,28 @@ exports.getComprehensiveStats = async (req, res) => {
       color: colors[index % colors.length]
     }));
 
-    // Get popular questions
+    // Get popular questions with enhanced categorization
     const popularQuestionsResult = await pool.query(`
       SELECT 
         message as question,
         COUNT(*) as count,
         CASE 
-          WHEN LOWER(message) LIKE '%license%' THEN 'Licensing'
-          WHEN LOWER(message) LIKE '%parking%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' THEN 'Health'
-          WHEN LOWER(message) LIKE '%zoning%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%building%' THEN 'Building'
-          WHEN LOWER(message) LIKE '%tax%' THEN 'Tax'
-          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' THEN 'Registration'
-          ELSE 'Other'
+          WHEN LOWER(message) LIKE '%license%' OR LOWER(message) LIKE '%permit%' THEN 'Licensing'
+          WHEN LOWER(message) LIKE '%parking%' OR LOWER(message) LIKE '%zoning%' THEN 'Zoning'
+          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' OR LOWER(message) LIKE '%sanitation%' THEN 'Health & Safety'
+          WHEN LOWER(message) LIKE '%building%' OR LOWER(message) LIKE '%construction%' THEN 'Building & Construction'
+          WHEN LOWER(message) LIKE '%tax%' OR LOWER(message) LIKE '%irs%' OR LOWER(message) LIKE '%filing%' THEN 'Tax & Accounting'
+          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' OR LOWER(message) LIKE '%dba%' THEN 'Business Registration'
+          WHEN LOWER(message) LIKE '%grant%' OR LOWER(message) LIKE '%funding%' OR LOWER(message) LIKE '%loan%' OR LOWER(message) LIKE '%financial%' THEN 'Grants & Funding'
+          WHEN LOWER(message) LIKE '%corporation%' OR LOWER(message) LIKE '%llc%' OR LOWER(message) LIKE '%s corp%' OR LOWER(message) LIKE '%business structure%' THEN 'Business Structure'
+          WHEN LOWER(message) LIKE '%insurance%' OR LOWER(message) LIKE '%liability%' OR LOWER(message) LIKE '%coverage%' THEN 'Insurance'
+          WHEN LOWER(message) LIKE '%employee%' OR LOWER(message) LIKE '%hire%' OR LOWER(message) LIKE '%payroll%' OR LOWER(message) LIKE '%worker%' THEN 'Employment & HR'
+          WHEN LOWER(message) LIKE '%market%' OR LOWER(message) LIKE '%advertise%' OR LOWER(message) LIKE '%promote%' OR LOWER(message) LIKE '%social media%' THEN 'Marketing & Promotion'
+          WHEN LOWER(message) LIKE '%website%' OR LOWER(message) LIKE '%online%' OR LOWER(message) LIKE '%digital%' THEN 'Digital & Technology'
+          WHEN LOWER(message) LIKE '%location%' OR LOWER(message) LIKE '%space%' OR LOWER(message) LIKE '%rent%' OR LOWER(message) LIKE '%lease%' THEN 'Location & Real Estate'
+          WHEN LOWER(message) LIKE '%supplier%' OR LOWER(message) LIKE '%vendor%' OR LOWER(message) LIKE '%inventory%' THEN 'Supply Chain'
+          WHEN LOWER(message) LIKE '%customer%' OR LOWER(message) LIKE '%client%' OR LOWER(message) LIKE '%service%' THEN 'Customer Service'
+          ELSE 'General Business'
         END as category
       FROM chat_logs 
       WHERE message IS NOT NULL AND message != ''
@@ -176,18 +184,26 @@ exports.getComprehensiveStats = async (req, res) => {
       users: parseInt(row.users)
     }));
 
-    // Get question categories
+    // Get question categories with enhanced categorization
     const questionCategoriesResult = await pool.query(`
       SELECT 
         CASE 
-          WHEN LOWER(message) LIKE '%license%' THEN 'Licensing'
-          WHEN LOWER(message) LIKE '%parking%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' THEN 'Health'
-          WHEN LOWER(message) LIKE '%zoning%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%building%' THEN 'Building'
-          WHEN LOWER(message) LIKE '%tax%' THEN 'Tax'
-          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' THEN 'Registration'
-          ELSE 'Other'
+          WHEN LOWER(message) LIKE '%license%' OR LOWER(message) LIKE '%permit%' THEN 'Licensing'
+          WHEN LOWER(message) LIKE '%parking%' OR LOWER(message) LIKE '%zoning%' THEN 'Zoning'
+          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' OR LOWER(message) LIKE '%sanitation%' THEN 'Health & Safety'
+          WHEN LOWER(message) LIKE '%building%' OR LOWER(message) LIKE '%construction%' THEN 'Building & Construction'
+          WHEN LOWER(message) LIKE '%tax%' OR LOWER(message) LIKE '%irs%' OR LOWER(message) LIKE '%filing%' THEN 'Tax & Accounting'
+          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' OR LOWER(message) LIKE '%dba%' THEN 'Business Registration'
+          WHEN LOWER(message) LIKE '%grant%' OR LOWER(message) LIKE '%funding%' OR LOWER(message) LIKE '%loan%' OR LOWER(message) LIKE '%financial%' THEN 'Grants & Funding'
+          WHEN LOWER(message) LIKE '%corporation%' OR LOWER(message) LIKE '%llc%' OR LOWER(message) LIKE '%s corp%' OR LOWER(message) LIKE '%business structure%' THEN 'Business Structure'
+          WHEN LOWER(message) LIKE '%insurance%' OR LOWER(message) LIKE '%liability%' OR LOWER(message) LIKE '%coverage%' THEN 'Insurance'
+          WHEN LOWER(message) LIKE '%employee%' OR LOWER(message) LIKE '%hire%' OR LOWER(message) LIKE '%payroll%' OR LOWER(message) LIKE '%worker%' THEN 'Employment & HR'
+          WHEN LOWER(message) LIKE '%market%' OR LOWER(message) LIKE '%advertise%' OR LOWER(message) LIKE '%promote%' OR LOWER(message) LIKE '%social media%' THEN 'Marketing & Promotion'
+          WHEN LOWER(message) LIKE '%website%' OR LOWER(message) LIKE '%online%' OR LOWER(message) LIKE '%digital%' THEN 'Digital & Technology'
+          WHEN LOWER(message) LIKE '%location%' OR LOWER(message) LIKE '%space%' OR LOWER(message) LIKE '%rent%' OR LOWER(message) LIKE '%lease%' THEN 'Location & Real Estate'
+          WHEN LOWER(message) LIKE '%supplier%' OR LOWER(message) LIKE '%vendor%' OR LOWER(message) LIKE '%inventory%' THEN 'Supply Chain'
+          WHEN LOWER(message) LIKE '%customer%' OR LOWER(message) LIKE '%client%' OR LOWER(message) LIKE '%service%' THEN 'Customer Service'
+          ELSE 'General Business'
         END as category,
         COUNT(*) as count
       FROM chat_logs 
