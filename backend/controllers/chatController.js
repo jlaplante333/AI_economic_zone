@@ -9,10 +9,9 @@ exports.handleChat = async (req, res) => {
   const { message, language = 'en', businessType: requestBusinessType = '', userId = 1 } = req.body;
   
   try {
-    // Fetch user's business type, revenue, and postal code from database if userId is provided
+    // Fetch ALL user data from database if userId is provided
     let userBusinessType = requestBusinessType;
-    let userRevenue = null;
-    let userPostalCode = null;
+    let userData = null;
     console.log('Attempting to fetch user data for userId:', userId);
     
     if (userId && userId !== 1) { // Skip for default user ID 1
@@ -21,29 +20,43 @@ exports.handleChat = async (req, res) => {
         const user = await findById(userId);
         console.log('User found:', user ? 'Yes' : 'No');
         if (user) {
-          console.log('User business_type field:', user.business_type);
-          console.log('User revenue fields:', {
+          console.log('User object keys:', Object.keys(user));
+          
+          // Get ALL user data
+          userData = {
+            id: user.id,
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            phone: user.phone,
+            language: user.language,
+            business_type: user.business_type,
+            is_admin: user.is_admin,
+            is_verified: user.is_verified,
+            last_login: user.last_login,
+            created_at: user.created_at,
+            // Address fields
+            address_line1: user.address_line1,
+            address_line2: user.address_line2,
+            city: user.city,
+            state: user.state,
+            zip_code: user.zip_code,
+            // Demographics
+            age: user.age,
+            ethnicity: user.ethnicity,
+            gender: user.gender,
+            // Business details
+            employee_count: user.employee_count,
+            years_in_business: user.years_in_business,
+            corporation_type: user.corporation_type,
+            // Financial information
             annual_revenue_2022: user.annual_revenue_2022,
             annual_revenue_2023: user.annual_revenue_2023,
             annual_revenue_2024: user.annual_revenue_2024
-          });
-          console.log('User postal code:', user.zip_code);
-          console.log('User object keys:', Object.keys(user));
-        }
-        
-        if (user && user.business_type) {
-          userBusinessType = user.business_type;
-          console.log('User business type from database:', userBusinessType);
-        } else {
-          console.log('No business_type found in user object');
-        }
-        
-        // Get the most recent revenue data
-        if (user) {
-          userRevenue = user.annual_revenue_2024 || user.annual_revenue_2023 || user.annual_revenue_2022;
-          userPostalCode = user.zip_code;
-          console.log('User revenue from database:', userRevenue);
-          console.log('User postal code from database:', userPostalCode);
+          };
+          
+          userBusinessType = user.business_type || requestBusinessType;
+          console.log('Complete user data fetched:', userData);
         }
       } catch (userError) {
         console.log('Could not fetch user data, using request business type:', userError.message);
@@ -56,14 +69,14 @@ exports.handleChat = async (req, res) => {
     // Use the business type from user profile, fallback to request business type, then default
     const finalBusinessType = userBusinessType || requestBusinessType || 'restaurant';
     console.log('Final business type being used:', finalBusinessType);
-    console.log('User revenue being used:', userRevenue);
-    console.log('User postal code being used:', userPostalCode);
+    console.log('User revenue being used:', userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022);
+    console.log('User postal code being used:', userData?.zip_code);
     
     console.log('Calling translate...');
     const englishMessage = await translate(message, language, 'en');
     console.log('English message:', englishMessage);
     console.log('Calling getOpenAIResponse with business type, revenue, and postal code');
-    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userRevenue, userPostalCode);
+    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData);
     console.log('OpenAI response:', openaiResponse);
     console.log('Calling translate for response...');
     const translatedResponse = await translate(openaiResponse, 'en', language);
@@ -73,8 +86,8 @@ exports.handleChat = async (req, res) => {
       await logChat(userId, message, translatedResponse, {
         businessType: finalBusinessType,
         language: language,
-        revenue: userRevenue,
-        postalCode: userPostalCode
+        revenue: userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022,
+        postalCode: userData?.zip_code
       });
     } catch (dbError) {
       console.log('Database logging failed (this is OK for testing):', dbError.message);
