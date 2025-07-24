@@ -30,7 +30,8 @@ function AnalyticsPage() {
     businessTypeData: [],
     popularQuestions: [],
     dailyActivity: [],
-    questionCategories: []
+    questionCategories: [],
+    recentActivity: [] // Empty array for fallback
   });
 
   useEffect(() => {
@@ -108,7 +109,8 @@ function AnalyticsPage() {
           { name: 'Building', value: 1, color: '#8b5cf6' },
           { name: 'Tax', value: 1, color: '#ef4444' },
           { name: 'Registration', value: 1, color: '#06b6d4' }
-        ]
+        ],
+        recentActivity: [] // Empty array for fallback
       });
     } finally {
       setLoading(false);
@@ -1143,129 +1145,143 @@ function AnalyticsPage() {
               📈 Recent Activity
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 16,
-                padding: '16px 20px',
-                borderRadius: 16,
-                background: currentThemeName === 'dark'
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : currentThemeName === 'beige'
-                  ? 'rgba(139, 69, 19, 0.05)'
-                  : 'rgba(59, 130, 246, 0.05)',
-                border: currentThemeName === 'dark'
-                  ? '1px solid rgba(255, 255, 255, 0.1)'
-                  : currentThemeName === 'beige'
-                  ? '1px solid rgba(139, 69, 19, 0.1)'
-                  : '1px solid rgba(59, 130, 246, 0.1)'
-              }}>
-                <div style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: '#3b82f6',
-                  boxShadow: '0 0 8px rgba(59, 130, 246, 0.4)'
-                }} />
-                <div>
-                  <div style={{ 
-                    fontSize: 15, 
-                    fontWeight: 600, 
-                    color: currentThemeName === 'dark' ? 'white' : theme.text,
-                    marginBottom: 4
+              {analyticsData.recentActivity && analyticsData.recentActivity.length > 0 ? (
+                analyticsData.recentActivity.map((activity, index) => (
+                  <div key={index} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 16,
+                    padding: '16px 20px',
+                    borderRadius: 16,
+                    background: currentThemeName === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : currentThemeName === 'beige'
+                      ? 'rgba(139, 69, 19, 0.05)'
+                      : 'rgba(59, 130, 246, 0.05)',
+                    border: currentThemeName === 'dark'
+                      ? '1px solid rgba(255, 255, 255, 0.1)'
+                      : currentThemeName === 'beige'
+                      ? '1px solid rgba(139, 69, 19, 0.1)'
+                      : '1px solid rgba(59, 130, 246, 0.1)'
                   }}>
-                    Analytics Dashboard Active
+                    <div style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      background: activity.type === 'user_login' ? '#3b82f6' 
+                        : activity.type === 'chat_started' ? '#10b981'
+                        : activity.type === 'user_registered' ? '#f59e0b'
+                        : '#6b7280',
+                      boxShadow: activity.type === 'user_login' ? '0 0 8px rgba(59, 130, 246, 0.4)'
+                        : activity.type === 'chat_started' ? '0 0 8px rgba(16, 185, 129, 0.4)'
+                        : activity.type === 'user_registered' ? '0 0 8px rgba(245, 158, 11, 0.4)'
+                        : '0 0 8px rgba(107, 114, 128, 0.4)'
+                    }} />
+                    <div>
+                      <div style={{ 
+                        fontSize: 15, 
+                        fontWeight: 600, 
+                        color: currentThemeName === 'dark' ? 'white' : theme.text,
+                        marginBottom: 4
+                      }}>
+                        {activity.description}
+                      </div>
+                      <div style={{ 
+                        fontSize: 13, 
+                        color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
+                      }}>
+                        {activity.userName} • {activity.timeAgo}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Fallback when no real activity data is available
+                <>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 16,
+                    padding: '16px 20px',
+                    borderRadius: 16,
+                    background: currentThemeName === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : currentThemeName === 'beige'
+                      ? 'rgba(139, 69, 19, 0.05)'
+                      : 'rgba(59, 130, 246, 0.05)',
+                    border: currentThemeName === 'dark'
+                      ? '1px solid rgba(255, 255, 255, 0.1)'
+                      : currentThemeName === 'beige'
+                      ? '1px solid rgba(139, 69, 19, 0.1)'
+                      : '1px solid rgba(59, 130, 246, 0.1)'
+                  }}>
+                    <div style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      background: '#3b82f6',
+                      boxShadow: '0 0 8px rgba(59, 130, 246, 0.4)'
+                    }} />
+                    <div>
+                      <div style={{ 
+                        fontSize: 15, 
+                        fontWeight: 600, 
+                        color: currentThemeName === 'dark' ? 'white' : theme.text,
+                        marginBottom: 4
+                      }}>
+                        Analytics Dashboard Active
+                      </div>
+                      <div style={{ 
+                        fontSize: 13, 
+                        color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
+                      }}>
+                        Real-time data monitoring enabled
+                      </div>
+                    </div>
                   </div>
                   <div style={{ 
-                    fontSize: 13, 
-                    color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 16,
+                    padding: '16px 20px',
+                    borderRadius: 16,
+                    background: currentThemeName === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : currentThemeName === 'beige'
+                      ? 'rgba(139, 69, 19, 0.05)'
+                      : 'rgba(59, 130, 246, 0.05)',
+                    border: currentThemeName === 'dark'
+                      ? '1px solid rgba(255, 255, 255, 0.1)'
+                      : currentThemeName === 'beige'
+                      ? '1px solid rgba(139, 69, 19, 0.1)'
+                      : '1px solid rgba(59, 130, 246, 0.1)'
                   }}>
-                    Real-time data monitoring enabled
+                    <div style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      background: '#10b981',
+                      boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+                    }} />
+                    <div>
+                      <div style={{ 
+                        fontSize: 15, 
+                        fontWeight: 600, 
+                        color: currentThemeName === 'dark' ? 'white' : theme.text,
+                        marginBottom: 4
+                      }}>
+                        System Status: Online
+                      </div>
+                      <div style={{ 
+                        fontSize: 13, 
+                        color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
+                      }}>
+                        All services operational
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 16,
-                padding: '16px 20px',
-                borderRadius: 16,
-                background: currentThemeName === 'dark'
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : currentThemeName === 'beige'
-                  ? 'rgba(139, 69, 19, 0.05)'
-                  : 'rgba(59, 130, 246, 0.05)',
-                border: currentThemeName === 'dark'
-                  ? '1px solid rgba(255, 255, 255, 0.1)'
-                  : currentThemeName === 'beige'
-                  ? '1px solid rgba(139, 69, 19, 0.1)'
-                  : '1px solid rgba(59, 130, 246, 0.1)'
-              }}>
-                <div style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: '#10b981',
-                  boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
-                }} />
-                <div>
-                  <div style={{ 
-                    fontSize: 15, 
-                    fontWeight: 600, 
-                    color: currentThemeName === 'dark' ? 'white' : theme.text,
-                    marginBottom: 4
-                  }}>
-                    System Status: Online
-                  </div>
-                  <div style={{ 
-                    fontSize: 13, 
-                    color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
-                  }}>
-                    All services operational
-                  </div>
-                </div>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 16,
-                padding: '16px 20px',
-                borderRadius: 16,
-                background: currentThemeName === 'dark'
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : currentThemeName === 'beige'
-                  ? 'rgba(139, 69, 19, 0.05)'
-                  : 'rgba(59, 130, 246, 0.05)',
-                border: currentThemeName === 'dark'
-                  ? '1px solid rgba(255, 255, 255, 0.1)'
-                  : currentThemeName === 'beige'
-                  ? '1px solid rgba(139, 69, 19, 0.1)'
-                  : '1px solid rgba(59, 130, 246, 0.1)'
-              }}>
-                <div style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: '#f59e0b',
-                  boxShadow: '0 0 8px rgba(245, 158, 11, 0.4)'
-                }} />
-                <div>
-                  <div style={{ 
-                    fontSize: 15, 
-                    fontWeight: 600, 
-                    color: currentThemeName === 'dark' ? 'white' : theme.text,
-                    marginBottom: 4
-                  }}>
-                    Data Collection Active
-                  </div>
-                  <div style={{ 
-                    fontSize: 13, 
-                    color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
-                  }}>
-                    User interactions being tracked
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

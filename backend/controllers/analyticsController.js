@@ -1,5 +1,25 @@
 const { getPool } = require('../config/db');
 
+// Helper function to format timestamps into "time ago" format
+const getTimeAgo = (timestamp) => {
+  const now = new Date();
+  const time = new Date(timestamp);
+  const diffInSeconds = Math.floor((now - time) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} seconds ago`;
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  }
+};
+
 exports.getStats = async (req, res) => {
   try {
     const pool = getPool();
@@ -188,6 +208,48 @@ exports.getComprehensiveStats = async (req, res) => {
     // Calculate user satisfaction (mock for now)
     const userSatisfaction = 4.8;
 
+    // Get recent activity (last 24 hours)
+    const recentActivityResult = await pool.query(`
+      SELECT 
+        'user_login' as type,
+        u.first_name,
+        u.last_name,
+        u.last_login as timestamp,
+        'User logged in' as description
+      FROM users u
+      WHERE u.last_login >= NOW() - INTERVAL '24 hours'
+      UNION ALL
+      SELECT 
+        'chat_started' as type,
+        u.first_name,
+        u.last_name,
+        cl.created_at as timestamp,
+        'Chat session started' as description
+      FROM chat_logs cl
+      JOIN users u ON cl.user_id = u.id
+      WHERE cl.created_at >= NOW() - INTERVAL '24 hours'
+        AND cl.message IS NOT NULL
+      UNION ALL
+      SELECT 
+        'user_registered' as type,
+        u.first_name,
+        u.last_name,
+        u.created_at as timestamp,
+        'New user registered' as description
+      FROM users u
+      WHERE u.created_at >= NOW() - INTERVAL '24 hours'
+      ORDER BY timestamp DESC
+      LIMIT 10
+    `);
+
+    const recentActivity = recentActivityResult.rows.map(row => ({
+      type: row.type,
+      userName: `${row.first_name} ${row.last_name}`,
+      timestamp: row.timestamp,
+      description: row.description,
+      timeAgo: getTimeAgo(row.timestamp)
+    }));
+
     res.json({
       userStats: {
         totalUsers,
@@ -201,6 +263,7 @@ exports.getComprehensiveStats = async (req, res) => {
       popularQuestions,
       dailyActivity,
       questionCategories,
+      recentActivity,
       message: 'Comprehensive analytics data retrieved successfully'
     });
 
