@@ -11,16 +11,30 @@ exports.handleChat = async (req, res) => {
   try {
     // Fetch user's business type from database if userId is provided
     let userBusinessType = requestBusinessType;
+    console.log('Attempting to fetch business type for userId:', userId);
+    
     if (userId && userId !== 1) { // Skip for default user ID 1
       try {
+        console.log('Calling findById for userId:', userId);
         const user = await findById(userId);
+        console.log('User found:', user ? 'Yes' : 'No');
+        if (user) {
+          console.log('User business_type field:', user.business_type);
+          console.log('User object keys:', Object.keys(user));
+        }
+        
         if (user && user.business_type) {
           userBusinessType = user.business_type;
           console.log('User business type from database:', userBusinessType);
+        } else {
+          console.log('No business_type found in user object');
         }
       } catch (userError) {
         console.log('Could not fetch user business type, using request business type:', userError.message);
+        console.log('Error details:', userError);
       }
+    } else {
+      console.log('Skipping user lookup - using default userId or userId is 1');
     }
     
     // Use the business type from user profile, fallback to request business type, then default

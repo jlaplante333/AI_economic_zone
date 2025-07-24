@@ -375,7 +375,11 @@ function AnalyticsPage() {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: theme.bg, 
+        background: currentThemeName === 'dark'
+          ? '#0f172a'  // Dark blue background
+          : currentThemeName === 'beige'
+          ? '#f5f5dc'  // Light beige background
+          : '#ffffff', // White background
         color: theme.text,
         display: 'flex',
         alignItems: 'center',
@@ -393,7 +397,11 @@ function AnalyticsPage() {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: theme.bg, 
+        background: currentThemeName === 'dark'
+          ? '#0f172a'  // Dark blue background
+          : currentThemeName === 'beige'
+          ? '#f5f5dc'  // Light beige background
+          : '#ffffff', // White background
         color: theme.text,
         display: 'flex',
         alignItems: 'center',
@@ -424,11 +432,37 @@ function AnalyticsPage() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: theme.bg, 
+      background: currentThemeName === 'dark'
+        ? '#0f172a'  // Dark blue background
+        : currentThemeName === 'beige'
+        ? '#f5f5dc'  // Light beige background
+        : '#ffffff', // White background
       color: theme.text,
-      padding: '20px'
+      padding: '20px',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
-      <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+      {/* Background gradient */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '300px',
+        background: currentThemeName === 'dark'
+          ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%)'
+          : currentThemeName === 'beige'
+          ? 'linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(160, 82, 45, 0.08) 100%)'
+          : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%)',
+        zIndex: 0
+      }} />
+
+      <div style={{ 
+        maxWidth: 1400, 
+        margin: '0 auto',
+        position: 'relative',
+        zIndex: 1
+      }}>
         {/* Header */}
         <div style={{ 
           display: 'flex', 

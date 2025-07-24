@@ -27,6 +27,15 @@ async function getOpenAIResponse(prompt, businessType) {
 
 Business Type: ${businessType}
 
+IMPORTANT: Always explain things in very simple terms (ELI5 - Explain Like I'm 5). Use:
+- Simple, everyday words that anyone can understand
+- Short sentences
+- Step-by-step explanations
+- Avoid complex legal or technical jargon
+- If you must use a technical term, explain it in simple terms
+- Use examples and analogies when helpful
+- Write as if explaining to someone who hasn't finished high school
+
 Provide helpful, accurate, and practical advice specific to Oakland, California. Be friendly, supportive, and explain things clearly. If you don't know something specific, suggest where they can find more information.`;
 
     const response = await axios.post(

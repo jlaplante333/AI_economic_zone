@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { ArrowLeft, User, Mail, Phone, Globe, Building2, Shield, CheckCircle, Clock, Calendar } from 'lucide-react';
+import { 
+  ArrowLeft, User, Mail, Phone, Globe, Building2, Shield, CheckCircle, 
+  Clock, Calendar, MapPin, Users, TrendingUp, DollarSign, Award,
+  Home, Briefcase, Heart, Star
+} from 'lucide-react';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { theme, currentThemeName } = useTheme();
 
@@ -12,26 +17,62 @@ function ProfilePage() {
     // Try to fetch the latest user info from the backend
     const fetchProfile = async () => {
       const localUser = localStorage.getItem('user');
-      if (!localUser) return;
+      if (!localUser) {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const response = await fetch('/api/auth/profile', {
           headers: {
-            // If you use JWT, add Authorization header here
+            'Authorization': `Bearer ${JSON.parse(localUser).token}`,
           },
-          credentials: 'include', // in case you use cookies for auth
+          credentials: 'include',
         });
+        
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
         } else {
-          setUser(JSON.parse(localUser)); // fallback to localStorage
+          // Fallback to localStorage data
+          const localUserData = JSON.parse(localUser);
+          setUser(localUserData);
         }
-      } catch {
-        setUser(JSON.parse(localUser)); // fallback to localStorage
+      } catch (error) {
+        console.log('Error fetching profile:', error);
+        // Fallback to localStorage data
+        const localUserData = JSON.parse(localUser);
+        setUser(localUserData);
+      } finally {
+        setLoading(false);
       }
     };
+    
     fetchProfile();
   }, []);
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        background: theme.bg, 
+        color: theme.text,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ 
+          background: theme.cardBg,
+          border: `1px solid ${theme.border}`,
+          borderRadius: 16,
+          padding: 40,
+          boxShadow: theme.shadow
+        }}>
+          Loading profile...
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -63,15 +104,15 @@ function ProfilePage() {
       gap: 16,
       padding: '16px 20px',
       background: currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
+        ? 'rgba(255, 255, 255, 0.08)'
         : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.05)'
-        : 'rgba(59, 130, 246, 0.05)',
+        ? 'rgba(139, 69, 19, 0.08)'
+        : 'rgba(59, 130, 246, 0.08)',
       border: currentThemeName === 'dark'
-        ? '1px solid rgba(255, 255, 255, 0.1)'
+        ? '1px solid rgba(255, 255, 255, 0.15)'
         : currentThemeName === 'beige'
-        ? '1px solid rgba(139, 69, 19, 0.1)'
-        : '1px solid rgba(59, 130, 246, 0.1)',
+        ? '1px solid rgba(139, 69, 19, 0.15)'
+        : '1px solid rgba(59, 130, 246, 0.15)',
       borderRadius: 12,
       marginBottom: 12,
       transition: 'all 0.2s ease'
@@ -79,50 +120,61 @@ function ProfilePage() {
     onMouseEnter={(e) => {
       e.currentTarget.style.transform = 'translateX(4px)';
       e.currentTarget.style.background = currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.08)'
+        ? 'rgba(255, 255, 255, 0.12)'
         : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.08)'
-        : 'rgba(59, 130, 246, 0.08)';
+        ? 'rgba(139, 69, 19, 0.12)'
+        : 'rgba(59, 130, 246, 0.12)';
     }}
     onMouseLeave={(e) => {
       e.currentTarget.style.transform = 'translateX(0)';
       e.currentTarget.style.background = currentThemeName === 'dark'
-        ? 'rgba(255, 255, 255, 0.05)'
+        ? 'rgba(255, 255, 255, 0.08)'
         : currentThemeName === 'beige'
-        ? 'rgba(139, 69, 19, 0.05)'
-        : 'rgba(59, 130, 246, 0.05)';
+        ? 'rgba(139, 69, 19, 0.08)'
+        : 'rgba(59, 130, 246, 0.08)';
     }}>
       <div style={{
         width: 40,
         height: 40,
         borderRadius: 10,
         background: currentThemeName === 'dark'
-          ? 'rgba(59, 130, 246, 0.2)'
+          ? 'rgba(59, 130, 246, 0.25)'
           : currentThemeName === 'beige'
-          ? 'rgba(139, 69, 19, 0.2)'
-          : 'rgba(59, 130, 246, 0.2)',
+          ? 'rgba(139, 69, 19, 0.25)'
+          : 'rgba(59, 130, 246, 0.15)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: color
+        color: color,
+        border: currentThemeName === 'dark'
+          ? '1px solid rgba(59, 130, 246, 0.4)'
+          : currentThemeName === 'beige'
+          ? '1px solid rgba(139, 69, 19, 0.4)'
+          : '1px solid rgba(59, 130, 246, 0.25)'
       }}>
         <Icon size={20} />
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ 
-          fontSize: 12, 
-          fontWeight: 600, 
-          color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary,
+          fontSize: 14, 
+          color: currentThemeName === 'dark' 
+            ? '#d1d5db' 
+            : currentThemeName === 'beige'
+            ? '#8b4513'
+            : '#374151',
           marginBottom: 4,
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px'
+          fontWeight: 500
         }}>
           {label}
         </div>
         <div style={{ 
           fontSize: 16, 
-          fontWeight: 600, 
-          color: currentThemeName === 'dark' ? 'white' : theme.text
+          fontWeight: 600,
+          color: currentThemeName === 'dark' 
+            ? '#ffffff' 
+            : currentThemeName === 'beige'
+            ? '#5d4037'
+            : '#111827'
         }}>
           {value || 'N/A'}
         </div>
@@ -130,70 +182,157 @@ function ProfilePage() {
     </div>
   );
 
+  const SectionHeader = ({ icon: Icon, title, subtitle, color = '#3b82f6' }) => (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      marginBottom: 20,
+      padding: '16px 20px',
+      background: currentThemeName === 'dark'
+        ? 'rgba(255, 255, 255, 0.05)'
+        : currentThemeName === 'beige'
+        ? 'rgba(139, 69, 19, 0.05)'
+        : 'rgba(59, 130, 246, 0.05)',
+      border: currentThemeName === 'dark'
+        ? '1px solid rgba(255, 255, 255, 0.08)'
+        : currentThemeName === 'beige'
+        ? '1px solid rgba(139, 69, 19, 0.08)'
+        : '1px solid rgba(59, 130, 246, 0.08)',
+      borderRadius: 12,
+      borderLeft: `4px solid ${color}`
+    }}>
+      <div style={{
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        background: currentThemeName === 'dark'
+          ? 'rgba(59, 130, 246, 0.25)'
+          : currentThemeName === 'beige'
+          ? 'rgba(139, 69, 19, 0.25)'
+          : 'rgba(59, 130, 246, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: color
+      }}>
+        <Icon size={18} />
+      </div>
+      <div>
+        <h3 style={{ 
+          fontSize: 18, 
+          fontWeight: 700, 
+          margin: '0 0 4px 0',
+          color: currentThemeName === 'dark' 
+            ? '#ffffff' 
+            : currentThemeName === 'beige'
+            ? '#5d4037'
+            : '#111827'
+        }}>
+          {title}
+        </h3>
+        <p style={{ 
+          fontSize: 14, 
+          color: currentThemeName === 'dark' 
+            ? '#d1d5db' 
+            : currentThemeName === 'beige'
+            ? '#8b4513'
+            : '#6b7280',
+          margin: 0
+        }}>
+          {subtitle}
+        </p>
+      </div>
+    </div>
+  );
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: theme.bg, 
+      background: currentThemeName === 'dark'
+        ? '#0f172a'  // Dark blue background
+        : currentThemeName === 'beige'
+        ? '#f5f5dc'  // Light beige background
+        : '#ffffff', // White background
       color: theme.text,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
+      padding: '20px',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
-      <div style={{ 
+      {/* Background gradient */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '300px',
         background: currentThemeName === 'dark'
-          ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)'
+          ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%)'
           : currentThemeName === 'beige'
-          ? 'linear-gradient(135deg, rgba(245, 245, 220, 0.9) 0%, rgba(250, 235, 215, 0.95) 100%)'
-          : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%)',
-        border: currentThemeName === 'dark'
-          ? '1px solid rgba(59, 130, 246, 0.2)'
-          : currentThemeName === 'beige'
-          ? '1px solid rgba(139, 69, 19, 0.15)'
-          : '1px solid rgba(59, 130, 246, 0.1)',
-        borderRadius: 24,
-        padding: 40,
-        minWidth: 400,
-        maxWidth: 600,
-        width: '100%',
-        boxShadow: currentThemeName === 'dark'
-          ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)'
-          : currentThemeName === 'beige'
-          ? '0 8px 32px rgba(139, 69, 19, 0.1), 0 0 0 1px rgba(139, 69, 19, 0.05)'
-          : '0 8px 32px rgba(59, 130, 246, 0.08), 0 0 0 1px rgba(59, 130, 246, 0.05)',
-        backdropFilter: 'blur(10px)',
-        position: 'relative',
-        overflow: 'hidden'
+          ? 'linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(160, 82, 45, 0.08) 100%)'
+          : 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%)',
+        zIndex: 0
+      }} />
+
+      <div style={{ 
+        maxWidth: 800, 
+        margin: '0 auto', 
+        position: 'relative', 
+        zIndex: 1 
       }}>
-        {/* Background gradient overlay */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: currentThemeName === 'dark'
-            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.03) 100%)'
-            : currentThemeName === 'beige'
-            ? 'linear-gradient(135deg, rgba(139, 69, 19, 0.03) 0%, rgba(160, 82, 45, 0.02) 100%)'
-            : 'linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(147, 51, 234, 0.01) 100%)',
-          pointerEvents: 'none'
-        }} />
-        
         {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: 16, 
-          marginBottom: 32,
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 20,
+          marginBottom: 40,
+          padding: '24px',
+          background: currentThemeName === 'dark'
+            ? 'rgba(30, 41, 59, 0.8)'
+            : currentThemeName === 'beige'
+            ? 'rgba(245, 245, 220, 0.9)'
+            : 'rgba(255, 255, 255, 0.95)',
+          border: currentThemeName === 'dark'
+            ? '1px solid rgba(59, 130, 246, 0.2)'
+            : currentThemeName === 'beige'
+            ? '1px solid rgba(139, 69, 19, 0.15)'
+            : '1px solid rgba(59, 130, 246, 0.1)',
+          borderRadius: 20,
+          boxShadow: currentThemeName === 'dark'
+            ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)'
+            : currentThemeName === 'beige'
+            ? '0 8px 32px rgba(139, 69, 19, 0.1), 0 0 0 1px rgba(139, 69, 19, 0.05)'
+            : '0 8px 32px rgba(59, 130, 246, 0.08), 0 0 0 1px rgba(59, 130, 246, 0.05)',
+          backdropFilter: 'blur(10px)',
           position: 'relative',
-          zIndex: 1
+          overflow: 'hidden'
         }}>
+          {/* Avatar */}
           <div style={{
-            width: 60,
-            height: 60,
-            borderRadius: 16,
+            width: 80,
+            height: 80,
+            borderRadius: 20,
             background: currentThemeName === 'dark'
               ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
               : currentThemeName === 'beige'
@@ -203,7 +342,7 @@ function ProfilePage() {
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
-            fontSize: 24,
+            fontSize: 32,
             fontWeight: 700,
             boxShadow: currentThemeName === 'dark'
               ? '0 4px 16px rgba(59, 130, 246, 0.3)'
@@ -211,33 +350,47 @@ function ProfilePage() {
               ? '0 4px 16px rgba(139, 69, 19, 0.2)'
               : '0 4px 16px rgba(59, 130, 246, 0.2)'
           }}>
-            {user.firstName?.charAt(0) || user.name?.charAt(0) || 'U'}
+            {user.first_name?.charAt(0) || user.firstName?.charAt(0) || 'U'}
           </div>
           <div>
-            <h2 style={{ 
-              fontSize: 28, 
+            <h1 style={{ 
+              fontSize: 32, 
               fontWeight: 700, 
               margin: '0 0 8px 0',
-              color: currentThemeName === 'dark' ? 'white' : theme.text
+              color: currentThemeName === 'dark' 
+                ? '#ffffff' 
+                : currentThemeName === 'beige'
+                ? '#5d4037'
+                : '#111827'
             }}>
-              User Profile
-            </h2>
+              {`${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || 'User Profile'}
+            </h1>
             <p style={{ 
               fontSize: 16, 
-              color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary,
+              color: currentThemeName === 'dark' 
+                ? '#d1d5db' 
+                : currentThemeName === 'beige'
+                ? '#8b4513'
+                : '#6b7280',
               margin: 0
             }}>
-              Account Information & Settings
+              {user.business_type || user.businessType || 'Business Owner'} • {user.city || 'Oakland'}, {user.state || 'CA'}
             </p>
           </div>
         </div>
 
-        {/* Profile Fields */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        {/* Personal Information Section */}
+        <SectionHeader 
+          icon={User} 
+          title="Personal Information" 
+          subtitle="Basic contact and demographic details"
+          color="#3b82f6"
+        />
+        <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={User} 
             label="Full Name" 
-            value={`${user.firstName || user.name || ''} ${user.lastName || ''}`.trim() || 'N/A'}
+            value={`${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || 'N/A'}
             color="#3b82f6"
           />
           <ProfileField 
@@ -255,37 +408,161 @@ function ProfilePage() {
           <ProfileField 
             icon={Globe} 
             label="Language" 
-            value={user.language}
+            value={user.language ? user.language.toUpperCase() : 'N/A'}
             color="#8b5cf6"
           />
           <ProfileField 
+            icon={Heart} 
+            label="Age" 
+            value={user.age ? `${user.age} years old` : 'N/A'}
+            color="#ec4899"
+          />
+          <ProfileField 
+            icon={Star} 
+            label="Ethnicity" 
+            value={user.ethnicity}
+            color="#06b6d4"
+          />
+          <ProfileField 
+            icon={User} 
+            label="Gender" 
+            value={user.gender}
+            color="#8b5cf6"
+          />
+        </div>
+
+        {/* Business Information Section */}
+        <SectionHeader 
+          icon={Building2} 
+          title="Business Information" 
+          subtitle="Company details and structure"
+          color="#ef4444"
+        />
+        <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
+          <ProfileField 
             icon={Building2} 
             label="Business Type" 
-            value={user.businessType}
+            value={user.business_type || user.businessType}
             color="#ef4444"
           />
           <ProfileField 
+            icon={Users} 
+            label="Employee Count" 
+            value={user.employee_count ? `${user.employee_count} employees` : 'N/A'}
+            color="#10b981"
+          />
+          <ProfileField 
+            icon={TrendingUp} 
+            label="Years in Business" 
+            value={user.years_in_business ? `${user.years_in_business} years` : 'N/A'}
+            color="#f59e0b"
+          />
+          <ProfileField 
+            icon={Award} 
+            label="Corporation Type" 
+            value={user.corporation_type}
+            color="#8b5cf6"
+          />
+        </div>
+
+        {/* Address Information Section */}
+        <SectionHeader 
+          icon={MapPin} 
+          title="Address Information" 
+          subtitle="Business location details"
+          color="#10b981"
+        />
+        <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
+          <ProfileField 
+            icon={Home} 
+            label="Address Line 1" 
+            value={user.address_line1}
+            color="#10b981"
+          />
+          <ProfileField 
+            icon={Home} 
+            label="Address Line 2" 
+            value={user.address_line2}
+            color="#10b981"
+          />
+          <ProfileField 
+            icon={MapPin} 
+            label="City" 
+            value={user.city}
+            color="#f59e0b"
+          />
+          <ProfileField 
+            icon={MapPin} 
+            label="State" 
+            value={user.state}
+            color="#8b5cf6"
+          />
+          <ProfileField 
+            icon={MapPin} 
+            label="ZIP Code" 
+            value={user.zip_code}
+            color="#06b6d4"
+          />
+        </div>
+
+        {/* Financial Information Section */}
+        <SectionHeader 
+          icon={DollarSign} 
+          title="Financial Information" 
+          subtitle="Annual revenue data"
+          color="#10b981"
+        />
+        <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
+          <ProfileField 
+            icon={DollarSign} 
+            label="Annual Revenue 2022" 
+            value={formatCurrency(user.annual_revenue_2022)}
+            color="#10b981"
+          />
+          <ProfileField 
+            icon={DollarSign} 
+            label="Annual Revenue 2023" 
+            value={formatCurrency(user.annual_revenue_2023)}
+            color="#f59e0b"
+          />
+          <ProfileField 
+            icon={DollarSign} 
+            label="Annual Revenue 2024" 
+            value={formatCurrency(user.annual_revenue_2024)}
+            color="#3b82f6"
+          />
+        </div>
+
+        {/* Account Information Section */}
+        <SectionHeader 
+          icon={Shield} 
+          title="Account Information" 
+          subtitle="Account status and security"
+          color="#8b5cf6"
+        />
+        <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
+          <ProfileField 
             icon={Shield} 
             label="Admin Status" 
-            value={user.isAdmin ? 'Administrator' : 'Regular User'}
-            color={user.isAdmin ? '#10b981' : '#6b7280'}
+            value={user.is_admin || user.isAdmin ? 'Administrator' : 'Regular User'}
+            color={user.is_admin || user.isAdmin ? '#10b981' : '#6b7280'}
           />
           <ProfileField 
             icon={CheckCircle} 
             label="Email Verification" 
-            value={user.isVerified ? 'Verified' : 'Not Verified'}
-            color={user.isVerified ? '#10b981' : '#f59e0b'}
+            value={user.is_verified || user.isVerified ? 'Verified' : 'Not Verified'}
+            color={user.is_verified || user.isVerified ? '#10b981' : '#f59e0b'}
           />
           <ProfileField 
             icon={Clock} 
             label="Last Login" 
-            value={user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A'}
+            value={user.last_login ? formatDate(user.last_login) : 'N/A'}
             color="#06b6d4"
           />
           <ProfileField 
             icon={Calendar} 
             label="Account Created" 
-            value={user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}
+            value={user.created_at ? formatDate(user.created_at) : 'N/A'}
             color="#8b5cf6"
           />
         </div>

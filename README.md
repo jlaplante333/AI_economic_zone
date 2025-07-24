@@ -7,6 +7,8 @@ A comprehensive AI-powered chatbot designed to help small businesses in Oakland 
 ### Core Functionality
 - **Multi-language AI Chatbot** - Support for 50+ languages
 - **Business-Specific Guidance** - Tailored responses for different business types
+- **ELI5 Chat Responses** - Simple, easy-to-understand explanations for complex topics
+- **Context-Aware Prompts** - AI responses based on user's business type from database
 - **Voice Input/Output** - Speech-to-text and text-to-speech capabilities
 - **Real-time Translation** - Instant language translation
 - **Dynamic Theme System** - Dark, Light, and Beige themes with seamless switching
@@ -39,6 +41,33 @@ A comprehensive AI-powered chatbot designed to help small businesses in Oakland 
 - **Accessibility Features** - High contrast ratios, keyboard navigation, screen reader support
 - **Smooth Animations** - Professional hover effects and transitions
 - **Glassmorphism Design** - Modern visual effects with backdrop blur
+- **Theme Color Corrections** - Optimized background colors and contrast for all themes
+
+## 🤖 Enhanced AI Capabilities
+
+### ELI5 (Explain Like I'm 5) Responses
+- **Simple Language** - Complex business concepts explained in everyday terms
+- **Step-by-Step Guidance** - Clear, actionable instructions for business processes
+- **Visual Analogies** - Easy-to-understand comparisons and examples
+- **Accessibility Focus** - Designed for users with limited formal education
+- **No Technical Jargon** - Plain language explanations of legal and regulatory requirements
+
+### Context-Aware Business Guidance
+- **Database Integration** - AI automatically fetches user's business type from profile
+- **Personalized Responses** - Tailored advice based on specific business category
+- **Dynamic Prompting** - System prompts include business context for relevant guidance
+- **Real-time Context** - Business type retrieved on each chat interaction
+- **Fallback Support** - Graceful handling when business type is unavailable
+
+### Business Type Categories
+- **Technology** - Software, IT services, digital products
+- **Restaurant** - Food service, cafes, catering
+- **Retail** - Stores, shops, e-commerce
+- **Transportation** - Delivery, logistics, transportation services
+- **Healthcare** - Medical services, wellness, health products
+- **Construction** - Building, renovation, contracting
+- **Professional Services** - Consulting, legal, accounting
+- **Manufacturing** - Production, assembly, industrial services
 
 ## 🛠️ Technology Stack
 
@@ -129,15 +158,18 @@ SELECT email, is_admin FROM users WHERE is_admin = true;
 ## 🎨 Theme System
 
 ### Available Themes
-- **Dark Theme** - Professional dark interface with blue accents
-- **Light Theme** - Clean white interface with blue highlights  
-- **Beige Theme** - Warm earth-toned interface with brown accents
+- **Dark Theme** - Professional dark interface with blue accents and dark blue backgrounds
+- **Light Theme** - Clean white interface with blue highlights and pure white backgrounds
+- **Beige Theme** - Warm earth-toned interface with brown accents and light beige backgrounds
 
 ### Theme Features
 - **Automatic Persistence** - Theme preference saved across sessions
 - **Seamless Switching** - Instant theme changes without page reload
 - **Consistent Styling** - All components adapt to current theme
 - **Accessibility Optimized** - High contrast ratios in all themes
+- **Background Matching** - All pages have theme-appropriate background colors
+- **Gradient Overlays** - Subtle decorative gradients that complement each theme
+- **Enhanced Contrast** - Optimized text and element visibility across all themes
 
 ## 🚀 Quick Start
 
