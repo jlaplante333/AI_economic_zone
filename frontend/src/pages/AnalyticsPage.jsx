@@ -685,8 +685,15 @@ function AnalyticsPage() {
                         ? '1px solid rgba(139, 69, 19, 0.15)'
                         : '1px solid rgba(59, 130, 246, 0.1)',
                       borderRadius: 12,
-                      color: currentThemeName === 'dark' ? 'white' : theme.text
+                      color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
+                      fontSize: '14px',
+                      fontWeight: '500'
                     }}
+                    formatter={(value, name, props) => [
+                      `${value} questions`,
+                      props.payload.name
+                    ]}
+                    labelFormatter={() => ''}
                   />
                   <Area 
                     type="monotone" 
