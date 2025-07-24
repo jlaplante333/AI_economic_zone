@@ -526,7 +526,7 @@ function AnalyticsPage() {
                   : '#6b7280',
                 margin: 0
               }}>
-                Real-time insights into user engagement and business performance
+                Real-time insights into user engagement and business performance (demo data)
               </p>
             </div>
           </div>
@@ -847,7 +847,9 @@ function AnalyticsPage() {
                         ? '1px solid rgba(139, 69, 19, 0.15)'
                         : '1px solid rgba(59, 130, 246, 0.1)',
                       borderRadius: 12,
-                      color: currentThemeName === 'dark' ? 'white' : theme.text
+                      color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
+                      fontSize: '14px',
+                      fontWeight: '500'
                     }}
                   />
                 </PieChart>
@@ -981,7 +983,9 @@ function AnalyticsPage() {
                         ? '1px solid rgba(139, 69, 19, 0.15)'
                         : '1px solid rgba(59, 130, 246, 0.1)',
                       borderRadius: 12,
-                      color: currentThemeName === 'dark' ? 'white' : theme.text
+                      color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
+                      fontSize: '14px',
+                      fontWeight: '500'
                     }}
                   />
                   <Bar 
@@ -1160,8 +1164,8 @@ function AnalyticsPage() {
                   width: 12,
                   height: 12,
                   borderRadius: '50%',
-                  background: '#10b981',
-                  boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+                  background: '#3b82f6',
+                  boxShadow: '0 0 8px rgba(59, 130, 246, 0.4)'
                 }} />
                 <div>
                   <div style={{ 
@@ -1170,13 +1174,13 @@ function AnalyticsPage() {
                     color: currentThemeName === 'dark' ? 'white' : theme.text,
                     marginBottom: 4
                   }}>
-                    New user registered
+                    Analytics Dashboard Active
                   </div>
                   <div style={{ 
                     fontSize: 13, 
                     color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
                   }}>
-                    2 hours ago
+                    Real-time data monitoring enabled
                   </div>
                 </div>
               </div>
@@ -1201,8 +1205,8 @@ function AnalyticsPage() {
                   width: 12,
                   height: 12,
                   borderRadius: '50%',
-                  background: '#3b82f6',
-                  boxShadow: '0 0 8px rgba(59, 130, 246, 0.4)'
+                  background: '#10b981',
+                  boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
                 }} />
                 <div>
                   <div style={{ 
@@ -1211,13 +1215,13 @@ function AnalyticsPage() {
                     color: currentThemeName === 'dark' ? 'white' : theme.text,
                     marginBottom: 4
                   }}>
-                    Chat session completed
+                    System Status: Online
                   </div>
                   <div style={{ 
                     fontSize: 13, 
                     color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
                   }}>
-                    4 hours ago
+                    All services operational
                   </div>
                 </div>
               </div>
@@ -1252,13 +1256,13 @@ function AnalyticsPage() {
                     color: currentThemeName === 'dark' ? 'white' : theme.text,
                     marginBottom: 4
                   }}>
-                    FAQ interaction
+                    Data Collection Active
                   </div>
                   <div style={{ 
                     fontSize: 13, 
                     color: currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary 
                   }}>
-                    6 hours ago
+                    User interactions being tracked
                   </div>
                 </div>
               </div>
