@@ -1,15 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, BarChart, Bar 
 } from 'recharts';
 import { 
-  Users, MessageCircle, TrendingUp, MapPin, Building2, 
-  Calendar, Clock, Star, Activity, Target, Award, Zap,
-  ArrowUpRight, ArrowDownRight, Eye, MessageSquare, UserCheck, Loader
+  Users, MessageCircle, Clock, TrendingUp, 
+  Activity, BarChart3, PieChart as PieChartIcon 
 } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-import { useNavigate } from 'react-router-dom';
+
+// Custom tooltip component for bar chart
+const CustomBarTooltip = ({ active, payload, label, currentThemeName }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div style={{
+        background: currentThemeName === 'dark'
+          ? 'rgba(30, 41, 59, 0.95)'
+          : currentThemeName === 'beige'
+          ? 'rgba(245, 245, 220, 0.95)'
+          : 'rgba(255, 255, 255, 0.95)',
+        border: currentThemeName === 'dark'
+          ? '1px solid rgba(59, 130, 246, 0.2)'
+          : currentThemeName === 'beige'
+          ? '1px solid rgba(139, 69, 19, 0.15)'
+          : '1px solid rgba(59, 130, 246, 0.1)',
+        borderRadius: 12,
+        padding: '12px 16px',
+        color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+      }}>
+        <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+          {data.name}
+        </div>
+        <div>
+          {data.value} questions
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 function AnalyticsPage() {
   const { theme, currentThemeName } = useTheme();
@@ -976,22 +1009,7 @@ function AnalyticsPage() {
                     stroke={currentThemeName === 'dark' ? '#9ca3af' : theme.textSecondary} 
                   />
                   <Tooltip 
-                    contentStyle={{
-                      background: currentThemeName === 'dark'
-                        ? 'rgba(30, 41, 59, 0.95)'
-                        : currentThemeName === 'beige'
-                        ? 'rgba(245, 245, 220, 0.95)'
-                        : 'rgba(255, 255, 255, 0.95)',
-                      border: currentThemeName === 'dark'
-                        ? '1px solid rgba(59, 130, 246, 0.2)'
-                        : currentThemeName === 'beige'
-                        ? '1px solid rgba(139, 69, 19, 0.15)'
-                        : '1px solid rgba(59, 130, 246, 0.1)',
-                      borderRadius: 12,
-                      color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
-                      fontSize: '14px',
-                      fontWeight: '500'
-                    }}
+                    content={<CustomBarTooltip currentThemeName={currentThemeName} />}
                   />
                   <Bar 
                     dataKey="value" 
