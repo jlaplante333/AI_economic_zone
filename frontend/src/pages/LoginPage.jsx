@@ -38,7 +38,8 @@ function LoginPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        // Store real user info in localStorage
+        // Store token and user info in localStorage
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify({
           id: data.user.id,
           email: data.user.email,
@@ -47,7 +48,11 @@ function LoginPage() {
           lastName: data.user.last_name,
           isAdmin: data.user.is_admin
         }));
-        navigate('/fullchat');
+        
+        // Redirect to the originally requested page or default to fullchat
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get('redirect') || '/fullchat';
+        navigate(redirectTo);
       } else {
         const errorData = await response.json();
         alert(errorData.message || 'Login failed. Please try again.');

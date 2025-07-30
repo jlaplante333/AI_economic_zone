@@ -1006,10 +1006,18 @@ function FullChatPage() {
                 ? 'Change to White'
                 : 'Change to Dark'}
         </button>
-        <a href="/login" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: '#ef4444', borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
+        <button
+          onClick={() => {
+            // Clear authentication data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            // Redirect to login page
+            window.location.href = '/login';
+          }}
+          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#ef4444', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
           onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
           onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >Logout</a>
+        >Logout</button>
         <button
           onClick={testSpeechSynthesis}
           style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#10b981', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import ProfessionalLanguagePage from './pages/ProfessionalLanguagePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -20,16 +21,47 @@ function App() {
         <Router>
           <div className="App">
             <Routes>
+              {/* Public routes - accessible without login */}
               <Route path="/" element={<ProfessionalLanguagePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-              <Route path="/chat" element={<ChatPage />} />
-              <Route path="/full-chat" element={<FullChatPage />} />
-              <Route path="/fullchat" element={<FullChatPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/ai-test" element={<AITestPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
+              
+              {/* Protected routes - require authentication */}
+              <Route path="/chat" element={
+                <ProtectedRoute>
+                  <ChatPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/full-chat" element={
+                <ProtectedRoute>
+                  <FullChatPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/fullchat" element={
+                <ProtectedRoute>
+                  <FullChatPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/ai-test" element={
+                <ProtectedRoute>
+                  <AITestPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/analytics" element={
+                <ProtectedRoute>
+                  <AnalyticsPage />
+                </ProtectedRoute>
+              } />
             </Routes>
           </div>
         </Router>
