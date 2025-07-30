@@ -10,6 +10,41 @@ import {
   Activity, BarChart3, PieChart as PieChartIcon, Loader, UserCheck, Star, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 
+// Custom tooltip component for pie chart
+const CustomPieTooltip = ({ active, payload, currentThemeName }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div style={{
+        background: currentThemeName === 'dark'
+          ? 'rgba(30, 41, 59, 0.95)'
+          : currentThemeName === 'beige'
+          ? 'rgba(245, 245, 220, 0.95)'
+          : 'rgba(255, 255, 255, 0.95)',
+        border: currentThemeName === 'dark'
+          ? '1px solid rgba(59, 130, 246, 0.2)'
+          : currentThemeName === 'beige'
+          ? '1px solid rgba(139, 69, 19, 0.15)'
+          : '1px solid rgba(59, 130, 246, 0.1)',
+        borderRadius: 12,
+        padding: '12px 16px',
+        color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+      }}>
+        <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+          {data.name}
+        </div>
+        <div>
+          {data.value}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 // Custom tooltip component for bar chart
 const CustomBarTooltip = ({ active, payload, label, currentThemeName }) => {
   if (active && payload && payload.length) {
@@ -878,22 +913,7 @@ function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{
-                      background: currentThemeName === 'dark'
-                        ? 'rgba(30, 41, 59, 0.95)'
-                        : currentThemeName === 'beige'
-                        ? 'rgba(245, 245, 220, 0.95)'
-                        : 'rgba(255, 255, 255, 0.95)',
-                      border: currentThemeName === 'dark'
-                        ? '1px solid rgba(59, 130, 246, 0.2)'
-                        : currentThemeName === 'beige'
-                        ? '1px solid rgba(139, 69, 19, 0.15)'
-                        : '1px solid rgba(59, 130, 246, 0.1)',
-                      borderRadius: 12,
-                      color: currentThemeName === 'dark' ? '#ffffff' : '#1f2937',
-                      fontSize: '14px',
-                      fontWeight: '500'
-                    }}
+                    content={<CustomPieTooltip currentThemeName={currentThemeName} />}
                   />
                 </PieChart>
               </ResponsiveContainer>
