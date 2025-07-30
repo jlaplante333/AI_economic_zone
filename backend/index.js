@@ -43,10 +43,12 @@ app.get('/health', (req, res) => res.json({
 const chatRoutes = require('./routes/chatRoutes');
 const authRoutes = require('./routes/authRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const ttsRoutes = require('./routes/ttsRoutes');
 
 app.use('/api/chat', chatRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/tts', ttsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

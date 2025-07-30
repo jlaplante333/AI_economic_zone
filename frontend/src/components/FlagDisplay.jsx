@@ -16,6 +16,13 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
     'th': 'https://flagcdn.com/w320/th.png',
     'ja': 'https://flagcdn.com/w320/jp.png',
     
+    // New languages with flags
+    'km': 'https://flagcdn.com/w320/kh.png', // Cambodia
+    'lo': 'https://flagcdn.com/w320/la.png', // Laos
+    'ti': 'https://flagcdn.com/w320/er.png', // Eritrea
+    'prs': 'https://flagcdn.com/w320/af.png', // Afghanistan
+    'mam': 'https://flagcdn.com/w320/gt.png', // Guatemala
+    
     // Additional languages
     'tr': 'https://flagcdn.com/w320/tr.png',
     'ru': 'https://flagcdn.com/w320/ru.png',

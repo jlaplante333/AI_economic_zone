@@ -1,6 +1,71 @@
 const { apiKey, apiUrl } = require('../config/openaiConfig');
 const axios = require('axios');
 
+// Function to validate AI response for logical inconsistencies
+function validateResponse(response, userData) {
+  console.log('🔍 Validating response for logical consistency...');
+  
+  const issues = [];
+  
+  // Check for ethnicity-based inconsistencies
+  if (userData?.ethnicity) {
+    const ethnicity = userData.ethnicity.toLowerCase();
+    const responseLower = response.toLowerCase();
+    
+    if ((ethnicity === 'white' || ethnicity === 'caucasian') && 
+        (responseLower.includes('minority grant') || 
+         responseLower.includes('minority program') || 
+         responseLower.includes('minority business') ||
+         responseLower.includes('hispanic grant') ||
+         responseLower.includes('black business') ||
+         responseLower.includes('asian business'))) {
+      issues.push('Minority-specific program recommended for White user');
+    }
+  }
+  
+  // Check for gender-based inconsistencies
+  if (userData?.gender) {
+    const gender = userData.gender.toLowerCase();
+    const responseLower = response.toLowerCase();
+    
+    if (gender === 'male' && 
+        (responseLower.includes('women grant') || 
+         responseLower.includes('women program') || 
+         responseLower.includes('female business'))) {
+      issues.push('Women-specific program recommended for Male user');
+    }
+  }
+  
+  // Check for revenue-based inconsistencies
+  if (userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022) {
+    const revenue = userData.annual_revenue_2024 || userData.annual_revenue_2023 || userData.annual_revenue_2022;
+    const responseLower = response.toLowerCase();
+    
+    if (revenue > 1000000 && 
+        (responseLower.includes('small business grant') || 
+         responseLower.includes('startup grant') ||
+         responseLower.includes('micro business'))) {
+      issues.push('Small business program recommended for large business');
+    }
+  }
+  
+  if (issues.length > 0) {
+    console.log('⚠️ Logical inconsistencies found:', issues);
+    return {
+      hasIssues: true,
+      issues: issues,
+      correctedResponse: response + '\n\n⚠️ CORRECTION: I need to clarify that some of the programs I mentioned may not be suitable for your specific profile. Please contact the Oakland Business Assistance Center at (510) 238-7398 for personalized recommendations that match your business profile exactly.'
+    };
+  }
+  
+  console.log('✅ Response validation passed');
+  return {
+    hasIssues: false,
+    issues: [],
+    correctedResponse: response
+  };
+}
+
 async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null, userData = null) {
   console.log('=== getOpenAIResponse called ===');
   console.log('Prompt:', prompt);
@@ -87,6 +152,45 @@ async function getOpenAIResponse(prompt, businessType, revenue = null, postalCod
 
 ${contextInfo}
 
+CRITICAL VALIDATION RULES - ALWAYS CHECK BEFORE RECOMMENDING:
+
+1. ETHNICITY-BASED PROGRAMS:
+   - If user ethnicity is "White" or "Caucasian": DO NOT recommend minority-specific grants, programs, or resources
+   - If user ethnicity is "Hispanic", "Black", "Asian", "Native American", etc.: You MAY recommend minority-specific programs
+   - If ethnicity is not specified: Ask for clarification before recommending ethnicity-based programs
+
+2. GENDER-BASED PROGRAMS:
+   - If user gender is "Male": DO NOT recommend women-specific grants or programs
+   - If user gender is "Female": You MAY recommend women-specific programs
+   - If gender is not specified: Ask for clarification before recommending gender-based programs
+
+3. AGE-BASED PROGRAMS:
+   - If user age is under 35: You MAY recommend young entrepreneur programs
+   - If user age is over 65: You MAY recommend senior-specific programs
+   - If age is not specified: Ask for clarification before recommending age-based programs
+
+4. REVENUE-BASED PROGRAMS:
+   - If annual revenue > $1M: DO NOT recommend small business grants (<$50K)
+   - If annual revenue < $100K: DO NOT recommend large business programs
+   - Always match program requirements to actual business size
+
+5. LOCATION-BASED PROGRAMS:
+   - Only recommend programs available in Oakland, California
+   - Consider specific Oakland neighborhoods and postal codes
+   - DO NOT recommend programs from other cities or states
+
+LOGICAL CONSISTENCY CHECK:
+Before making any recommendation, verify:
+- Does this program match the user's ethnicity? (if ethnicity-specific)
+- Does this program match the user's gender? (if gender-specific)  
+- Does this program match the user's age? (if age-specific)
+- Does this program match the user's business size/revenue?
+- Is this program available in Oakland, California?
+
+If any of these checks fail, either:
+1. Recommend an alternative that DOES match the user's profile, OR
+2. Explain why the requested program doesn't match their profile and suggest alternatives
+
 CRITICAL: All responses must be SPECIFIC to Oakland, California, and US regulations. Never give generic advice - always focus on:
 - Oakland city requirements and procedures
 - California state regulations that apply to Oakland businesses
@@ -140,7 +244,17 @@ Provide helpful, accurate, and practical advice specific to Oakland, California.
       }
     );
 
-    return response.data.choices[0].message.content;
+    const aiResponse = response.data.choices[0].message.content;
+    
+    // Validate the response for logical inconsistencies
+    const validation = validateResponse(aiResponse, userData);
+    
+    if (validation.hasIssues) {
+      console.log('⚠️ Returning corrected response due to logical inconsistencies');
+      return validation.correctedResponse;
+    }
+    
+    return aiResponse;
   } catch (error) {
     console.error('OpenAI API Error:', error.response?.data || error.message);
     return `I'm having trouble connecting right now. Please try again in a moment. (Error: ${error.message})`;

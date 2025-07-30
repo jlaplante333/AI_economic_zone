@@ -135,6 +135,9 @@ function LoginPage() {
             }}
           >
             <Globe size={14} />
+            <span style={{ fontSize: '16px', marginRight: '4px' }}>
+              {availableLanguages[currentLanguageIndex].flag}
+            </span>
             {availableLanguages[currentLanguageIndex].name}
           </button>
           <p className="login-subtitle">Sign in to access your Oakland AI assistant</p>

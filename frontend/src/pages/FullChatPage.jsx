@@ -1,29 +1,9 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut } from 'lucide-react';
+import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut, Loader } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import path from 'path';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-
-function DebugDropdown() {
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 100,
-      right: 100,
-      background: 'red',
-      zIndex: 9999999,
-      pointerEvents: 'auto',
-      width: 400,
-      height: 400,
-      padding: 40
-    }}>
-      <Link to="/profile" style={{ fontSize: 30, display: 'block', margin: 10, color: 'white' }}>Profile</Link>
-      <Link to="/analytics" style={{ fontSize: 30, display: 'block', margin: 10, color: 'white' }}>Analytics</Link>
-      <Link to="/login" style={{ fontSize: 30, display: 'block', margin: 10, color: 'white' }}>Logout</Link>
-    </div>
-  );
-}
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -41,6 +21,14 @@ function FullChatPage() {
           transform: translateX(-50%) translateY(-3px);
         }
       }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
@@ -52,12 +40,20 @@ function FullChatPage() {
   const [businessType, setBusinessType] = useState('');
   const [user, setUser] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
+  const [wasVoiceMessage, setWasVoiceMessage] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState('alloy');
+  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const [showQuickOptionsModal, setShowQuickOptionsModal] = useState(false);
   const [showBusinessOptionsModal, setShowBusinessOptionsModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef(null);
   const chatMessagesRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const speechRef = useRef(null);
+  const currentAudioRef = useRef(null);
   
   // Theme context
   const { theme, currentThemeName, toggleTheme, isToggling } = useTheme();
@@ -75,6 +71,140 @@ function FullChatPage() {
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = selectedLanguage;
+
+      recognitionRef.current.onstart = () => {
+        console.log('Speech recognition started with language:', selectedLanguage);
+        setIsRecording(true);
+        setIsListening(true);
+        // Clear any stored final transcript
+        recognitionRef.current.finalTranscript = '';
+        // Stop any currently playing speech
+        stopCurrentSpeech();
+      };
+
+      recognitionRef.current.onresult = (event) => {
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        console.log('Speech recognition result:', { finalTranscript, interimTranscript });
+        
+        // Update input message with transcript
+        setInputMessage(finalTranscript || interimTranscript);
+        
+        // Store the final transcript for later use
+        if (finalTranscript) {
+          recognitionRef.current.finalTranscript = finalTranscript;
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        console.log('Speech recognition ended');
+        setIsRecording(false);
+        setIsListening(false);
+        
+        // Add a delay to ensure final transcript is captured
+        setTimeout(() => {
+          // Get the final transcript directly from the recognition results
+          let finalTranscript = '';
+          if (recognitionRef.current && recognitionRef.current.results) {
+            console.log('Recognition results:', recognitionRef.current.results);
+            console.log('Number of results:', recognitionRef.current.results.length);
+            
+            for (let i = 0; i < recognitionRef.current.results.length; i++) {
+              const result = recognitionRef.current.results[i];
+              console.log(`Result ${i}:`, result);
+              console.log(`Is final:`, result.isFinal);
+              console.log(`Transcript:`, result[0]?.transcript);
+              
+              if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+              }
+            }
+          }
+          
+          // Also try to get from the current input message as fallback
+          const inputMessageText = inputMessage.trim();
+          const storedFinalTranscript = recognitionRef.current.finalTranscript || '';
+          const finalMessage = finalTranscript.trim() || storedFinalTranscript.trim() || inputMessageText;
+          
+          console.log('Final transcript from results:', finalTranscript);
+          console.log('Stored final transcript:', storedFinalTranscript);
+          console.log('Input message text:', inputMessageText);
+          console.log('Final message to send:', finalMessage);
+          
+          if (finalMessage) {
+            console.log('🎤 VOICE MESSAGE DETECTED!');
+            console.log('📝 Final message to send:', finalMessage);
+            console.log('🚀 Sending voice message to OpenAI...');
+            
+            // Clear the input immediately
+            setInputMessage('');
+            // Set processing state
+            setIsProcessingVoice(true);
+            // Set voice message flag
+            setWasVoiceMessage(true);
+            
+            // Send the message immediately without delay
+            handleSendMessage(finalMessage).finally(() => {
+              console.log('✅ Voice message processing completed');
+              setIsProcessingVoice(false);
+            });
+          } else {
+            console.log('❌ No final transcript to send');
+          }
+        }, 500); // Wait 500ms for final transcript to be captured
+      };
+    } else {
+      console.error('Speech recognition not supported in this browser');
+    }
+
+    // Initialize text-to-speech
+    if ('speechSynthesis' in window) {
+      speechRef.current = window.speechSynthesis;
+      console.log('🔊 Speech synthesis initialized successfully');
+      
+      // Test speech synthesis
+      const testUtterance = new SpeechSynthesisUtterance('Test');
+      testUtterance.volume = 0; // Silent test
+      speechRef.current.speak(testUtterance);
+      console.log('🔊 Speech synthesis test completed');
+    } else {
+      console.error('❌ Text-to-speech not supported in this browser');
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      if (speechRef.current && speechRef.current.speaking) {
+        speechRef.current.cancel();
+      }
+    };
+  }, [selectedLanguage]); // Remove inputMessage dependency to prevent infinite re-renders
+
   // Close profile menu and modals when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -125,48 +255,48 @@ function FullChatPage() {
 
   // All available business options
   const allBusinessOptions = [
-    { type: 'beauty salon', icon: <Scissors size={32} color="#60a5fa" />, label: 'I own a beauty salon' },
-    { type: 'restaurant', icon: <UtensilsCrossed size={32} color="#f59e42" />, label: 'I own a restaurant' },
-    { type: 'retail store', icon: <ShoppingBag size={32} color="#f472b6" />, label: 'I own a retail store' },
-    { type: 'coffee shop', icon: <Coffee size={32} color="#a3a3a3" />, label: 'I own a coffee shop' },
-    { type: 'barbershop', icon: <Scissors size={32} color="#f87171" />, label: 'I own a barbershop' },
-    { type: 'bakery', icon: <Home size={32} color="#fbbf24" />, label: 'I own a bakery' },
-    { type: 'gym', icon: <Heart size={32} color="#34d399" />, label: 'I own a gym' },
-    { type: 'auto repair', icon: <Settings size={32} color="#f59e42" />, label: 'I own an auto repair shop' },
-    { type: 'laundry', icon: <ShoppingBag size={32} color="#60a5fa" />, label: 'I own a laundry service' },
-    { type: 'pet grooming', icon: <User size={32} color="#fbbf24" />, label: 'I own a pet grooming business' },
-    { type: 'tattoo parlor', icon: <Edit size={32} color="#a78bfa" />, label: 'I own a tattoo parlor' },
-    { type: 'nail salon', icon: <Star size={32} color="#f472b6" />, label: 'I own a nail salon' },
-    { type: 'photography studio', icon: <Camera size={32} color="#60a5fa" />, label: 'I own a photography studio' },
-    { type: 'consulting', icon: <Briefcase size={32} color="#a3a3a3" />, label: 'I own a consulting business' },
-    { type: 'daycare', icon: <User size={32} color="#fbbf24" />, label: 'I own a daycare center' },
-    { type: 'cleaning service', icon: <Home size={32} color="#34d399" />, label: 'I own a cleaning service' },
-    { type: 'food truck', icon: <ShoppingBag size={32} color="#f59e42" />, label: 'I own a food truck' },
-    { type: 'yoga studio', icon: <User size={32} color="#a78bfa" />, label: 'I own a yoga studio' },
-    { type: 'music school', icon: <Star size={32} color="#60a5fa" />, label: 'I own a music school' },
-    { type: 'dance studio', icon: <User size={32} color="#f472b6" />, label: 'I own a dance studio' },
-    { type: 'art gallery', icon: <BookOpen size={32} color="#fbbf24" />, label: 'I own an art gallery' },
-    { type: 'bookstore', icon: <BookOpen size={32} color="#a3a3a3" />, label: 'I own a bookstore' },
-    { type: 'florist', icon: <Star size={32} color="#34d399" />, label: 'I own a florist shop' },
-    { type: 'jewelry store', icon: <Gem size={32} color="#60a5fa" />, label: 'I own a jewelry store' },
-    { type: 'vintage shop', icon: <Book size={32} color="#f59e42" />, label: 'I own a vintage shop' },
-    { type: 'tech startup', icon: <MonitorSmartphone size={32} color="#a78bfa" />, label: 'I own a tech startup' },
-    { type: 'dental office', icon: <User size={32} color="#60a5fa" />, label: 'I own a dental office' },
-    { type: 'law firm', icon: <Briefcase size={32} color="#f59e42" />, label: 'I own a law firm' },
-    { type: 'real estate', icon: <Building2 size={32} color="#34d399" />, label: 'I own a real estate business' },
-    { type: 'insurance agency', icon: <Shield size={32} color="#f472b6" />, label: 'I own an insurance agency' },
-    { type: 'accounting firm', icon: <DollarSign size={32} color="#fbbf24" />, label: 'I own an accounting firm' },
-    { type: 'marketing agency', icon: <Megaphone size={32} color="#a78bfa" />, label: 'I own a marketing agency' },
-    { type: 'web design', icon: <MonitorSmartphone size={32} color="#60a5fa" />, label: 'I own a web design business' },
-    { type: 'construction', icon: <Building size={32} color="#f59e42" />, label: 'I own a construction business' },
-    { type: 'landscaping', icon: <Droplet size={32} color="#34d399" />, label: 'I own a landscaping business' },
-    { type: 'plumbing', icon: <Settings size={32} color="#60a5fa" />, label: 'I own a plumbing business' },
-    { type: 'electrical', icon: <Lightbulb size={32} color="#fbbf24" />, label: 'I own an electrical business' },
-    { type: 'HVAC', icon: <Flame size={32} color="#f59e42" />, label: 'I own an HVAC business' },
-    { type: 'roofing', icon: <Building size={32} color="#a3a3a3" />, label: 'I own a roofing business' },
-    { type: 'painting', icon: <Edit size={32} color="#f472b6" />, label: 'I own a painting business' },
-    { type: 'carpentry', icon: <Settings size={32} color="#f59e42" />, label: 'I own a carpentry business' },
-    { type: 'other', icon: <Building2 size={32} color="#a3a3a3" />, label: 'I own another type of business' }
+    { type: 'beauty salon', icon: <Scissors size={48} color="#60a5fa" />, label: 'I own a beauty salon' },
+    { type: 'restaurant', icon: <UtensilsCrossed size={48} color="#f59e42" />, label: 'I own a restaurant' },
+    { type: 'retail store', icon: <ShoppingBag size={48} color="#f472b6" />, label: 'I own a retail store' },
+    { type: 'coffee shop', icon: <Coffee size={48} color="#a3a3a3" />, label: 'I own a coffee shop' },
+    { type: 'barbershop', icon: <Scissors size={48} color="#f87171" />, label: 'I own a barbershop' },
+    { type: 'bakery', icon: <Star size={48} color="#fbbf24" />, label: 'I own a bakery' },
+    { type: 'gym', icon: <Heart size={48} color="#34d399" />, label: 'I own a gym' },
+    { type: 'auto repair', icon: <Settings size={48} color="#f59e42" />, label: 'I own an auto repair shop' },
+    { type: 'laundry', icon: <Droplet size={48} color="#60a5fa" />, label: 'I own a laundry service' },
+    { type: 'pet grooming', icon: <Heart size={48} color="#fbbf24" />, label: 'I own a pet grooming business' },
+    { type: 'tattoo parlor', icon: <Edit size={48} color="#a78bfa" />, label: 'I own a tattoo parlor' },
+    { type: 'nail salon', icon: <Star size={48} color="#f472b6" />, label: 'I own a nail salon' },
+    { type: 'photography studio', icon: <Camera size={48} color="#60a5fa" />, label: 'I own a photography studio' },
+    { type: 'consulting', icon: <Briefcase size={48} color="#a3a3a3" />, label: 'I own a consulting business' },
+    { type: 'daycare', icon: <Users size={48} color="#fbbf24" />, label: 'I own a daycare center' },
+    { type: 'cleaning service', icon: <Droplet size={48} color="#34d399" />, label: 'I own a cleaning service' },
+    { type: 'food truck', icon: <Truck size={48} color="#f59e42" />, label: 'I own a food truck' },
+    { type: 'yoga studio', icon: <Heart size={48} color="#a78bfa" />, label: 'I own a yoga studio' },
+    { type: 'music school', icon: <Star size={48} color="#60a5fa" />, label: 'I own a music school' },
+    { type: 'dance studio', icon: <Users size={48} color="#f472b6" />, label: 'I own a dance studio' },
+    { type: 'art gallery', icon: <BookOpen size={48} color="#fbbf24" />, label: 'I own an art gallery' },
+    { type: 'bookstore', icon: <BookOpen size={48} color="#a3a3a3" />, label: 'I own a bookstore' },
+    { type: 'florist', icon: <Leaf size={48} color="#34d399" />, label: 'I own a florist shop' },
+    { type: 'jewelry store', icon: <Gem size={48} color="#60a5fa" />, label: 'I own a jewelry store' },
+    { type: 'vintage shop', icon: <Package size={48} color="#f59e42" />, label: 'I own a vintage shop' },
+    { type: 'tech startup', icon: <MonitorSmartphone size={48} color="#a78bfa" />, label: 'I own a tech startup' },
+    { type: 'dental office', icon: <User size={48} color="#60a5fa" />, label: 'I own a dental office' },
+    { type: 'law firm', icon: <Briefcase size={48} color="#f59e42" />, label: 'I own a law firm' },
+    { type: 'real estate', icon: <Building2 size={48} color="#34d399" />, label: 'I own a real estate business' },
+    { type: 'insurance agency', icon: <Shield size={48} color="#f472b6" />, label: 'I own an insurance agency' },
+    { type: 'accounting firm', icon: <DollarSign size={48} color="#fbbf24" />, label: 'I own an accounting firm' },
+    { type: 'marketing agency', icon: <Megaphone size={48} color="#a78bfa" />, label: 'I own a marketing agency' },
+    { type: 'web design', icon: <MonitorSmartphone size={48} color="#60a5fa" />, label: 'I own a web design business' },
+    { type: 'construction', icon: <Building size={48} color="#f59e42" />, label: 'I own a construction business' },
+    { type: 'landscaping', icon: <Leaf size={48} color="#34d399" />, label: 'I own a landscaping business' },
+    { type: 'plumbing', icon: <Droplet size={48} color="#60a5fa" />, label: 'I own a plumbing business' },
+    { type: 'electrical', icon: <Lightbulb size={48} color="#fbbf24" />, label: 'I own an electrical business' },
+    { type: 'HVAC', icon: <Flame size={48} color="#f59e42" />, label: 'I own an HVAC business' },
+    { type: 'roofing', icon: <Building size={48} color="#a3a3a3" />, label: 'I own a roofing business' },
+    { type: 'painting', icon: <Edit size={48} color="#f472b6" />, label: 'I own a painting business' },
+    { type: 'carpentry', icon: <Settings size={48} color="#f59e42" />, label: 'I own a carpentry business' },
+    { type: 'other', icon: <Building2 size={48} color="#a3a3a3" />, label: 'I own another type of business' }
   ];
 
   // All available quick options
@@ -304,7 +434,6 @@ function FullChatPage() {
       // Change one random option at a time
       const randomIndex = Math.floor(Math.random() * quickOptions.length);
       setChangingOptions(prev => new Set([...prev, randomIndex]));
-      
       // After matrix effect duration, update the option
       setTimeout(() => {
         const newOptions = [...quickOptions];
@@ -338,7 +467,6 @@ function FullChatPage() {
       // Change one random business option at a time
       const randomIndex = Math.floor(Math.random() * randomBusinessOptions.length);
       setChangingBusinessOptions(prev => new Set([...prev, randomIndex]));
-      
       // After matrix effect duration, update the option
       setTimeout(() => {
         const newOptions = [...randomBusinessOptions];
@@ -413,6 +541,8 @@ function FullChatPage() {
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
     
+    console.log('📨 handleSendMessage called with:', message);
+    
     // Add user message to chat
     const userMessage = { type: 'user', content: message, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
@@ -423,35 +553,53 @@ function FullChatPage() {
     setTimeout(() => scrollToBottom(), 100);
 
     try {
+      console.log('🌐 Sending request to OpenAI...');
+      console.log('🗣️ Using language:', selectedLanguage.split('-')[0]);
       // Get user ID from user state or localStorage
       const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
       const userId = currentUser.id || 1; // Fallback to 1 if no user ID
-      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message, 
-          language: 'en', 
+          language: selectedLanguage.split('-')[0], // Extract language code (e.g., 'en' from 'en-US')
           businessType, 
           userId: userId 
         })
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       const data = await response.json();
-      
       if (!data || !data.response) {
         throw new Error('Invalid response format from server');
       }
-      
+      console.log('🤖 Received AI response:', data.response);
       const botMessage = { type: 'answer', content: data.response, timestamp: new Date() };
       setMessages(prev => [...prev, botMessage]);
+      // Speak ALL AI responses using OpenAI TTS
+      if (speechRef.current && data.response) {
+        console.log('🔊 Speaking AI response...');
+        console.log('Speech synthesis available:', !!speechRef.current);
+        console.log('Response to speak:', data.response);
+        console.log('Was voice message:', wasVoiceMessage);
+        
+        // Use OpenAI TTS for natural voice
+        speakTextWithOpenAI(data.response);
+        
+        // Reset the voice message flag after speaking
+        setWasVoiceMessage(false);
+      } else {
+        console.log('🔇 Not speaking response. Reasons:');
+        console.log('- Speech synthesis available:', !!speechRef.current);
+        console.log('- Has response:', !!data.response);
+        console.log('- Was voice message:', wasVoiceMessage);
+        console.log('- Is recording:', isRecording);
+        console.log('- Is listening:', isListening);
+      }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('❌ Error sending message:', error);
       const errorMessage = { 
         type: 'answer', 
         content: 'Sorry, I\'m having trouble connecting. Please try again.', 
@@ -465,15 +613,23 @@ function FullChatPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setWasVoiceMessage(false); // Reset voice message flag for text input
+    // Stop any currently playing speech
+    stopCurrentSpeech();
     handleSendMessage(inputMessage);
   };
 
   const handleQuickOption = (option) => {
+    setWasVoiceMessage(false); // Reset voice message flag for quick options
+    // Stop any currently playing speech
+    stopCurrentSpeech();
     handleSendMessage(`Tell me about ${option.toLowerCase()}`);
   };
 
   const handleBusinessTypeSelect = (type) => {
     setBusinessType(type);
+    // Stop any currently playing speech
+    stopCurrentSpeech();
     const userMessage = { type: 'user', content: `I own a ${type}`, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
     
@@ -483,9 +639,169 @@ function FullChatPage() {
   };
 
   const handleVoiceToggle = () => {
-    setIsRecording(!isRecording);
-    // TODO: Implement actual voice recording functionality
-    // For now, just toggle the state
+    console.log('Voice toggle clicked, isRecording:', isRecording);
+    console.log('Current selected language:', selectedLanguage);
+    
+    if (recognitionRef.current) {
+      if (isRecording) {
+        // Stop recording
+        console.log('Stopping speech recognition');
+        recognitionRef.current.stop();
+      } else {
+        // Start recording
+        console.log('Starting speech recognition with language:', selectedLanguage);
+        
+        // Reinitialize speech recognition with current language
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognitionRef.current = new SpeechRecognition();
+          recognitionRef.current.continuous = false;
+          recognitionRef.current.interimResults = true;
+          recognitionRef.current.lang = selectedLanguage;
+          
+          // Reattach event handlers
+          recognitionRef.current.onstart = () => {
+            console.log('Speech recognition started with language:', selectedLanguage);
+            setIsRecording(true);
+            setIsListening(true);
+            recognitionRef.current.finalTranscript = '';
+            stopCurrentSpeech();
+          };
+          
+          recognitionRef.current.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const transcript = event.results[i][0].transcript;
+              if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+              } else {
+                interimTranscript += transcript;
+              }
+            }
+
+            console.log('Speech recognition result:', { finalTranscript, interimTranscript, language: selectedLanguage });
+            
+            setInputMessage(finalTranscript || interimTranscript);
+            
+            if (finalTranscript) {
+              recognitionRef.current.finalTranscript = finalTranscript;
+            }
+          };
+
+          recognitionRef.current.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsRecording(false);
+            setIsListening(false);
+          };
+
+          recognitionRef.current.onend = () => {
+            console.log('Speech recognition ended');
+            setIsRecording(false);
+            setIsListening(false);
+            
+            setTimeout(() => {
+              let finalTranscript = '';
+              if (recognitionRef.current && recognitionRef.current.results) {
+                for (let i = 0; i < recognitionRef.current.results.length; i++) {
+                  const result = recognitionRef.current.results[i];
+                  if (result.isFinal) {
+                    finalTranscript += result[0].transcript;
+                  }
+                }
+              }
+              
+              const inputMessageText = inputMessage.trim();
+              const storedFinalTranscript = recognitionRef.current.finalTranscript || '';
+              const finalMessage = finalTranscript.trim() || storedFinalTranscript.trim() || inputMessageText;
+              
+              console.log('Final message to send:', finalMessage, 'in language:', selectedLanguage);
+              
+              if (finalMessage) {
+                console.log('🎤 VOICE MESSAGE DETECTED!');
+                console.log('📝 Final message to send:', finalMessage);
+                console.log('🚀 Sending voice message to OpenAI...');
+                
+                setInputMessage('');
+                setIsProcessingVoice(true);
+                setWasVoiceMessage(true);
+                
+                handleSendMessage(finalMessage).finally(() => {
+                  console.log('✅ Voice message processing completed');
+                  setIsProcessingVoice(false);
+                });
+              }
+            }, 500);
+          };
+        }
+        
+        setInputMessage(''); // Clear input before starting
+        recognitionRef.current.finalTranscript = '';
+        stopCurrentSpeech();
+        recognitionRef.current.start();
+      }
+    } else {
+      console.error('Speech recognition not available');
+    }
+  };
+
+  const handleVoiceMessage = async (message) => {
+    if (!message.trim()) return '';
+    
+    setIsProcessingVoice(true);
+    
+    try {
+      // Add user voice message to chat
+      const userMessage = { type: 'user', content: message, timestamp: new Date() };
+      setMessages(prev => [...prev, userMessage]);
+      // Get user ID from user state or localStorage
+      const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = currentUser.id || 1; // Fallback to 1 if no user ID
+      // Send to backend
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          message: message,
+          language: selectedLanguage.split('-')[0], // Use selected language
+          businessType: businessType,
+          userId: userId
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Add AI response to chat
+        const aiMessage = { type: 'answer', content: data.response, timestamp: new Date() };
+        setMessages(prev => [...prev, aiMessage]);
+        
+        // Speak the response if speech synthesis is available
+        if (speechRef.current && data.response) {
+          const utterance = new SpeechSynthesisUtterance(data.response);
+          utterance.rate = 0.9; // Slightly slower for clarity
+          utterance.pitch = 1.0;
+          utterance.volume = 0.8;
+          speechRef.current.speak(utterance);
+        }
+        
+        // Return the response for text-to-speech
+        return data.response;
+      } else {
+        throw new Error('Failed to get response from AI');
+      }
+    } catch (error) {
+      console.error('Error processing voice message:', error);
+      const errorMessage = { type: 'answer', content: 'Sorry, I encountered an error processing your voice message. Please try again.', timestamp: new Date() };
+      setMessages(prev => [...prev, errorMessage]);
+      return 'Sorry, I encountered an error processing your voice message. Please try again.';
+    } finally {
+      setIsProcessingVoice(false);
+    }
   };
 
   // Helper to render markdown-like content for AI answers
@@ -522,37 +838,161 @@ function FullChatPage() {
 
   const avatarRef = useRef(null);
 
+  // Test speech synthesis function
+  const testSpeechSynthesis = () => {
+    console.log('🔊 Testing OpenAI TTS...');
+    speakTextWithOpenAI('Hello, this is a test of the OpenAI text-to-speech system with natural voice.');
+  };
+
+  // Function to speak text with better error handling
+  const speakText = (text) => {
+    if (!speechRef.current) {
+      console.error('❌ Speech synthesis not available');
+      return;
+    }
+    
+    if (!text || text.trim() === '') {
+      console.log('🔇 No text to speak');
+      return;
+    }
+    
+    console.log('🔊 Speaking text:', text);
+    
+    try {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 0.8;
+      
+      utterance.onstart = () => console.log('🔊 Speech started');
+      utterance.onend = () => console.log('🔊 Speech ended');
+      utterance.onerror = (event) => {
+        console.error('🔊 Speech error:', event.error);
+        console.error('🔊 Error details:', event);
+      };
+      
+      speechRef.current.speak(utterance);
+      console.log('🔊 Speech synthesis initiated');
+    } catch (error) {
+      console.error('🔊 Error with speech synthesis:', error);
+    }
+  };
+
+  // Function to stop any currently playing speech
+  const stopCurrentSpeech = () => {
+    // Stop browser speech synthesis
+    if (speechRef.current && speechRef.current.speaking) {
+      console.log('🔇 Stopping browser speech synthesis...');
+      speechRef.current.cancel();
+    }
+    
+    // Stop OpenAI TTS audio
+    if (currentAudioRef.current) {
+      console.log('🔇 Stopping OpenAI TTS audio...');
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+    }
+  };
+
+  // Function to speak text using OpenAI TTS API
+  const speakTextWithOpenAI = async (text) => {
+    if (!text || text.trim() === '') {
+      console.log('🔇 No text to speak');
+      return;
+    }
+    
+    // Check if voice is set to "none"
+    if (selectedVoice === 'none') {
+      console.log('🔇 Voice disabled - skipping speech');
+      return;
+    }
+    
+    console.log('🎤 Speaking text with OpenAI TTS:', text.substring(0, 100) + '...');
+    
+    try {
+      const response = await fetch('/api/tts/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          voice: selectedVoice // Use the selected voice
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
+      
+      // Get the audio blob
+      const audioBlob = await response.blob();
+      
+      // Create an audio element and play it
+      const audio = new Audio(URL.createObjectURL(audioBlob));
+      
+      // Track the current audio element
+      currentAudioRef.current = audio;
+      
+      audio.onloadstart = () => console.log('🔊 Audio loading started');
+      audio.oncanplay = () => console.log('🔊 Audio can play');
+      audio.onplay = () => console.log('🔊 Audio playing started');
+      audio.onended = () => {
+        console.log('🔊 Audio playing ended');
+        currentAudioRef.current = null;
+      };
+      audio.onerror = (error) => {
+        console.error('🔊 Audio error:', error);
+        currentAudioRef.current = null;
+      };
+      
+      // Play the audio
+      await audio.play();
+      console.log('🔊 OpenAI TTS audio initiated');
+      
+    } catch (error) {
+      console.error('❌ OpenAI TTS Error:', error);
+      // Fallback to browser speech synthesis
+      console.log('🔄 Falling back to browser speech synthesis...');
+      speakText(text);
+    }
+  };
+
   return (
     <>
       <div
         style={{
           position: 'fixed',
-          top: 120,
-          right: 40,
+          top: 80,
+          right: 20,
           zIndex: 999999,
           background: theme.modalBg,
           border: `1px solid ${theme.primaryBorder}`,
           color: theme.primaryText,
-          padding: 20,
+          padding: 12,
           display: 'flex',
           flexDirection: 'column',
-          minWidth: '200px',
-          gap: '8px',
-          borderRadius: 12,
-          boxShadow: `0 10px 25px ${theme.primaryShadow}`,
+          minWidth: '160px',
+          maxWidth: '180px',
+          gap: '6px',
+          borderRadius: 8,
+          boxShadow: `0 8px 20px ${theme.primaryShadow}`,
+          fontSize: '14px',
+          backdropFilter: 'blur(10px)',
         }}
       >
-        <a href="/profile" style={{ fontSize: 20, padding: 10, textDecoration: 'none', color: theme.primaryText, borderRadius: 8, transition: 'background 0.2s' }}
+        <a href="/profile" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
           onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >Profile</a>
-        <a href="/analytics" style={{ fontSize: 20, padding: 10, textDecoration: 'none', color: theme.primaryText, borderRadius: 8, transition: 'background 0.2s' }}
+        <a href="/analytics" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
           onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >Analytics</a>
         <button
           type="button"
-          style={{ fontSize: 20, padding: 10, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 8, cursor: isToggling ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 6, cursor: isToggling ? 'not-allowed' : 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
           onClick={() => { if (!isToggling) toggleTheme(); }}
           disabled={isToggling}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
@@ -566,14 +1006,60 @@ function FullChatPage() {
                 ? 'Change to White'
                 : 'Change to Dark'}
         </button>
-        <a href="/login" style={{ fontSize: 20, padding: 10, textDecoration: 'none', color: '#ef4444', borderRadius: 8, transition: 'background 0.2s' }}
+        <a href="/login" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: '#ef4444', borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
           onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
           onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >Logout</a>
+        <button
+          onClick={testSpeechSynthesis}
+          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#10b981', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#d1fae5'}
+          onMouseLeave={e => e.currentTarget.style.background = 'none'}
+        >Test Speech</button>
+        <select
+          value={selectedVoice}
+          onChange={(e) => setSelectedVoice(e.target.value)}
+          style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
+        >
+          <option value="none">No Voice</option>
+          <option value="alloy">Alloy - Balanced</option>
+          <option value="echo">Echo - Professional</option>
+          <option value="fable">Fable - Friendly</option>
+          <option value="onyx">Onyx - Authoritative</option>
+          <option value="nova">Nova - Energetic</option>
+          <option value="shimmer">Shimmer - Melodic</option>
+        </select>
+        <select
+          value={selectedLanguage}
+          onChange={(e) => setSelectedLanguage(e.target.value)}
+          style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
+        >
+          <option value="en-US">English (US)</option>
+          <option value="vi-VN">Tiếng Việt (Vietnamese)</option>
+          <option value="ar-SA">العربية (Arabic)</option>
+          <option value="es-ES">Español (Spanish)</option>
+          <option value="zh-CN">中文 (Chinese)</option>
+          <option value="fr-FR">Français (French)</option>
+          <option value="de-DE">Deutsch (German)</option>
+          <option value="it-IT">Italiano (Italian)</option>
+          <option value="pt-BR">Português (Portuguese)</option>
+          <option value="ru-RU">Русский (Russian)</option>
+          <option value="ja-JP">日本語 (Japanese)</option>
+          <option value="ko-KR">한국어 (Korean)</option>
+          <option value="hi-IN">हिन्दी (Hindi)</option>
+          <option value="km-KH">ភាសាខ្មែរ (Khmer)</option>
+          <option value="lo-LA">ພາສາລາວ (Laos)</option>
+          <option value="ti-ER">ትግርኛ (Tigrinya)</option>
+          <option value="prs-AF">دری (Dari)</option>
+          <option value="mam-GT">Mam (Mam)</option>
+        </select>
+        <div style={{ fontSize: 11, color: '#666', textAlign: 'left', marginTop: 2 }}>
+          🗣️ Language: {selectedLanguage.split('-')[0].toUpperCase()}
+        </div>
       </div>
       <div className="full-chat-container" style={{ 
         background: theme.primaryBg,
-        marginRight: showProfileMenu ? '220px' : '60px',
+        marginRight: showProfileMenu ? '200px' : '40px',
         transition: 'margin-right 0.3s ease',
         maxWidth: '100vw',
         overflowX: 'hidden'
@@ -1078,7 +1564,7 @@ function FullChatPage() {
             paddingRight: '20px',
             paddingLeft: '20px',
             paddingTop: '80px', // Increased from 40px to 80px to move chat further from menu
-            maxWidth: 'calc(100vw - 280px)',
+            maxWidth: 'calc(100vw - 240px)',
             minWidth: '600px',
             marginRight: 'auto',
             marginLeft: 'auto'
@@ -1106,7 +1592,7 @@ function FullChatPage() {
             )}
             
             {messages.map((message, index) => (
-              <div key={index} className={`message ${message.type === 'question' ? 'chat-question' : message.type === 'answer' ? 'chat-answer' : 'user-message'}`} style={{
+              <div key={index} className={`message ${message.type === 'question' ? 'chat-question' : message.type === 'answer' ? 'chat-answer' : message.type === 'processing' ? 'processing-message' : 'user-message'}`} style={{
                 display: 'flex',
                 justifyContent: message.type === 'question' ? 'flex-start' : 'flex-end', // User questions on left, AI answers on right
                 marginBottom: '16px',
@@ -1125,6 +1611,19 @@ function FullChatPage() {
                     border: `1px solid ${theme.border}`,
                     maxWidth: '70%'
                   }}>{message.content}</div>
+                ) : message.type === 'processing' ? (
+                  <div className="bubble" style={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    color: 'white',
+                    maxWidth: '70%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontStyle: 'italic'
+                  }}>
+                    <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    {message.content}
+                  </div>
                 ) : (
                   <div className="bubble" style={{
                     background: theme.cardBg,
@@ -1207,15 +1706,18 @@ function FullChatPage() {
                 type="button" 
                 className="voice-btn"
                 onClick={handleVoiceToggle}
+                disabled={isProcessingVoice}
                 style={{
                   background: isRecording 
                     ? theme.voiceButtonRecording
+                    : isProcessingVoice
+                    ? theme.primaryButton
                     : theme.voiceButtonIdle,
                   border: 'none',
                   color: 'white',
                   padding: '12px',
                   borderRadius: '50%',
-                  cursor: 'pointer',
+                  cursor: isProcessingVoice ? 'not-allowed' : 'pointer',
                   width: '44px',
                   height: '44px',
                   display: 'flex',
@@ -1224,37 +1726,42 @@ function FullChatPage() {
                   transition: 'all 0.3s ease',
                   boxShadow: isRecording 
                     ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
+                    : isProcessingVoice
+                    ? '0 4px 16px rgba(59, 130, 246, 0.4)'
                     : `0 2px 8px ${theme.accentShadow}`,
                   position: 'relative',
                   overflow: 'hidden',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  opacity: isProcessingVoice ? 0.7 : 1
                 }}
                 onMouseEnter={e => {
-                  if (!isRecording) {
+                  if (!isRecording && !isProcessingVoice) {
                     e.currentTarget.style.transform = 'scale(1.05)';
                     e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
                   }
                 }}
                 onMouseLeave={e => {
-                  if (!isRecording) {
+                  if (!isRecording && !isProcessingVoice) {
                     e.currentTarget.style.transform = 'scale(1)';
                     e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
                   }
                 }}
               >
-                {isRecording && (
+                {(isRecording || isProcessingVoice) && (
                   <div style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                    background: isProcessingVoice 
+                      ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
                     animation: 'pulse 1.5s infinite',
                     borderRadius: '50%'
                   }} />
                 )}
-                {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                {isProcessingVoice ? <Loader size={20} /> : isRecording ? <MicOff size={20} /> : <Mic size={20} />}
               </button>
               <input
                 type="text"

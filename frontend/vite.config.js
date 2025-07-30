@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 3001, // Frontend on 3001
+      port: 3003, // Frontend on 3003
       proxy: {
         '/api': {
           target: 'http://localhost:3000', // Backend on 3000
