@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import path from 'path';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
+import ProfileMenu from '../components/ProfileMenu';
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -961,110 +962,16 @@ function FullChatPage() {
 
   return (
     <>
-      <div
-        style={{
-          position: 'fixed',
-          top: 80,
-          right: 20,
-          zIndex: 999999,
-          background: theme.modalBg,
-          border: `1px solid ${theme.primaryBorder}`,
-          color: theme.primaryText,
-          padding: 12,
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: '160px',
-          maxWidth: '180px',
-          gap: '6px',
-          borderRadius: 8,
-          boxShadow: `0 8px 20px ${theme.primaryShadow}`,
-          fontSize: '14px',
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        <a href="/profile" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >Profile</a>
-        <a href="/analytics" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >Analytics</a>
-        <button
-          type="button"
-          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 6, cursor: isToggling ? 'not-allowed' : 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
-          onClick={() => { if (!isToggling) toggleTheme(); }}
-          disabled={isToggling}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >
-          {isToggling
-            ? 'Switching...'
-            : currentThemeName === 'dark'
-              ? 'Change to Beige'
-              : currentThemeName === 'beige'
-                ? 'Change to White'
-                : 'Change to Dark'}
-        </button>
-        <button
-          onClick={() => {
-            // Clear authentication data
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            // Redirect to login page
-            window.location.href = '/login';
-          }}
-          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#ef4444', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
-          onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >Logout</button>
-        <button
-          onClick={testSpeechSynthesis}
-          style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#10b981', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
-          onMouseEnter={e => e.currentTarget.style.background = '#d1fae5'}
-          onMouseLeave={e => e.currentTarget.style.background = 'none'}
-        >Test Speech</button>
-        <select
-          value={selectedVoice}
-          onChange={(e) => setSelectedVoice(e.target.value)}
-          style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
-        >
-          <option value="none">No Voice</option>
-          <option value="alloy">Alloy - Balanced</option>
-          <option value="echo">Echo - Professional</option>
-          <option value="fable">Fable - Friendly</option>
-          <option value="onyx">Onyx - Authoritative</option>
-          <option value="nova">Nova - Energetic</option>
-          <option value="shimmer">Shimmer - Melodic</option>
-        </select>
-        <select
-          value={selectedLanguage}
-          onChange={(e) => setSelectedLanguage(e.target.value)}
-          style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
-        >
-          <option value="en-US">English (US)</option>
-          <option value="vi-VN">Tiếng Việt (Vietnamese)</option>
-          <option value="ar-SA">العربية (Arabic)</option>
-          <option value="es-ES">Español (Spanish)</option>
-          <option value="zh-CN">中文 (Chinese)</option>
-          <option value="fr-FR">Français (French)</option>
-          <option value="de-DE">Deutsch (German)</option>
-          <option value="it-IT">Italiano (Italian)</option>
-          <option value="pt-BR">Português (Portuguese)</option>
-          <option value="ru-RU">Русский (Russian)</option>
-          <option value="ja-JP">日本語 (Japanese)</option>
-          <option value="ko-KR">한국어 (Korean)</option>
-          <option value="hi-IN">हिन्दी (Hindi)</option>
-          <option value="km-KH">ភាសាខ្មែរ (Khmer)</option>
-          <option value="lo-LA">ພາສາລາວ (Laos)</option>
-          <option value="ti-ER">ትግርኛ (Tigrinya)</option>
-          <option value="prs-AF">دری (Dari)</option>
-          <option value="mam-GT">Mam (Mam)</option>
-        </select>
-        <div style={{ fontSize: 11, color: '#666', textAlign: 'left', marginTop: 2 }}>
-          🗣️ Language: {selectedLanguage.split('-')[0].toUpperCase()}
-        </div>
-      </div>
+      <ProfileMenu 
+        selectedVoice={selectedVoice}
+        setSelectedVoice={setSelectedVoice}
+        selectedLanguage={selectedLanguage}
+        setSelectedLanguage={setSelectedLanguage}
+        testSpeechSynthesis={testSpeechSynthesis}
+        toggleTheme={toggleTheme}
+        isToggling={isToggling}
+        currentThemeName={currentThemeName}
+      />
       <div className="full-chat-container" style={{ 
         background: theme.primaryBg,
         marginRight: showProfileMenu ? '200px' : '40px',
