@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { stopAllSpeech } from '../utils/speechUtils';
 
 const ProfileMenu = ({ 
   selectedVoice, 
@@ -12,6 +13,29 @@ const ProfileMenu = ({
   currentThemeName 
 }) => {
   const { theme } = useTheme();
+
+  // Stop speech when navigating away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('🔇 ProfileMenu: Stopping speech before page unload');
+      stopAllSpeech();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('🔇 ProfileMenu: Stopping speech when page becomes hidden');
+        stopAllSpeech();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <div

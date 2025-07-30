@@ -5,6 +5,7 @@ import path from 'path';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import ProfileMenu from '../components/ProfileMenu';
+import { stopAllSpeech, setCurrentAudio, initializeSpeechCleanup } from '../utils/speechUtils';
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -881,19 +882,7 @@ function FullChatPage() {
 
   // Function to stop any currently playing speech
   const stopCurrentSpeech = () => {
-    // Stop browser speech synthesis
-    if (speechRef.current && speechRef.current.speaking) {
-      console.log('🔇 Stopping browser speech synthesis...');
-      speechRef.current.cancel();
-    }
-    
-    // Stop OpenAI TTS audio
-    if (currentAudioRef.current) {
-      console.log('🔇 Stopping OpenAI TTS audio...');
-      currentAudioRef.current.pause();
-      currentAudioRef.current.currentTime = 0;
-      currentAudioRef.current = null;
-    }
+    stopAllSpeech();
   };
 
   // Function to speak text using OpenAI TTS API
@@ -933,19 +922,19 @@ function FullChatPage() {
       // Create an audio element and play it
       const audio = new Audio(URL.createObjectURL(audioBlob));
       
-      // Track the current audio element
-      currentAudioRef.current = audio;
+      // Track the current audio element using the utility
+      setCurrentAudio(audio);
       
       audio.onloadstart = () => console.log('🔊 Audio loading started');
       audio.oncanplay = () => console.log('🔊 Audio can play');
       audio.onplay = () => console.log('🔊 Audio playing started');
       audio.onended = () => {
         console.log('🔊 Audio playing ended');
-        currentAudioRef.current = null;
+        setCurrentAudio(null);
       };
       audio.onerror = (error) => {
         console.error('🔊 Audio error:', error);
-        currentAudioRef.current = null;
+        setCurrentAudio(null);
       };
       
       // Play the audio
@@ -959,6 +948,43 @@ function FullChatPage() {
       speakText(text);
     }
   };
+
+  // Initialize global speech cleanup
+  useEffect(() => {
+    const cleanup = initializeSpeechCleanup();
+    return cleanup;
+  }, []);
+
+  // Cleanup speech synthesis when component unmounts or navigates away
+  useEffect(() => {
+    return () => {
+      console.log('🔇 Cleaning up speech synthesis on component unmount');
+      stopAllSpeech();
+    };
+  }, []);
+
+  // Stop speech when navigating away (beforeunload event)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('🔇 Stopping speech before page unload');
+      stopAllSpeech();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('🔇 Stopping speech when page becomes hidden');
+        stopAllSpeech();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <>
