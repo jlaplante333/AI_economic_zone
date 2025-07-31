@@ -1187,47 +1187,46 @@ function FullChatPage() {
                   <Settings size={14} />
                   Change Business
                 </button>
+                
+                {/* New Chat Button - Next to Change Business */}
+                <button
+                  onClick={() => {
+                    setMessages([]);
+                    setInputMessage('');
+                    setBusinessType('');
+                    setShowProfileMenu(false);
+                    setRandomBusinessOptions(getRandomBusinessOptions());
+                    setQuickOptions(getRandomQuickOptions(false));
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '16px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(34, 197, 94, 0.4)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.3)';
+                  }}
+                >
+                  <Plus size={14} />
+                  New Chat
+                </button>
               </div>
-              
-              {/* New Chat Button - Right Side */}
-              <button
-                onClick={() => {
-                  setMessages([]);
-                  setInputMessage('');
-                  setBusinessType('');
-                  setShowProfileMenu(false);
-                  setRandomBusinessOptions(getRandomBusinessOptions());
-                  setQuickOptions(getRandomQuickOptions(false));
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '16px',
-                  padding: '12px 16px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
-                  transition: 'all 0.2s ease',
-                  whiteSpace: 'nowrap',
-                  marginTop: '-40px'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(34, 197, 94, 0.4)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(34, 197, 94, 0.3)';
-                }}
-              >
-                <Plus size={14} />
-                New Chat
-              </button>
             </div>
           )}
 

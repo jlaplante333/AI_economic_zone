@@ -86,16 +86,16 @@ function LoginPage() {
         </div>
         
         <h1 className="main-heading">
-          Smart help for<br />
-          small businesses<br />
-          in Oakland.
+          {t('smartHelp')}<br />
+          {t('smallBusinesses')}<br />
+          {t('inOakland')}
         </h1>
         <p className="sub-heading">
-          Speak your language.<br />
-          Get answers. No paperwork.
+          {t('speakYourLanguage')}<br />
+          {t('getAnswers')}
         </p>
         <p style={{ color: '#64748b', fontSize: '16px' }}>
-          Don't have an account? <a href="/signup" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Sign up</a>
+          {t('noAccount')} <a href="/signup" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>{t('signUp')}</a>
         </p>
       </div>
 
@@ -145,30 +145,30 @@ function LoginPage() {
             </span>
             {availableLanguages[currentLanguageIndex].name}
           </button>
-          <p className="login-subtitle">Sign in to access your Oakland AI assistant</p>
+          <p className="login-subtitle">{t('signInToAccess')}</p>
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="username" className="form-label">Username</label>
+              <label htmlFor="username" className="form-label">{t('username')}</label>
               <input
                 type="text"
                 id="username"
                 className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder={t('usernamePlaceholder')}
                 required
                 disabled={isLoading}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password" className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">{t('password')}</label>
               <input
                 type="password"
                 id="password"
                 className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('passwordPlaceholder')}
                 required
                 disabled={isLoading}
               />
@@ -182,12 +182,12 @@ function LoginPage() {
                 cursor: isLoading ? 'not-allowed' : 'pointer'
               }}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? t('signingIn') : t('signIn')}
             </button>
           </form>
           <div className="login-footer">
-            <p>Don't have an account? <a href="/signup" className="signup-link">Sign up</a></p>
-            <p><a href="#" className="forgot-password">Forgot password?</a></p>
+            <p>{t('noAccount')} <a href="/signup" className="signup-link">{t('signUp')}</a></p>
+            <p><a href="#" className="forgot-password">{t('forgotPassword')}</a></p>
           </div>
         </div>
       </div>
