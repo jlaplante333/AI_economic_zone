@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getLanguageNames } from '../language/languages';
+import { config } from '../env';
 import '../css/pages/signup.css';
 
 function SignupPage() {
@@ -149,12 +150,12 @@ function SignupPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Debug: Log what we're sending
-    console.log('Sending signup data:', formData);
-    console.log('API URL:', '/api/auth/register');
+          // Debug: Log what we're sending
+      console.log('Sending signup data:', formData);
+      console.log('API URL:', `${config.VITE_API_URL}/api/auth/register`);
 
-    try {
-      const response = await fetch('/api/auth/register', {
+      try {
+        const response = await fetch(`${config.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
