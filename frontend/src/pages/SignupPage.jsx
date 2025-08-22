@@ -149,6 +149,10 @@ function SignupPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    // Debug: Log what we're sending
+    console.log('Sending signup data:', formData);
+    console.log('API URL:', '/api/auth/register');
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -158,12 +162,17 @@ function SignupPage() {
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Success response:', data);
         // Redirect to login with verification message
         navigate('/login?message=verification_required');
       } else {
         const errorData = await response.json();
+        console.error('Error response:', errorData);
         alert(errorData.message || 'Signup failed. Please try again.');
       }
     } catch (error) {
