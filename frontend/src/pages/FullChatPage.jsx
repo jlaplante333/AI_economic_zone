@@ -42,13 +42,31 @@ function FullChatPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [businessType, setBusinessType] = useState('');
+  // Theme context
+  const { theme, toggleTheme, isToggling, currentThemeName } = useTheme();
+  const { t, currentLanguage } = useLanguage();
+  
   const [user, setUser] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isProcessingVoice, setIsProcessingVoice] = useState(false);
   const [wasVoiceMessage, setWasVoiceMessage] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState('alloy');
-  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
+  const [selectedLanguage, setSelectedLanguage] = useState(() => {
+    // Map language codes from LanguageContext to speech recognition language codes
+    const languageMap = {
+      'en': 'en-US',
+      'es': 'es-ES',
+      'vi': 'vi-VN',
+      'ar': 'ar-SA',
+      'zh-cn': 'zh-cn',
+      'zh-hk': 'zh-hk',
+      'prs': 'prs-AF',
+      'mam': 'mam-GT'
+    };
+    return languageMap[currentLanguage] || 'en-US';
+  });
+  const [hasManuallyChangedLanguage, setHasManuallyChangedLanguage] = useState(false);
   const [showQuickOptionsModal, setShowQuickOptionsModal] = useState(false);
   const [showBusinessOptionsModal, setShowBusinessOptionsModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -58,10 +76,6 @@ function FullChatPage() {
   const recognitionRef = useRef(null);
   const speechRef = useRef(null);
   const currentAudioRef = useRef(null);
-  
-  // Theme context
-  const { theme, toggleTheme, isToggling, currentThemeName } = useTheme();
-  const { t } = useLanguage();
   
   // Debug theme context
   useEffect(() => {
@@ -73,6 +87,35 @@ function FullChatPage() {
     console.log('Theme changed! currentThemeName:', currentThemeName);
     console.log('New theme primaryBg:', theme.primaryBg);
   }, [currentThemeName]);
+
+  // Update selectedLanguage when currentLanguage changes
+  useEffect(() => {
+    const languageMap = {
+      'en': 'en-US',
+      'es': 'es-ES',
+      'vi': 'vi-VN',
+      'ar': 'ar-SA',
+      'zh-cn': 'zh-cn',
+      'zh-hk': 'zh-hk',
+      'prs': 'prs-AF',
+      'mam': 'mam-GT'
+    };
+    const newSelectedLanguage = languageMap[currentLanguage] || 'en-US';
+    
+    // Only auto-update if the user hasn't manually changed the language
+    if (!hasManuallyChangedLanguage && newSelectedLanguage !== selectedLanguage) {
+      setSelectedLanguage(newSelectedLanguage);
+      console.log('🎤 Auto-updated speech language to match interface language:', newSelectedLanguage);
+    }
+  }, [currentLanguage, selectedLanguage, hasManuallyChangedLanguage]);
+
+  // Update speech recognition language when selectedLanguage changes
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = selectedLanguage;
+      console.log('🎤 Speech recognition language updated to:', selectedLanguage);
+    }
+  }, [selectedLanguage]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   const [quickOptions, setQuickOptions] = useState([]);
@@ -1060,6 +1103,8 @@ function FullChatPage() {
         setSelectedVoice={setSelectedVoice}
         selectedLanguage={selectedLanguage}
         setSelectedLanguage={setSelectedLanguage}
+        hasManuallyChangedLanguage={hasManuallyChangedLanguage}
+        setHasManuallyChangedLanguage={setHasManuallyChangedLanguage}
         testSpeechSynthesis={testSpeechSynthesis}
         toggleTheme={toggleTheme}
         isToggling={isToggling}
@@ -1453,7 +1498,7 @@ function FullChatPage() {
                       letterSpacing: '0.01em',
                       textShadow: `0 2px 12px ${theme.accentShadow}`
                     }}>
-                      What type of business do you own?
+                      {t('chat.businessTypeQuestion')}
                     </div>
                     <div className="business-type-buttons" style={{
                       display: 'flex',
@@ -1587,7 +1632,7 @@ function FullChatPage() {
                   fontWeight: '700',
                   marginBottom: '16px',
                   color: theme.welcomeText
-                }}>Welcome to Oakland AI! 👋</h2>
+                                  }}>{t('chat.welcomeTitle')}</h2>
                 <p style={{
                   fontSize: '16px',
                   color: theme.textSecondary,
@@ -1774,7 +1819,7 @@ function FullChatPage() {
               </button>
               <input
                 type="text"
-                placeholder="Ask me anything about your business in Oakland..."
+                                        placeholder={t('chat.inputPlaceholder')}
                 className="message-input"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}

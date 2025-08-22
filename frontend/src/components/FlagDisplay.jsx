@@ -29,8 +29,8 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
     'vi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Flag_of_South_Vietnam.svg/1200px-Flag_of_South_Vietnam.svg.png',
     'ar': 'https://flagcdn.com/w320/sa.png',
     'es': 'https://flagcdn.com/w320/mx.png',
-    'zh-cn': 'https://flagcdn.com/w320/cn.png',
-    'zh-hk': 'https://flagcdn.com/w320/hk.png',
+      'zh-cn': 'https://flagcdn.com/w320/cn.png', // Mandarin - China
+  'zh-hk': 'https://flagcdn.com/w320/hk.png', // Cantonese - Hong Kong
     'tl': 'https://flagcdn.com/w320/ph.png',
     'ko': 'https://flagcdn.com/w320/kr.png',
     'hi': 'https://flagcdn.com/w320/in.png',

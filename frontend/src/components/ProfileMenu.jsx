@@ -8,6 +8,8 @@ const ProfileMenu = ({
   setSelectedVoice, 
   selectedLanguage, 
   setSelectedLanguage, 
+  hasManuallyChangedLanguage,
+  setHasManuallyChangedLanguage,
   testSpeechSynthesis, 
   toggleTheme, 
   isToggling, 
@@ -154,16 +156,28 @@ const ProfileMenu = ({
         <option value="nova">Nova - Energetic</option>
         <option value="shimmer">Shimmer - Melodic</option>
       </select>
+      <div style={{ fontSize: 11, color: '#666', textAlign: 'left', marginTop: 4, marginBottom: 2 }}>
+        🎤 Speech Language
+        <div style={{ fontSize: 9, color: '#999', marginTop: 2 }}>
+          Defaults to your interface language
+        </div>
+      </div>
       <select
         value={selectedLanguage}
-        onChange={(e) => setSelectedLanguage(e.target.value)}
+        onChange={(e) => {
+          setSelectedLanguage(e.target.value);
+          setHasManuallyChangedLanguage(true);
+          console.log('🎤 User manually changed speech language to:', e.target.value);
+        }}
         style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
+        title="Speech Recognition Language"
       >
         <option value="en-US">English (US)</option>
         <option value="vi-VN">Tiếng Việt (Vietnamese)</option>
         <option value="ar-SA">العربية (Arabic)</option>
         <option value="es-ES">Español (Spanish)</option>
-        <option value="zh-CN">中文 (Chinese)</option>
+        <option value="zh-cn">普通话 (Mandarin)</option>
+        <option value="zh-hk">廣東話 (Cantonese)</option>
         <option value="fr-FR">Français (French)</option>
         <option value="de-DE">Deutsch (German)</option>
         <option value="it-IT">Italiano (Italian)</option>
@@ -179,8 +193,50 @@ const ProfileMenu = ({
         <option value="mam-GT">Mam (Mam)</option>
       </select>
       <div style={{ fontSize: 11, color: '#666', textAlign: 'left', marginTop: 2 }}>
-        🗣️ Language: {selectedLanguage.split('-')[0].toUpperCase()}
+        🎤 Speech: {selectedLanguage.split('-')[0].toUpperCase()}
+        {hasManuallyChangedLanguage && (
+          <span style={{ color: '#f59e0b', marginLeft: 8 }}>
+            (Manual)
+          </span>
+        )}
       </div>
+      {hasManuallyChangedLanguage && (
+        <button
+          onClick={() => {
+            setHasManuallyChangedLanguage(false);
+            // Reset to interface language
+            const languageMap = {
+              'en': 'en-US',
+              'es': 'es-ES',
+              'vi': 'vi-VN',
+              'ar': 'ar-SA',
+              'zh-cn': 'zh-cn',
+              'zh-hk': 'zh-hk',
+              'prs': 'prs-AF',
+              'mam': 'mam-GT'
+            };
+            // Get current language from localStorage or default to English
+            const currentLang = localStorage.getItem('selectedLanguage') || 'en';
+            const resetLanguage = languageMap[currentLang] || 'en-US';
+            setSelectedLanguage(resetLanguage);
+            console.log('🎤 Reset speech language to interface language:', resetLanguage);
+          }}
+          style={{ 
+            fontSize: 10, 
+            padding: '2px 6px', 
+            borderRadius: 4, 
+            border: '1px solid #f59e0b', 
+            background: 'none', 
+            color: '#f59e0b', 
+            cursor: 'pointer',
+            marginTop: 4,
+            width: '100%'
+          }}
+          title="Reset to interface language"
+        >
+          Reset to Interface Language
+        </button>
+      )}
     </div>
   );
 };

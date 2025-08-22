@@ -5,7 +5,8 @@ const CountryIcon = ({ countryCode, className = '' }) => {
   const countryIcons = {
     'en': 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=240&h=240&fit=crop&crop=center', // Statue of Liberty
     'es': 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=240&h=240&fit=crop&crop=center', // Sagrada Familia
-    'zh': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=240&h=240&fit=crop&crop=center', // Great Wall of China
+    'zh-cn': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=240&h=240&fit=crop&crop=center', // Great Wall of China - Mandarin
+  'zh-hk': 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=240&h=240&fit=crop&crop=center', // Great Wall of China - Cantonese
     'vi': 'https://images.unsplash.com/photo-1643029891412-92f9a81a8c16?q=80&w=3572&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Vietnam
     'tl': 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=240&h=240&fit=crop&crop=center', // Manila, Philippines
     'ar': 'https://images.unsplash.com/photo-1633546707050-88e2b545831c?q=80&w=1335&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Saudi Arabia

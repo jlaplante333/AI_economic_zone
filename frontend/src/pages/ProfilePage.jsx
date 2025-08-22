@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   ArrowLeft, User, Mail, Phone, Globe, Building2, Shield, CheckCircle, 
   Clock, Calendar, MapPin, Users, TrendingUp, DollarSign, Award,
@@ -12,6 +13,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { theme, currentThemeName } = useTheme();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Always fetch complete user data from database
@@ -88,7 +90,7 @@ function ProfilePage() {
           padding: 40,
           boxShadow: theme.shadow
         }}>
-          Loading profile...
+          {t('profile.loadingProfile')}
         </div>
       </div>
     );
@@ -130,7 +132,7 @@ function ProfilePage() {
         }}>
           <h2 style={{ marginBottom: 16 }}>No User Data Found</h2>
           <p style={{ marginBottom: 24, color: '#6b7280' }}>
-            Please log in to view your profile.
+            {t('profile.pleaseLogin')}
           </p>
           <button 
             onClick={() => navigate('/login')}
@@ -435,7 +437,7 @@ function ProfilePage() {
                 ? '#5d4037'
                 : '#111827'
             }}>
-              {`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User Profile'}
+              {`${user.first_name || ''} ${user.last_name || ''}`.trim() || t('profile.userProfile')}
             </h1>
             <p style={{ 
               fontSize: 16, 
@@ -454,44 +456,44 @@ function ProfilePage() {
         {/* Personal Information Section */}
         <SectionHeader 
           icon={User} 
-          title="Personal Information" 
-          subtitle="Basic contact and demographic details"
+          title={t('profile.personalInfo')} 
+          subtitle={t('profile.personalInfoSubtitle')}
           color="#3b82f6"
         />
         <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={User} 
-            label="Full Name" 
+            label={t('profile.fullName')} 
             color="#3b82f6"
           />
           <ProfileField 
             icon={Mail} 
-            label="Email Address" 
+            label={t('profile.emailAddress')} 
             color="#10b981"
           />
           <ProfileField 
             icon={Phone} 
-            label="Phone Number" 
+            label={t('profile.phoneNumber')} 
             color="#f59e0b"
           />
           <ProfileField 
             icon={Globe} 
-            label="Language" 
+            label={t('profile.language')} 
             color="#8b5cf6"
           />
           <ProfileField 
             icon={Heart} 
-            label="Age" 
+            label={t('profile.age')} 
             color="#ec4899"
           />
           <ProfileField 
             icon={Star} 
-            label="Ethnicity" 
+            label={t('profile.ethnicity')} 
             color="#06b6d4"
           />
           <ProfileField 
             icon={User} 
-            label="Gender" 
+            label={t('profile.gender')} 
             color="#8b5cf6"
           />
         </div>
@@ -499,29 +501,29 @@ function ProfilePage() {
         {/* Business Information Section */}
         <SectionHeader 
           icon={Building2} 
-          title="Business Information" 
-          subtitle="Company details and structure"
+          title={t('profile.businessInfo')} 
+          subtitle={t('profile.businessInfoSubtitle')}
           color="#ef4444"
         />
         <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={Building2} 
-            label="Business Type" 
+            label={t('profile.businessType')} 
             color="#ef4444"
           />
           <ProfileField 
             icon={Users} 
-            label="Employee Count" 
+            label={t('profile.employeeCount')} 
             color="#10b981"
           />
           <ProfileField 
             icon={TrendingUp} 
-            label="Years in Business" 
+            label={t('profile.yearsInBusiness')} 
             color="#f59e0b"
           />
           <ProfileField 
             icon={Award} 
-            label="Corporation Type" 
+            label={t('profile.corporationType')} 
             color="#8b5cf6"
           />
         </div>
@@ -529,34 +531,34 @@ function ProfilePage() {
         {/* Address Information Section */}
         <SectionHeader 
           icon={MapPin} 
-          title="Address Information" 
-          subtitle="Business location details"
+          title={t('profile.addressInfo')} 
+          subtitle={t('profile.addressInfoSubtitle')}
           color="#10b981"
         />
         <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={Home} 
-            label="Address Line 1" 
+            label={t('profile.addressLine1')} 
             color="#10b981"
           />
           <ProfileField 
             icon={Home} 
-            label="Address Line 2" 
+            label={t('profile.addressLine2')} 
             color="#10b981"
           />
           <ProfileField 
             icon={MapPin} 
-            label="City" 
+            label={t('profile.city')} 
             color="#f59e0b"
           />
           <ProfileField 
             icon={MapPin} 
-            label="State" 
+            label={t('profile.state')} 
             color="#8b5cf6"
           />
           <ProfileField 
             icon={MapPin} 
-            label="ZIP Code" 
+            label={t('profile.zipCode')} 
             color="#06b6d4"
           />
         </div>
@@ -564,24 +566,24 @@ function ProfilePage() {
         {/* Financial Information Section */}
         <SectionHeader 
           icon={DollarSign} 
-          title="Financial Information" 
-          subtitle="Annual revenue data"
+          title={t('profile.financialInfo')} 
+          subtitle={t('profile.financialInfoSubtitle')}
           color="#10b981"
         />
         <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={DollarSign} 
-            label="Annual Revenue 2022" 
+            label={t('profile.annualRevenue2022')} 
             color="#10b981"
           />
           <ProfileField 
             icon={DollarSign} 
-            label="Annual Revenue 2023" 
+            label={t('profile.annualRevenue2023')} 
             color="#f59e0b"
           />
           <ProfileField 
             icon={DollarSign} 
-            label="Annual Revenue 2024" 
+            label={t('profile.annualRevenue2024')} 
             color="#3b82f6"
           />
         </div>
@@ -589,29 +591,29 @@ function ProfilePage() {
         {/* Account Information Section */}
         <SectionHeader 
           icon={Shield} 
-          title="Account Information" 
-          subtitle="Account status and security"
+          title={t('profile.accountInfo')} 
+          subtitle={t('profile.accountInfoSubtitle')}
           color="#8b5cf6"
         />
         <div style={{ position: 'relative', zIndex: 1, marginBottom: 40 }}>
           <ProfileField 
             icon={Shield} 
-            label="Admin Status" 
+            label={t('profile.adminStatus')} 
             color={user.is_admin ? '#10b981' : '#6b7280'}
           />
           <ProfileField 
             icon={CheckCircle} 
-            label="Email Verification" 
+            label={t('profile.emailVerification')} 
             color={user.is_verified ? '#10b981' : '#f59e0b'}
           />
           <ProfileField 
             icon={Clock} 
-            label="Last Login" 
+            label={t('profile.lastLogin')} 
             color="#06b6d4"
           />
           <ProfileField 
             icon={Calendar} 
-            label="Account Created" 
+            label={t('profile.accountCreated')} 
             color="#8b5cf6"
           />
         </div>
@@ -663,7 +665,7 @@ function ProfilePage() {
           }}
         >
           <ArrowLeft size={20} />
-          Back to Chat
+          {t('profile.backToChat')}
         </button>
       </div>
     </div>

@@ -97,7 +97,10 @@
     "scrollToBottom": "滚动到底部",
     "copyMessage": "复制消息",
     "messageCopied": "消息已复制到剪贴板",
-    "welcomeMessage": "我在这里帮助您了解在奥克兰经营企业的方方面面。请询问我任何关于许可证、许可、法规或当地商业资源的问题。"
+    "welcomeMessage": "我在这里帮助您了解在奥克兰经营企业的方方面面。请询问我任何关于许可证、许可、法规或当地商业资源的问题。",
+    "welcomeTitle": "欢迎来到奥克兰AI！👋",
+    "businessTypeQuestion": "您拥有什么类型的企业？",
+    "inputPlaceholder": "请询问我任何关于您在奥克兰企业的问题..."
   },
   "businessTypes": {
     "beautySalon": "我拥有一家美容院",
@@ -245,7 +248,41 @@
     "changePassword": "修改密码",
     "deleteAccount": "删除账户",
     "profileUpdated": "个人资料更新成功",
-    "passwordChanged": "密码修改成功"
+    "passwordChanged": "密码修改成功",
+    "loadingProfile": "加载个人资料中...",
+    "pleaseLogin": "请登录以查看您的个人资料。",
+    "userProfile": "用户资料",
+    "personalInfoSubtitle": "基本联系方式和人口统计详情",
+    "businessInfoSubtitle": "公司详情和结构",
+    "addressInfo": "地址信息",
+    "addressInfoSubtitle": "企业位置详情",
+    "financialInfo": "财务信息",
+    "financialInfoSubtitle": "年收入数据",
+    "accountInfo": "账户信息",
+    "accountInfoSubtitle": "账户状态和安全",
+    "backToChat": "返回聊天",
+    "fullName": "全名",
+    "emailAddress": "电子邮件地址",
+    "phoneNumber": "电话号码",
+    "age": "年龄",
+    "ethnicity": "种族",
+    "gender": "性别",
+    "businessType": "企业类型",
+    "employeeCount": "员工数量",
+    "yearsInBusiness": "经营年数",
+    "corporationType": "公司类型",
+    "addressLine1": "地址行1",
+    "addressLine2": "地址行2",
+    "city": "城市",
+    "state": "州",
+    "zipCode": "邮政编码",
+    "annualRevenue2022": "2022年年收入",
+    "annualRevenue2023": "2023年年收入",
+    "annualRevenue2024": "2024年年收入",
+    "adminStatus": "管理员状态",
+    "emailVerification": "电子邮件验证",
+    "lastLogin": "最后登录",
+    "accountCreated": "账户创建时间"
   },
   "settings": {
     "title": "设置",
@@ -297,4 +334,4 @@
     "about": "关于",
     "help": "帮助"
   }
-} 
+}
