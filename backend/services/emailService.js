@@ -213,4 +213,22 @@ class EmailService {
   }
 }
 
-module.exports = new EmailService(); 
+// Lazy-loaded email service instance
+let emailServiceInstance = null;
+
+const getEmailService = () => {
+  if (!emailServiceInstance) {
+    try {
+      emailServiceInstance = new EmailService();
+    } catch (error) {
+      console.warn('Email service not available:', error.message);
+      return null;
+    }
+  }
+  return emailServiceInstance;
+};
+
+module.exports = {
+  EmailService,
+  getEmailService
+}; 

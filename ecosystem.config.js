@@ -10,11 +10,11 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'development',
-        PORT: 3001
+        PORT: 3002
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3001
+        PORT: 3002
       },
       // Ensure .env is loaded from root directory
       env_file: './.env',
@@ -34,11 +34,11 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'development',
-        PORT: 3000
+        PORT: 3003
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3003
       },
       // Ensure .env is loaded from root directory (relative to frontend cwd)
       env_file: '../.env',

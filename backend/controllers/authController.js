@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const emailService = require('../services/emailService');
+const { getEmailService } = require('../services/emailService');
 const smsService = require('../services/smsService');
 const { getPool } = require('../config/db');
 
@@ -123,7 +123,7 @@ exports.register = async (req, res) => {
 
     // Send verification email
     try {
-      await emailService.sendVerificationEmail(email, user.emailVerificationToken, firstName);
+      await getEmailService().sendVerificationEmail(email, user.emailVerificationToken, firstName);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
       // Don't fail registration if email fails
@@ -312,7 +312,7 @@ exports.verifyEmail = async (req, res) => {
 
     // Send welcome email
     try {
-      await emailService.sendWelcomeEmail(user.email, user.first_name);
+      await getEmailService().sendWelcomeEmail(user.email, user.first_name);
     } catch (emailError) {
       console.error('Failed to send welcome email:', emailError);
     }
@@ -346,7 +346,7 @@ exports.resendVerification = async (req, res) => {
 
     // Send verification email
     try {
-      await emailService.sendVerificationEmail(email, user.emailVerificationToken, user.first_name);
+      await getEmailService().sendVerificationEmail(email, user.emailVerificationToken, user.first_name);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
       return res.status(500).json({
@@ -395,7 +395,7 @@ exports.forgotPassword = async (req, res) => {
 
     // Send password reset email
     try {
-      await emailService.sendPasswordResetEmail(email, user.passwordResetToken, user.first_name);
+      await getEmailService().sendPasswordResetEmail(email, user.passwordResetToken, user.first_name);
     } catch (emailError) {
       console.error('Failed to send password reset email:', emailError);
       return res.status(500).json({

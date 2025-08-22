@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       port: 3003, // Frontend on 3003
       proxy: {
         '/api': {
-          target: 'http://localhost:3000', // Backend on 3000
+          target: 'http://localhost:3002', // Backend on 3002
           changeOrigin: true,
         },
       },

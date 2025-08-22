@@ -1,14 +1,32 @@
 const OpenAI = require('openai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openaiClient = null;
+
+const getOpenAIClient = () => {
+  if (!openaiClient) {
+    try {
+      openaiClient = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    } catch (error) {
+      console.warn('OpenAI client not available:', error.message);
+      return null;
+    }
+  }
+  return openaiClient;
+};
 
 exports.generateSpeech = async (text, voice = 'alloy') => {
   try {
     // Handle "none" voice option
     if (voice === 'none') {
       console.log('🔇 Voice disabled - skipping speech generation');
+      return null;
+    }
+    
+    const openai = getOpenAIClient();
+    if (!openai) {
+      console.warn('OpenAI client not available - skipping speech generation');
       return null;
     }
     

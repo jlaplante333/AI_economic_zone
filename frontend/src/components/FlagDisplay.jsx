@@ -100,6 +100,9 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
   };
 
   const flagUrl = flagImages[countryCode] || 'https://flagcdn.com/w320/un.png';
+  
+  // Debug logging for flag loading
+  console.log(`Loading flag for ${countryCode}:`, flagUrl);
 
   return (
     <div className={`flag-container ${className}`} data-country={countryCode}>
@@ -110,8 +113,10 @@ const FlagDisplay = ({ countryCode, className = '' }) => {
           alt={`${countryCode} flag`}
           className="flag-image"
           onError={(e) => {
-            // Fallback to a generic flag if image fails to load
-            e.target.src = 'https://flagcdn.com/w320/un.png';
+            // Log the error for debugging
+            console.warn(`Flag failed to load for ${countryCode}:`, flagUrl);
+            // Don't fallback to generic flag - keep the original URL
+            // e.target.src = 'https://flagcdn.com/w320/un.png';
           }}
         />
       </div>
