@@ -13,7 +13,12 @@ const app = express();
 
 // Basic middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: ['https://ai-economic-zone-static.onrender.com', 'http://localhost:3003'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -29,10 +34,16 @@ app.get('/health', (req, res) => res.json({
 // Simple auth routes for testing
 app.post('/api/auth/register', async (req, res) => {
   try {
+    console.log('=== REGISTER ENDPOINT CALLED ===');
+    console.log('Request headers:', req.headers);
+    console.log('Request body:', req.body);
+    console.log('Content-Type:', req.get('Content-Type'));
+    
     const { email, password, firstName, lastName, businessType, language, ethnicity, gender } = req.body;
     
     // Basic validation
     if (!email || !password || !firstName || !lastName) {
+      console.log('Validation failed - missing fields');
       return res.status(400).json({ 
         success: false, 
         message: 'Missing required fields: email, password, firstName, lastName' 
@@ -44,7 +55,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     console.log('Registration attempt:', { email, firstName, lastName, businessType, language, ethnicity, gender });
     
-    res.json({
+    const responseData = {
       success: true,
       message: 'User registered successfully. Please check your email to verify your account.',
       user: { 
@@ -54,7 +65,13 @@ app.post('/api/auth/register', async (req, res) => {
         lastName: lastName,
         is_verified: false 
       }
-    });
+    };
+    
+    console.log('Sending response:', responseData);
+    console.log('Response length:', JSON.stringify(responseData).length);
+    
+    res.json(responseData);
+    console.log('=== REGISTER ENDPOINT COMPLETED ===');
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ success: false, message: 'Registration failed: ' + error.message });
