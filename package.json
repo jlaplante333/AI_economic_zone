@@ -1,10 +1,10 @@
 {
   "name": "oaklandai",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "start": "node backend/index.js",
+    "start": "node src/index.js",
     "dev": "node backend/index.js",
     "start:all": "node start.js",
     "pm2:start": "pm2 start ecosystem.config.js",
