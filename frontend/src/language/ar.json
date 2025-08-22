@@ -63,7 +63,14 @@
     "selectLanguage": "اختر لغتك",
     "languageSelected": "تم اختيار اللغة",
     "configuringAI": "جاري تكوين الذكاء الاصطناعي لـ {{language}}...",
-    "preparingExperience": "جاري إعداد تجربة الذكاء الاصطناعي المخصصة..."
+    "preparingExperience": "جاري إعداد تجربة الذكاء الاصطناعي الشخصية..."
+  },
+  "welcome": {
+    "smartHelp": "مساعدة ذكية لـ",
+    "smallBusinesses": "الشركات الصغيرة",
+    "inOakland": "في أوكلاند.",
+    "speakYourLanguage": "تحدث لغتك.",
+    "getAnswers": "احصل على إجابات. بدون أوراق."
   },
   "chat": {
     "title": "مساعد أوكلاند للذكاء الاصطناعي",

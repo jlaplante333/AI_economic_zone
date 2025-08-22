@@ -46,16 +46,22 @@
     "signUp": "Registrarse",
     "signOut": "Cerrar sesión",
     "rememberMe": "Recordarme",
+    "welcome": "Bienvenido",
     "loginSuccess": "Inicio de sesión exitoso",
     "loginError": "Error al iniciar sesión. Inténtalo de nuevo.",
     "registerSuccess": "Registro exitoso",
     "registerError": "Error en el registro. Inténtalo de nuevo.",
     "passwordResetSent": "Correo de restablecimiento de contraseña enviado",
-    "passwordResetError": "Error al enviar correo de restablecimiento",
-    "emailVerificationSent": "Correo de verificación enviado",
-    "emailVerificationError": "Error al enviar correo de verificación",
+    "passwordResetError": "Error al enviar correo de restablecimiento de contraseña",
+    "emailVerificationSent": "Verificación de correo enviada",
+    "emailVerificationError": "Error al enviar verificación de correo",
     "accountVerified": "Cuenta verificada exitosamente",
-    "verificationError": "Error en la verificación"
+    "verificationError": "Error en la verificación",
+    "noAccount": "¿No tienes una cuenta?",
+    "signInToAccess": "Inicia sesión para acceder a tu asistente de inteligencia artificial de Oakland",
+    "usernamePlaceholder": "Ingresa tu nombre de usuario",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "signingIn": "Iniciando sesión..."
   },
   "languageSelection": {
     "title": "Elige tu idioma",
@@ -64,6 +70,13 @@
     "languageSelected": "Idioma seleccionado",
     "configuringAI": "Configurando inteligencia artificial para {{language}}...",
     "preparingExperience": "Preparando tu experiencia de inteligencia artificial personalizada..."
+  },
+  "welcome": {
+    "smartHelp": "Ayuda inteligente para",
+    "smallBusinesses": "pequeñas empresas",
+    "inOakland": "en Oakland.",
+    "speakYourLanguage": "Habla tu idioma.",
+    "getAnswers": "Obtén respuestas. Sin papeleo."
   },
   "chat": {
     "title": "Asistente IA de Oakland",

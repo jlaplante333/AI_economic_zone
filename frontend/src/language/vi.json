@@ -46,6 +46,7 @@
     "signUp": "Đăng ký",
     "signOut": "Đăng xuất",
     "rememberMe": "Ghi nhớ tôi",
+    "welcome": "Chào mừng",
     "loginSuccess": "Đăng nhập thành công",
     "loginError": "Đăng nhập thất bại. Vui lòng thử lại.",
     "registerSuccess": "Đăng ký thành công",
@@ -55,15 +56,27 @@
     "emailVerificationSent": "Email xác minh đã được gửi",
     "emailVerificationError": "Không thể gửi email xác minh",
     "accountVerified": "Tài khoản đã được xác minh thành công",
-    "verificationError": "Xác minh thất bại"
+    "verificationError": "Xác minh thất bại",
+    "noAccount": "Chưa có tài khoản?",
+    "signInToAccess": "Đăng nhập để truy cập trợ lý trí tuệ nhân tạo Oakland của bạn",
+    "usernamePlaceholder": "Nhập tên đăng nhập của bạn",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "signingIn": "Đang đăng nhập..."
   },
   "languageSelection": {
     "title": "Chọn ngôn ngữ của bạn",
     "subtitle": "Chọn ngôn ngữ ưa thích để bắt đầu hành trình với trí tuệ nhân tạo",
-    "selectLanguage": "Chọn ngôn ngữ",
+    "selectLanguage": "Chọn ngôn ngữ của bạn",
     "languageSelected": "Đã chọn ngôn ngữ",
     "configuringAI": "Đang cấu hình trí tuệ nhân tạo cho {{language}}...",
     "preparingExperience": "Đang chuẩn bị trải nghiệm trí tuệ nhân tạo cá nhân hóa..."
+  },
+  "welcome": {
+    "smartHelp": "Hỗ trợ thông minh cho",
+    "smallBusinesses": "doanh nghiệp nhỏ",
+    "inOakland": "tại Oakland.",
+    "speakYourLanguage": "Nói ngôn ngữ của bạn.",
+    "getAnswers": "Nhận câu trả lời. Không cần giấy tờ."
   },
   "chat": {
     "title": "Trợ lý AI Oakland",

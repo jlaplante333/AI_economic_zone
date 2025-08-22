@@ -46,6 +46,7 @@
     "signUp": "Sign Up",
     "signOut": "Sign Out",
     "rememberMe": "Remember Me",
+    "welcome": "Welcome",
     "loginSuccess": "Login successful",
     "loginError": "Login failed. Please try again.",
     "registerSuccess": "Registration successful",
@@ -55,7 +56,12 @@
     "emailVerificationSent": "Email verification sent",
     "emailVerificationError": "Failed to send email verification",
     "accountVerified": "Account verified successfully",
-    "verificationError": "Verification failed"
+    "verificationError": "Verification failed",
+    "noAccount": "Don't have an account?",
+    "signInToAccess": "Sign in to access your Oakland AI assistant",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "signingIn": "Signing In..."
   },
   "languageSelection": {
     "title": "Choose Your Language",
@@ -64,6 +70,13 @@
     "languageSelected": "Language selected",
     "configuringAI": "Configuring AI for {{language}}...",
     "preparingExperience": "Preparing your personalized AI experience..."
+  },
+  "welcome": {
+    "smartHelp": "Smart help for",
+    "smallBusinesses": "small businesses",
+    "inOakland": "in Oakland.",
+    "speakYourLanguage": "Speak your language.",
+    "getAnswers": "Get answers. No paperwork."
   },
   "chat": {
     "title": "Oakland AI Assistant",

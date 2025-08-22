@@ -46,6 +46,7 @@
     "signUp": "ثبت‌نام",
     "signOut": "خروج",
     "rememberMe": "مرا به خاطر بسپار",
+    "welcome": "خوش آمدید",
     "loginSuccess": "ورود موفقیت‌آمیز",
     "loginError": "ورود ناموفق. لطفاً دوباره تلاش کنید.",
     "registerSuccess": "ثبت‌نام موفقیت‌آمیز",
@@ -54,16 +55,28 @@
     "passwordResetError": "ارسال ایمیل بازنشانی رمز عبور ناموفق",
     "emailVerificationSent": "ایمیل تأیید ارسال شد",
     "emailVerificationError": "ارسال ایمیل تأیید ناموفق",
-    "accountVerified": "حساب کاربری با موفقیت تأیید شد",
-    "verificationError": "تأیید ناموفق"
+    "accountVerified": "حساب با موفقیت تأیید شد",
+    "verificationError": "تأیید ناموفق",
+    "noAccount": "حساب ندارید؟",
+    "signInToAccess": "برای دسترسی به دستیار هوش مصنوعی اوکلند وارد شوید",
+    "usernamePlaceholder": "نام کاربری خود را وارد کنید",
+    "passwordPlaceholder": "رمز عبور خود را وارد کنید",
+    "signingIn": "در حال ورود..."
   },
   "languageSelection": {
     "title": "زبان خود را انتخاب کنید",
-    "subtitle": "زبان مورد علاقه خود را انتخاب کنید تا سفر هوش مصنوعی خود را شروع کنید",
+    "subtitle": "زبان مورد نظر خود را برای شروع سفر هوش مصنوعی انتخاب کنید",
     "selectLanguage": "زبان خود را انتخاب کنید",
-    "languageSelected": "زبان انتخاب شد",
+    "languageSelected": "زبان انتخاب شده",
     "configuringAI": "در حال پیکربندی هوش مصنوعی برای {{language}}...",
-    "preparingExperience": "در حال آماده‌سازی تجربه شخصی‌سازی شده هوش مصنوعی..."
+    "preparingExperience": "در حال آماده‌سازی تجربه هوش مصنوعی شخصی..."
+  },
+  "welcome": {
+    "smartHelp": "کمک هوشمند برای",
+    "smallBusinesses": "کسب‌وکارهای کوچک",
+    "inOakland": "در اوکلند.",
+    "speakYourLanguage": "به زبان خود صحبت کنید.",
+    "getAnswers": "پاسخ‌ها را دریافت کنید. بدون کاغذ."
   },
   "chat": {
     "title": "دستیار هوش مصنوعی اوکلند",

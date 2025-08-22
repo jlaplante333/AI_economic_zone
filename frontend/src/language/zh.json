@@ -33,7 +33,7 @@
   "auth": {
     "login": "登录",
     "register": "注册",
-    "email": "邮箱",
+    "email": "电子邮件",
     "password": "密码",
     "confirmPassword": "确认密码",
     "username": "用户名",
@@ -44,26 +44,39 @@
     "resetPassword": "重置密码",
     "signIn": "登录",
     "signUp": "注册",
-    "signOut": "退出",
+    "signOut": "退出登录",
     "rememberMe": "记住我",
+    "welcome": "欢迎",
     "loginSuccess": "登录成功",
-    "loginError": "登录失败，请重试。",
+    "loginError": "登录失败。请重试。",
     "registerSuccess": "注册成功",
-    "registerError": "注册失败，请重试。",
+    "registerError": "注册失败。请重试。",
     "passwordResetSent": "密码重置邮件已发送",
     "passwordResetError": "发送密码重置邮件失败",
-    "emailVerificationSent": "验证邮件已发送",
-    "emailVerificationError": "发送验证邮件失败",
+    "emailVerificationSent": "邮件验证已发送",
+    "emailVerificationError": "发送邮件验证失败",
     "accountVerified": "账户验证成功",
-    "verificationError": "验证失败"
+    "verificationError": "验证失败",
+    "noAccount": "没有账户？",
+    "signInToAccess": "登录以访问您的奥克兰人工智能助手",
+    "usernamePlaceholder": "请输入您的用户名",
+    "passwordPlaceholder": "请输入您的密码",
+    "signingIn": "正在登录..."
   },
   "languageSelection": {
     "title": "选择您的语言",
-    "subtitle": "选择您偏好的语言，开始您的人工智能之旅",
-    "selectLanguage": "选择语言",
+    "subtitle": "选择您偏好的语言开始您的人工智能之旅",
+    "selectLanguage": "选择您的语言",
     "languageSelected": "已选择语言",
     "configuringAI": "正在为{{language}}配置人工智能...",
-    "preparingExperience": "正在准备您的个性化人工智能体验..."
+    "preparingExperience": "正在准备您个性化的人工智能体验..."
+  },
+  "welcome": {
+    "smartHelp": "为小企业提供",
+    "smallBusinesses": "智能帮助",
+    "inOakland": "在奥克兰。",
+    "speakYourLanguage": "说您的语言。",
+    "getAnswers": "获得答案。无需文书工作。"
   },
   "chat": {
     "title": "奥克兰AI助手",

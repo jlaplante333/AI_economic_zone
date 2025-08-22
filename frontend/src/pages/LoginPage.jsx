@@ -113,23 +113,23 @@ function LoginPage() {
         </div>
         
         <h1 className="main-heading">
-          {t('smartHelp')}<br />
-          {t('smallBusinesses')}<br />
-          {t('inOakland')}
+          {t('welcome.smartHelp')}<br />
+          {t('welcome.smallBusinesses')}<br />
+          {t('welcome.inOakland')}
         </h1>
         <p className="sub-heading">
-          {t('speakYourLanguage')}<br />
-          {t('getAnswers')}
+          {t('welcome.speakYourLanguage')}<br />
+          {t('welcome.getAnswers')}
         </p>
         <p style={{ color: '#64748b', fontSize: '16px' }}>
-          {t('noAccount')} <button onClick={() => navigate('/signup')} className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('signUp')}</button>
+          {t('auth.noAccount')} <button onClick={() => navigate('/signup')} className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('auth.signUp')}</button>
         </p>
       </div>
 
-      {/* Right side - Login section */}
+      {/* Right side - Login form */}
       <div className="login-section">
         <div className="login-container">
-          <h2 className="login-title">{t('welcome')}</h2>
+          <h2 className="login-title">{t('auth.welcome')}</h2>
           
           {/* Change Language Button */}
           <button 
@@ -172,7 +172,7 @@ function LoginPage() {
             </span>
             {availableLanguages[currentLanguageIndex].name}
           </button>
-          <p className="login-subtitle">{t('signInToAccess')}</p>
+          <p className="login-subtitle">{t('auth.signInToAccess')}</p>
           <form onSubmit={handleSubmit} className="login-form">
             {/* Verification Message */}
             {verificationMessage && (
@@ -192,27 +192,27 @@ function LoginPage() {
             )}
             
             <div className="form-group">
-              <label htmlFor="username" className="form-label">{t('username')}</label>
+              <label htmlFor="username" className="form-label">{t('auth.username')}</label>
               <input
                 type="text"
                 id="username"
                 className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('usernamePlaceholder')}
+                placeholder={t('auth.usernamePlaceholder')}
                 required
                 disabled={isLoading}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password" className="form-label">{t('password')}</label>
+              <label htmlFor="password" className="form-label">{t('auth.password')}</label>
               <input
                 type="password"
                 id="password"
                 className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('passwordPlaceholder')}
+                placeholder={t('auth.passwordPlaceholder')}
                 required
                 disabled={isLoading}
               />
@@ -226,12 +226,12 @@ function LoginPage() {
                 cursor: isLoading ? 'not-allowed' : 'pointer'
               }}
             >
-              {isLoading ? t('signingIn') : t('signIn')}
+              {isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </button>
           </form>
           <div className="login-footer">
-            <p>{t('noAccount')} <button onClick={() => navigate('/signup')} className="signup-link">{t('signUp')}</button></p>
-            <p><a href="#" className="forgot-password">{t('forgotPassword')}</a></p>
+            <p>{t('auth.noAccount')} <button onClick={() => navigate('/signup')} className="signup-link">{t('auth.signUp')}</button></p>
+            <p><a href="#" className="forgot-password">{t('auth.forgotPassword')}</a></p>
           </div>
         </div>
       </div>
