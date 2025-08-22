@@ -25,7 +25,7 @@ const getEnvVar = (key, defaultValue = '') => {
 
 // Export commonly used environment variables
 export const config = {
-  VITE_API_URL: getEnvVar('VITE_API_URL', 'https://ai-economic-zone.onrender.com'),
+  VITE_API_URL: getEnvVar('VITE_API_URL', import.meta.env.MODE === 'production' ? 'https://ai-economic-zone.onrender.com' : 'http://localhost:3002'),
   VITE_APP_NAME: getEnvVar('VITE_APP_NAME', 'Oakland AI'),
   NODE_ENV: getEnvVar('NODE_ENV', 'development'),
 };
