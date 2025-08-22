@@ -931,6 +931,7 @@ function FullChatPage() {
     console.log('🎤 Speaking text with OpenAI TTS:', text.substring(0, 100) + '...');
     
     try {
+      console.log('🔍 Making TTS request to /api/tts/generate');
       const response = await fetch('/api/tts/generate', {
         method: 'POST',
         headers: {
@@ -942,13 +943,23 @@ function FullChatPage() {
         })
       });
       
+      console.log('🔍 TTS response status:', response.status);
+      console.log('🔍 TTS response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
-        throw new Error(`TTS API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ TTS API error response:', errorText);
+        throw new Error(`TTS API error: ${response.status} - ${errorText}`);
       }
       
       // Get the audio blob with proper MIME type
+      console.log('🔍 Creating audio blob from response...');
       const audioBlob = await response.blob();
       console.log('🔊 Audio blob created:', audioBlob.type, 'size:', audioBlob.size);
+      
+      if (!audioBlob || audioBlob.size === 0) {
+        throw new Error('Audio blob is empty or invalid');
+      }
       
       // Create blob URL with proper MIME type
       const blobUrl = URL.createObjectURL(audioBlob);
@@ -971,17 +982,24 @@ function FullChatPage() {
       };
       audio.onerror = (error) => {
         console.error('🔊 Audio error:', error);
+        console.error('🔊 Audio error details:', {
+          error: error.target.error,
+          networkState: error.target.networkState,
+          readyState: error.target.readyState
+        });
         setCurrentAudio(null);
         // Clean up blob URL on error
         URL.revokeObjectURL(blobUrl);
       };
       
       // Play the audio
+      console.log('🔊 Attempting to play audio...');
       await audio.play();
-      console.log('🔊 OpenAI TTS audio initiated');
+      console.log('🔊 OpenAI TTS audio initiated successfully');
       
     } catch (error) {
       console.error('❌ OpenAI TTS Error:', error);
+      console.error('❌ Error stack:', error.stack);
       // Fallback to browser speech synthesis
       console.log('🔄 Falling back to browser speech synthesis...');
       speakText(text);

@@ -14,8 +14,13 @@ exports.generateTTS = async (req, res) => {
     
     // Handle "none" voice option
     if (audioBuffer === null) {
+      console.log('🔇 No audio buffer returned, sending 204');
       return res.status(204).send(); // No content response
     }
+    
+    console.log('🎤 Audio buffer received, size:', audioBuffer.length);
+    console.log('🎤 Audio buffer type:', typeof audioBuffer);
+    console.log('🎤 Audio buffer is Buffer:', Buffer.isBuffer(audioBuffer));
     
     // Set proper headers for audio response
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -24,11 +29,16 @@ exports.generateTTS = async (req, res) => {
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Content-Disposition', 'inline');
     
+    console.log('🎤 Headers set, sending audio buffer...');
+    
     // Send the audio buffer
     res.send(audioBuffer);
     
+    console.log('🎤 Audio buffer sent successfully');
+    
   } catch (error) {
     console.error('❌ TTS Controller Error:', error);
+    console.error('❌ TTS Controller Error stack:', error.stack);
     res.status(500).json({ error: 'Failed to generate speech' });
   }
 };

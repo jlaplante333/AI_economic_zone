@@ -31,6 +31,8 @@ exports.generateSpeech = async (text, voice = 'alloy') => {
     }
     
     console.log('🎤 Generating speech for text:', text.substring(0, 100) + '...');
+    console.log('🎤 Using voice:', voice);
+    console.log('🎤 OpenAI client available:', !!openai);
     
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
@@ -39,12 +41,20 @@ exports.generateSpeech = async (text, voice = 'alloy') => {
     });
     
     console.log('🎤 Speech generated successfully');
+    console.log('🎤 MP3 response type:', typeof mp3);
+    console.log('🎤 MP3 response properties:', Object.keys(mp3));
     
     // Convert the response to a buffer
-    const buffer = Buffer.from(await mp3.arrayBuffer());
+    const arrayBuffer = await mp3.arrayBuffer();
+    console.log('🎤 Array buffer created, size:', arrayBuffer.byteLength);
+    
+    const buffer = Buffer.from(arrayBuffer);
+    console.log('🎤 Buffer created, size:', buffer.length);
+    
     return buffer;
   } catch (error) {
     console.error('❌ TTS Error:', error);
+    console.error('❌ TTS Error stack:', error.stack);
     throw new Error('Failed to generate speech');
   }
 };
