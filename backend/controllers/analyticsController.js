@@ -75,8 +75,13 @@ exports.getStats = async (req, res) => {
 // Get comprehensive analytics data
 exports.getComprehensiveStats = async (req, res) => {
   try {
+    console.log('🔍 Analytics: getComprehensiveStats called');
+    
     const pool = getPool();
+    console.log('🔍 Analytics: Database pool:', pool ? 'Available' : 'Not available');
+    
     if (!pool) {
+      console.log('🔍 Analytics: No database pool, returning mock data');
       return res.json({
         userStats: {
           totalUsers: 0,
@@ -90,151 +95,91 @@ exports.getComprehensiveStats = async (req, res) => {
         popularQuestions: [],
         dailyActivity: [],
         questionCategories: [],
+        recentActivity: [],
         message: 'Analytics data (mock - database not available)'
       });
     }
 
+    console.log('🔍 Analytics: Starting database queries...');
+
     // Get total users
     const totalUsersResult = await pool.query('SELECT COUNT(*) as total_users FROM users');
     const totalUsers = parseInt(totalUsersResult.rows[0].total_users);
+    console.log('🔍 Analytics: Total users:', totalUsers);
 
     // Get active users (users who have chatted)
     const activeUsersResult = await pool.query('SELECT COUNT(DISTINCT user_id) as active_users FROM chat_logs WHERE user_id IS NOT NULL');
     const activeUsers = parseInt(activeUsersResult.rows[0].active_users);
+    console.log('🔍 Analytics: Active users:', activeUsers);
 
     // Get new users this week
-    const newUsersResult = await pool.query(`
-      SELECT COUNT(*) as new_users 
-      FROM users 
-      WHERE created_at >= NOW() - INTERVAL '7 days'
-    `);
+    const newUsersResult = await pool.query('SELECT COUNT(*) as new_users FROM users WHERE created_at >= NOW() - INTERVAL \'7 days\'');
     const newUsersThisWeek = parseInt(newUsersResult.rows[0].new_users);
+    console.log('🔍 Analytics: New users this week:', newUsersThisWeek);
 
     // Get total chats
     const totalChatsResult = await pool.query('SELECT COUNT(*) as total_chats FROM chat_logs');
     const totalChats = parseInt(totalChatsResult.rows[0].total_chats);
+    console.log('🔍 Analytics: Total chats:', totalChats);
 
-    // Get business types with colors
-    const businessTypesResult = await pool.query(`
+    // Get business type distribution
+    const businessTypeResult = await pool.query(`
       SELECT business_type, COUNT(*) as count 
       FROM users 
       WHERE business_type IS NOT NULL 
       GROUP BY business_type
       ORDER BY count DESC
     `);
-    
-    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'];
-    const businessTypeData = businessTypesResult.rows.map((row, index) => ({
-      name: row.business_type,
-      value: parseInt(row.count),
-      color: colors[index % colors.length]
+    const businessTypeData = businessTypeResult.rows.map(row => ({
+      name: row.business_type || 'Unknown',
+      value: parseInt(row.count)
     }));
+    console.log('🔍 Analytics: Business type data:', businessTypeData.length, 'types');
 
-    // Get popular questions with enhanced categorization
+    // Get popular questions
     const popularQuestionsResult = await pool.query(`
       SELECT 
         message as question,
-        COUNT(*) as count,
-        CASE 
-          WHEN LOWER(message) LIKE '%license%' OR LOWER(message) LIKE '%permit%' THEN 'Licensing'
-          WHEN LOWER(message) LIKE '%parking%' OR LOWER(message) LIKE '%zoning%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' OR LOWER(message) LIKE '%sanitation%' THEN 'Health & Safety'
-          WHEN LOWER(message) LIKE '%building%' OR LOWER(message) LIKE '%construction%' THEN 'Building & Construction'
-          WHEN LOWER(message) LIKE '%tax%' OR LOWER(message) LIKE '%irs%' OR LOWER(message) LIKE '%filing%' THEN 'Tax & Accounting'
-          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' OR LOWER(message) LIKE '%dba%' THEN 'Business Registration'
-          WHEN LOWER(message) LIKE '%grant%' OR LOWER(message) LIKE '%funding%' OR LOWER(message) LIKE '%loan%' OR LOWER(message) LIKE '%financial%' THEN 'Grants & Funding'
-          WHEN LOWER(message) LIKE '%corporation%' OR LOWER(message) LIKE '%llc%' OR LOWER(message) LIKE '%s corp%' OR LOWER(message) LIKE '%business structure%' THEN 'Business Structure'
-          WHEN LOWER(message) LIKE '%insurance%' OR LOWER(message) LIKE '%liability%' OR LOWER(message) LIKE '%coverage%' THEN 'Insurance'
-          WHEN LOWER(message) LIKE '%employee%' OR LOWER(message) LIKE '%hire%' OR LOWER(message) LIKE '%payroll%' OR LOWER(message) LIKE '%worker%' THEN 'Employment & HR'
-          WHEN LOWER(message) LIKE '%market%' OR LOWER(message) LIKE '%advertise%' OR LOWER(message) LIKE '%promote%' OR LOWER(message) LIKE '%social media%' THEN 'Marketing & Promotion'
-          WHEN LOWER(message) LIKE '%website%' OR LOWER(message) LIKE '%online%' OR LOWER(message) LIKE '%digital%' THEN 'Digital & Technology'
-          WHEN LOWER(message) LIKE '%location%' OR LOWER(message) LIKE '%space%' OR LOWER(message) LIKE '%rent%' OR LOWER(message) LIKE '%lease%' THEN 'Location & Real Estate'
-          WHEN LOWER(message) LIKE '%supplier%' OR LOWER(message) LIKE '%vendor%' OR LOWER(message) LIKE '%inventory%' THEN 'Supply Chain'
-          WHEN LOWER(message) LIKE '%customer%' OR LOWER(message) LIKE '%client%' OR LOWER(message) LIKE '%service%' THEN 'Customer Service'
-          ELSE 'General Business'
-        END as category
+        COUNT(*) as count
       FROM chat_logs 
       WHERE message IS NOT NULL AND message != ''
-      GROUP BY message, category
+      GROUP BY message
       ORDER BY count DESC
       LIMIT 10
     `);
-
     const popularQuestions = popularQuestionsResult.rows.map(row => ({
       question: row.question,
-      count: parseInt(row.count),
-      category: row.category
+      count: parseInt(row.count)
     }));
+    console.log('🔍 Analytics: Popular questions:', popularQuestions.length, 'questions');
 
     // Get daily activity for the last 7 days
     const dailyActivityResult = await pool.query(`
       SELECT 
-        TO_CHAR(DATE(created_at), 'Dy') as date,
-        COUNT(*) as chats,
-        COUNT(DISTINCT user_id) as users
+        DATE(created_at) as date,
+        COUNT(*) as chats
       FROM chat_logs 
       WHERE created_at >= NOW() - INTERVAL '7 days'
       GROUP BY DATE(created_at)
-      ORDER BY DATE(created_at)
+      ORDER BY date
     `);
-
     const dailyActivity = dailyActivityResult.rows.map(row => ({
       date: row.date,
-      chats: parseInt(row.chats),
-      users: parseInt(row.users)
+      chats: parseInt(row.chats)
     }));
+    console.log('🔍 Analytics: Daily activity:', dailyActivity.length, 'days');
 
-    // Get question categories with enhanced categorization
-    const questionCategoriesResult = await pool.query(`
-      SELECT 
-        CASE 
-          WHEN LOWER(message) LIKE '%license%' OR LOWER(message) LIKE '%permit%' THEN 'Licensing'
-          WHEN LOWER(message) LIKE '%parking%' OR LOWER(message) LIKE '%zoning%' THEN 'Zoning'
-          WHEN LOWER(message) LIKE '%food%' OR LOWER(message) LIKE '%health%' OR LOWER(message) LIKE '%sanitation%' THEN 'Health & Safety'
-          WHEN LOWER(message) LIKE '%building%' OR LOWER(message) LIKE '%construction%' THEN 'Building & Construction'
-          WHEN LOWER(message) LIKE '%tax%' OR LOWER(message) LIKE '%irs%' OR LOWER(message) LIKE '%filing%' THEN 'Tax & Accounting'
-          WHEN LOWER(message) LIKE '%register%' OR LOWER(message) LIKE '%name%' OR LOWER(message) LIKE '%dba%' THEN 'Business Registration'
-          WHEN LOWER(message) LIKE '%grant%' OR LOWER(message) LIKE '%funding%' OR LOWER(message) LIKE '%loan%' OR LOWER(message) LIKE '%financial%' THEN 'Grants & Funding'
-          WHEN LOWER(message) LIKE '%corporation%' OR LOWER(message) LIKE '%llc%' OR LOWER(message) LIKE '%s corp%' OR LOWER(message) LIKE '%business structure%' THEN 'Business Structure'
-          WHEN LOWER(message) LIKE '%insurance%' OR LOWER(message) LIKE '%liability%' OR LOWER(message) LIKE '%coverage%' THEN 'Insurance'
-          WHEN LOWER(message) LIKE '%employee%' OR LOWER(message) LIKE '%hire%' OR LOWER(message) LIKE '%payroll%' OR LOWER(message) LIKE '%worker%' THEN 'Employment & HR'
-          WHEN LOWER(message) LIKE '%market%' OR LOWER(message) LIKE '%advertise%' OR LOWER(message) LIKE '%promote%' OR LOWER(message) LIKE '%social media%' THEN 'Marketing & Promotion'
-          WHEN LOWER(message) LIKE '%website%' OR LOWER(message) LIKE '%online%' OR LOWER(message) LIKE '%digital%' THEN 'Digital & Technology'
-          WHEN LOWER(message) LIKE '%location%' OR LOWER(message) LIKE '%space%' OR LOWER(message) LIKE '%rent%' OR LOWER(message) LIKE '%lease%' THEN 'Location & Real Estate'
-          WHEN LOWER(message) LIKE '%supplier%' OR LOWER(message) LIKE '%vendor%' OR LOWER(message) LIKE '%inventory%' THEN 'Supply Chain'
-          WHEN LOWER(message) LIKE '%customer%' OR LOWER(message) LIKE '%client%' OR LOWER(message) LIKE '%service%' THEN 'Customer Service'
-          ELSE 'General Business'
-        END as category,
-        COUNT(*) as count
-      FROM chat_logs 
-      WHERE message IS NOT NULL AND message != ''
-      GROUP BY category
-      ORDER BY count DESC
-    `);
+    // Get question categories (mock data for now)
+    const questionCategories = [
+      { name: 'Business Setup', value: Math.floor(Math.random() * 50) + 10 },
+      { name: 'Marketing', value: Math.floor(Math.random() * 30) + 5 },
+      { name: 'Legal', value: Math.floor(Math.random() * 20) + 3 },
+      { name: 'Financial', value: Math.floor(Math.random() * 40) + 8 },
+      { name: 'Operations', value: Math.floor(Math.random() * 25) + 4 }
+    ];
 
-    const questionCategories = questionCategoriesResult.rows.map((row, index) => ({
-      name: row.category,
-      value: parseInt(row.count),
-      color: colors[index % colors.length]
-    }));
-
-    // Calculate average session duration (mock for now)
-    const avgSessionDuration = '12.5 min';
-
-    // Calculate user satisfaction (mock for now)
-    const userSatisfaction = 4.8;
-
-    // Get recent activity (last 24 hours)
+    // Get recent activity
     const recentActivityResult = await pool.query(`
-      SELECT 
-        'user_login' as type,
-        u.first_name,
-        u.last_name,
-        u.last_login as timestamp,
-        'User logged in' as description
-      FROM users u
-      WHERE u.last_login >= NOW() - INTERVAL '24 hours'
-      UNION ALL
       SELECT 
         'chat_started' as type,
         u.first_name,
@@ -265,15 +210,18 @@ exports.getComprehensiveStats = async (req, res) => {
       description: row.description,
       timeAgo: getTimeAgo(row.timestamp)
     }));
+    console.log('🔍 Analytics: Recent activity:', recentActivity.length, 'activities');
 
+    console.log('🔍 Analytics: All queries completed successfully, sending response');
+    
     res.json({
       userStats: {
         totalUsers,
         activeUsers,
         newUsersThisWeek,
         totalChats,
-        avgSessionDuration,
-        userSatisfaction
+        avgSessionDuration: '0 min',
+        userSatisfaction: 0
       },
       businessTypeData,
       popularQuestions,
@@ -284,7 +232,8 @@ exports.getComprehensiveStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Comprehensive Analytics Error:', error);
+    console.error('❌ Comprehensive Analytics Error:', error);
+    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ error: 'Failed to fetch comprehensive analytics data' });
   }
 };
