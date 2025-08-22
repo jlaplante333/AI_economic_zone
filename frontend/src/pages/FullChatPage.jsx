@@ -7,6 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import ProfileMenu from '../components/ProfileMenu';
 import { stopAllSpeech, setCurrentAudio, initializeSpeechCleanup, getCurrentAudio } from '../utils/speechUtils';
+import { useLanguage } from '../context/LanguageContext';
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -59,7 +60,8 @@ function FullChatPage() {
   const currentAudioRef = useRef(null);
   
   // Theme context
-  const { theme, currentThemeName, toggleTheme, isToggling } = useTheme();
+  const { theme, toggleTheme, isToggling, currentThemeName } = useTheme();
+  const { t } = useLanguage();
   
   // Debug theme context
   useEffect(() => {
@@ -258,110 +260,84 @@ function FullChatPage() {
 
   // All available business options
   const allBusinessOptions = [
-    { type: 'beauty salon', icon: <Scissors size={48} color="#60a5fa" />, label: 'I own a beauty salon' },
-    { type: 'restaurant', icon: <UtensilsCrossed size={48} color="#f59e42" />, label: 'I own a restaurant' },
-    { type: 'retail store', icon: <ShoppingBag size={48} color="#f472b6" />, label: 'I own a retail store' },
-    { type: 'coffee shop', icon: <Coffee size={48} color="#a3a3a3" />, label: 'I own a coffee shop' },
-    { type: 'barbershop', icon: <Scissors size={48} color="#f87171" />, label: 'I own a barbershop' },
-    { type: 'bakery', icon: <Star size={48} color="#fbbf24" />, label: 'I own a bakery' },
-    { type: 'gym', icon: <Heart size={48} color="#34d399" />, label: 'I own a gym' },
-    { type: 'auto repair', icon: <Settings size={48} color="#f59e42" />, label: 'I own an auto repair shop' },
-    { type: 'laundry', icon: <Droplet size={48} color="#60a5fa" />, label: 'I own a laundry service' },
-    { type: 'pet grooming', icon: <Heart size={48} color="#fbbf24" />, label: 'I own a pet grooming business' },
-    { type: 'tattoo parlor', icon: <Edit size={48} color="#a78bfa" />, label: 'I own a tattoo parlor' },
-    { type: 'nail salon', icon: <Star size={48} color="#f472b6" />, label: 'I own a nail salon' },
-    { type: 'photography studio', icon: <Camera size={48} color="#60a5fa" />, label: 'I own a photography studio' },
-    { type: 'consulting', icon: <Briefcase size={48} color="#a3a3a3" />, label: 'I own a consulting business' },
-    { type: 'daycare', icon: <Users size={48} color="#fbbf24" />, label: 'I own a daycare center' },
-    { type: 'cleaning service', icon: <Droplet size={48} color="#34d399" />, label: 'I own a cleaning service' },
-    { type: 'food truck', icon: <Truck size={48} color="#f59e42" />, label: 'I own a food truck' },
-    { type: 'yoga studio', icon: <Heart size={48} color="#a78bfa" />, label: 'I own a yoga studio' },
-    { type: 'music school', icon: <Star size={48} color="#60a5fa" />, label: 'I own a music school' },
-    { type: 'dance studio', icon: <Users size={48} color="#f472b6" />, label: 'I own a dance studio' },
-    { type: 'art gallery', icon: <BookOpen size={48} color="#fbbf24" />, label: 'I own an art gallery' },
-    { type: 'bookstore', icon: <BookOpen size={48} color="#a3a3a3" />, label: 'I own a bookstore' },
-    { type: 'florist', icon: <Leaf size={48} color="#34d399" />, label: 'I own a florist shop' },
-    { type: 'jewelry store', icon: <Gem size={48} color="#60a5fa" />, label: 'I own a jewelry store' },
-    { type: 'vintage shop', icon: <Package size={48} color="#f59e42" />, label: 'I own a vintage shop' },
-    { type: 'tech startup', icon: <MonitorSmartphone size={48} color="#a78bfa" />, label: 'I own a tech startup' },
-    { type: 'dental office', icon: <User size={48} color="#60a5fa" />, label: 'I own a dental office' },
-    { type: 'law firm', icon: <Briefcase size={48} color="#f59e42" />, label: 'I own a law firm' },
-    { type: 'real estate', icon: <Building2 size={48} color="#34d399" />, label: 'I own a real estate business' },
-    { type: 'insurance agency', icon: <Shield size={48} color="#f472b6" />, label: 'I own an insurance agency' },
-    { type: 'accounting firm', icon: <DollarSign size={48} color="#fbbf24" />, label: 'I own an accounting firm' },
-    { type: 'marketing agency', icon: <Megaphone size={48} color="#a78bfa" />, label: 'I own a marketing agency' },
-    { type: 'web design', icon: <MonitorSmartphone size={48} color="#60a5fa" />, label: 'I own a web design business' },
-    { type: 'construction', icon: <Building size={48} color="#f59e42" />, label: 'I own a construction business' },
-    { type: 'landscaping', icon: <Leaf size={48} color="#34d399" />, label: 'I own a landscaping business' },
-    { type: 'plumbing', icon: <Droplet size={48} color="#60a5fa" />, label: 'I own a plumbing business' },
-    { type: 'electrical', icon: <Lightbulb size={48} color="#fbbf24" />, label: 'I own an electrical business' },
-    { type: 'HVAC', icon: <Flame size={48} color="#f59e42" />, label: 'I own an HVAC business' },
-    { type: 'roofing', icon: <Building size={48} color="#a3a3a3" />, label: 'I own a roofing business' },
-    { type: 'painting', icon: <Edit size={48} color="#f472b6" />, label: 'I own a painting business' },
-    { type: 'carpentry', icon: <Settings size={48} color="#f59e42" />, label: 'I own a carpentry business' },
-    { type: 'other', icon: <Building2 size={48} color="#a3a3a3" />, label: 'I own another type of business' }
+    { type: 'beauty salon', icon: <Scissors size={48} color="#60a5fa" />, label: t('businessTypes.beautySalon') },
+    { type: 'restaurant', icon: <UtensilsCrossed size={48} color="#f59e42" />, label: t('businessTypes.restaurant') },
+    { type: 'retail store', icon: <ShoppingBag size={48} color="#f472b6" />, label: t('businessTypes.retailStore') },
+    { type: 'coffee shop', icon: <Coffee size={48} color="#a3a3a3" />, label: t('businessTypes.coffeeShop') },
+    { type: 'barbershop', icon: <Scissors size={48} color="#f87171" />, label: t('businessTypes.barbershop') },
+    { type: 'bakery', icon: <Star size={48} color="#fbbf24" />, label: t('businessTypes.bakery') },
+    { type: 'gym', icon: <Heart size={48} color="#34d399" />, label: t('businessTypes.gym') },
+    { type: 'auto repair', icon: <Settings size={48} color="#f59e42" />, label: t('businessTypes.autoRepair') },
+    { type: 'laundry', icon: <Droplet size={48} color="#60a5fa" />, label: t('businessTypes.laundry') },
+    { type: 'pet grooming', icon: <Heart size={48} color="#fbbf24" />, label: t('businessTypes.petGrooming') },
+    { type: 'tattoo parlor', icon: <Edit size={48} color="#a78bfa" />, label: t('businessTypes.tattooParlor') },
+    { type: 'nail salon', icon: <Star size={48} color="#f472b6" />, label: t('businessTypes.nailSalon') },
+    { type: 'photography studio', icon: <Camera size={48} color="#60a5fa" />, label: t('businessTypes.photographyStudio') },
+    { type: 'consulting', icon: <Briefcase size={48} color="#a3a3a3" />, label: t('businessTypes.consulting') },
+    { type: 'daycare', icon: <Users size={48} color="#fbbf24" />, label: t('businessTypes.daycare') },
+    { type: 'cleaning service', icon: <Droplet size={48} color="#34d399" />, label: t('businessTypes.cleaningService') },
+    { type: 'food truck', icon: <Truck size={48} color="#f59e42" />, label: t('businessTypes.foodTruck') },
+    { type: 'yoga studio', icon: <Heart size={48} color="#a78bfa" />, label: t('businessTypes.yogaStudio') },
+    { type: 'music school', icon: <Star size={48} color="#60a5fa" />, label: t('businessTypes.musicSchool') },
+    { type: 'dance studio', icon: <Users size={48} color="#f472b6" />, label: t('businessTypes.danceStudio') },
+    { type: 'art gallery', icon: <BookOpen size={48} color="#fbbf24" />, label: t('businessTypes.artGallery') },
+    { type: 'bookstore', icon: <BookOpen size={48} color="#a3a3a3" />, label: t('businessTypes.bookstore') },
+    { type: 'florist', icon: <Leaf size={48} color="#34d399" />, label: t('businessTypes.florist') },
+    { type: 'jewelry store', icon: <Gem size={48} color="#60a5fa" />, label: t('businessTypes.jewelryStore') },
+    { type: 'vintage shop', icon: <Package size={48} color="#f59e42" />, label: t('businessTypes.vintageShop') },
+    { type: 'tech startup', icon: <MonitorSmartphone size={48} color="#a78bfa" />, label: t('businessTypes.techStartup') },
+    { type: 'dental office', icon: <User size={48} color="#60a5fa" />, label: t('businessTypes.dentalOffice') },
+    { type: 'law firm', icon: <Briefcase size={48} color="#f59e42" />, label: t('businessTypes.lawFirm') },
+    { type: 'real estate', icon: <Building2 size={48} color="#34d399" />, label: t('businessTypes.realEstate') },
+    { type: 'insurance agency', icon: <Shield size={48} color="#f472b6" />, label: t('businessTypes.insuranceAgency') },
+    { type: 'accounting firm', icon: <DollarSign size={48} color="#fbbf24" />, label: t('businessTypes.accountingFirm') },
+    { type: 'marketing agency', icon: <Megaphone size={48} color="#a78bfa" />, label: t('businessTypes.marketingAgency') },
+    { type: 'web design', icon: <MonitorSmartphone size={48} color="#60a5fa" />, label: t('businessTypes.webDesign') },
+    { type: 'construction', icon: <Building size={48} color="#f59e42" />, label: t('businessTypes.construction') },
+    { type: 'landscaping', icon: <Leaf size={48} color="#34d399" />, label: t('businessTypes.landscaping') },
+    { type: 'plumbing', icon: <Droplet size={48} color="#60a5fa" />, label: t('businessTypes.plumbing') },
+    { type: 'electrical', icon: <Lightbulb size={48} color="#fbbf24" />, label: t('businessTypes.electrical') },
+    { type: 'HVAC', icon: <Flame size={48} color="#f59e42" />, label: t('businessTypes.hvac') },
+    { type: 'roofing', icon: <Building size={48} color="#a3a3a3" />, label: t('businessTypes.roofing') },
+    { type: 'painting', icon: <Edit size={48} color="#f472b6" />, label: t('businessTypes.painting') },
+    { type: 'carpentry', icon: <Settings size={48} color="#f59e42" />, label: t('businessTypes.carpentry') },
+    { type: 'other', icon: <Building2 size={48} color="#a3a3a3" />, label: t('businessTypes.other') }
   ];
 
-  // All available quick options
-  const allQuickOptions = [
-    { label: 'Business License', icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
-    { label: 'Parking Rules', icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
-    { label: 'Permits', icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
-    { label: 'Taxes', icon: <DollarSign size={32} color="#93c5fd" />, value: 'Taxes' },
-    { label: 'Zoning', icon: <Map size={32} color="#93c5fd" />, value: 'Zoning' },
-    { label: 'Health & Safety', icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Health & Safety' },
-    { label: 'Employment Law', icon: <Users size={32} color="#93c5fd" />, value: 'Employment Law' },
-    { label: 'Insurance', icon: <Shield size={32} color="#93c5fd" />, value: 'Insurance' },
-    { label: 'Accessibility', icon: <KeyRound size={32} color="#93c5fd" />, value: 'Accessibility' },
-    { label: 'Marketing', icon: <Megaphone size={32} color="#93c5fd" />, value: 'Marketing' },
-    { label: 'Grants', icon: <Gift size={32} color="#93c5fd" />, value: 'Grants' },
-    { label: 'Utilities', icon: <Droplet size={32} color="#93c5fd" />, value: 'Utilities' },
-    { label: 'Inspections', icon: <ClipboardCheck size={32} color="#93c5fd" />, value: 'Inspections' },
-    { label: 'Waste Disposal', icon: <Trash size={32} color="#93c5fd" />, value: 'Waste Disposal' },
-    { label: 'Fire Safety', icon: <Flame size={32} color="#93c5fd" />, value: 'Fire Safety' },
-    { label: 'Security', icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Security' },
-    { label: 'Building Codes', icon: <Building size={32} color="#93c5fd" />, value: 'Building Codes' },
-    { label: 'Certifications', icon: <BadgeCheck size={32} color="#93c5fd" />, value: 'Certifications' },
-    { label: 'Emergencies', icon: <AlertTriangle size={32} color="#93c5fd" />, value: 'Emergencies' },
-    { label: 'Innovation', icon: <Lightbulb size={32} color="#93c5fd" />, value: 'Innovation' },
-    { label: 'Networking', icon: <Users size={32} color="#93c5fd" />, value: 'Business Networking' },
-    { label: 'Financing', icon: <DollarSign size={32} color="#93c5fd" />, value: 'Business Financing' },
-    { label: 'Legal Help', icon: <Briefcase size={32} color="#93c5fd" />, value: 'Legal Assistance' },
-    { label: 'Accounting', icon: <FileText size={32} color="#93c5fd" />, value: 'Accounting Services' },
-    { label: 'Technology', icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
-    { label: 'Sustainability', icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
-    { label: 'Export/Import', icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' },
-    { label: 'E-commerce', icon: <ShoppingBag size={32} color="#93c5fd" />, value: 'Online Business' },
-    { label: 'Social Media', icon: <Share size={32} color="#93c5fd" />, value: 'Social Media Marketing' },
-    { label: 'Customer Service', icon: <MessageCircle size={32} color="#93c5fd" />, value: 'Customer Support' },
-    { label: 'Inventory', icon: <Package size={32} color="#93c5fd" />, value: 'Inventory Management' },
-    { label: 'Shipping', icon: <Truck size={32} color="#93c5fd" />, value: 'Shipping & Logistics' },
-    { label: 'Data Protection', icon: <Lock size={32} color="#93c5fd" />, value: 'Data Security' },
-    { label: 'Remote Work', icon: <Home size={32} color="#93c5fd" />, value: 'Remote Work Policies' },
-    { label: 'Diversity', icon: <Users size={32} color="#93c5fd" />, value: 'Diversity & Inclusion' },
-    { label: 'Mental Health', icon: <Heart size={32} color="#93c5fd" />, value: 'Employee Wellness' },
-    { label: 'Training', icon: <BookOpen size={32} color="#93c5fd" />, value: 'Employee Training' },
-    { label: 'Equipment', icon: <Settings size={32} color="#93c5fd" />, value: 'Business Equipment' },
-    { label: 'Software', icon: <Monitor size={32} color="#93c5fd" />, value: 'Business Software' },
-    { label: 'Analytics', icon: <BarChart3 size={32} color="#93c5fd" />, value: 'Business Analytics' },
-    { label: 'Partnerships', icon: <Handshake size={32} color="#93c5fd" />, value: 'Business Partnerships' },
-    { label: 'Expansion', icon: <ArrowUpRight size={32} color="#93c5fd" />, value: 'Business Growth' },
-    { label: 'Crisis Management', icon: <AlertCircle size={32} color="#93c5fd" />, value: 'Crisis Planning' },
-    { label: 'Succession', icon: <UserCheck size={32} color="#93c5fd" />, value: 'Succession Planning' },
+  // Quick options for common business questions
+  const quickOptions = [
+    { label: t('quickOptions.businessLicense'), icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
+    { label: t('quickOptions.parkingRules'), icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
+    { label: t('quickOptions.permits'), icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
+    { label: t('quickOptions.taxes'), icon: <DollarSign size={32} color="#93c5fd" />, value: 'Taxes' },
+    { label: t('quickOptions.zoning'), icon: <Map size={32} color="#93c5fd" />, value: 'Zoning' },
+    { label: t('quickOptions.healthSafety'), icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Health & Safety' },
+    { label: t('quickOptions.employmentLaw'), icon: <Users size={32} color="#93c5fd" />, value: 'Employment Law' },
+    { label: t('quickOptions.insurance'), icon: <Shield size={32} color="#93c5fd" />, value: 'Insurance' },
+    { label: t('quickOptions.accessibility'), icon: <KeyRound size={32} color="#93c5fd" />, value: 'Accessibility' },
+    { label: t('quickOptions.marketing'), icon: <Megaphone size={32} color="#93c5fd" />, value: 'Marketing' },
+    { label: t('quickOptions.grants'), icon: <Gift size={32} color="#93c5fd" />, value: 'Grants' },
+    { label: t('quickOptions.utilities'), icon: <Droplet size={32} color="#93c5fd" />, value: 'Utilities' },
+    { label: t('quickOptions.inspections'), icon: <ClipboardCheck size={32} color="#93c5fd" />, value: 'Inspections' },
+    { label: t('quickOptions.wasteDisposal'), icon: <Trash size={32} color="#93c5fd" />, value: 'Waste Disposal' },
+    { label: t('quickOptions.fireSafety'), icon: <Flame size={32} color="#93c5fd" />, value: 'Fire Safety' },
+    { label: t('quickOptions.security'), icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Security' },
+    { label: t('quickOptions.buildingCodes'), icon: <Building size={32} color="#93c5fd" />, value: 'Building Codes' },
+    { label: t('quickOptions.certifications'), icon: <BadgeCheck size={32} color="#93c5fd" />, value: 'Certifications' },
+    { label: t('quickOptions.emergencies'), icon: <AlertTriangle size={32} color="#93c5fd" />, value: 'Emergencies' },
+    { label: t('quickOptions.innovation'), icon: <Lightbulb size={32} color="#93c5fd" />, value: 'Innovation' },
+    { label: t('quickOptions.networking'), icon: <Users size={32} color="#93c5fd" />, value: 'Business Networking' },
+    { label: t('quickOptions.financing'), icon: <DollarSign size={32} color="#93c5fd" />, value: 'Business Financing' },
+    { label: t('quickOptions.legalHelp'), icon: <Briefcase size={32} color="#93c5fd" />, value: 'Legal Assistance' },
+    { label: t('quickOptions.accounting'), icon: <FileText size={32} color="#93c5fd" />, value: 'Accounting Services' },
+    { label: t('quickOptions.technology'), icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
+    { label: t('quickOptions.sustainability'), icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
+    { label: t('quickOptions.exportImport'), icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' }
   ];
-
-  // State for quick options
-  const [quickOptions, setQuickOptions] = useState([]);
-
-  // Function to get random business options
-  const getRandomBusinessOptions = () => {
-    const shuffled = [...allBusinessOptions].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
-  };
 
   // Function to get random quick options (4 for pre-conversation, 8 for during conversation)
   const getRandomQuickOptions = (isConversationStarted = false) => {
-    const shuffled = [...allQuickOptions].sort(() => 0.5 - Math.random());
+    const shuffled = [...quickOptions].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, isConversationStarted ? 8 : 4);
   };
 
@@ -440,7 +416,7 @@ function FullChatPage() {
       // After matrix effect duration, update the option
       setTimeout(() => {
         const newOptions = [...quickOptions];
-        const availableOptions = allQuickOptions.filter(option => 
+        const availableOptions = quickOptions.filter(option => 
           !newOptions.some(existing => existing.label === option.label)
         );
         if (availableOptions.length > 0) {
@@ -1607,12 +1583,14 @@ function FullChatPage() {
                   color: theme.welcomeText
                 }}>Welcome to Oakland AI! 👋</h2>
                 <p style={{
-                  fontSize: '1.1rem',
-                  lineHeight: '1.6',
-                  color: theme.welcomeSubtext,
+                  fontSize: '16px',
+                  color: theme.textSecondary,
+                  textAlign: 'center',
                   maxWidth: '600px',
-                  margin: '0 auto'
-                }}>I'm here to help you navigate running your business in Oakland. Ask me anything about licenses, permits, regulations, or local business resources.</p>
+                  margin: '0 auto',
+                  lineHeight: '1.6',
+                  marginBottom: '60px'
+                }}>{t('chat.welcomeMessage')}</p>
               </div>
             )}
             
@@ -1968,7 +1946,7 @@ function FullChatPage() {
                   gap: '16px',
                   marginBottom: '60px'
                 }}>
-                  {allQuickOptions.map((option, index) => (
+                  {quickOptions.map((option, index) => (
                     <button
                       key={index}
                       onClick={() => {
