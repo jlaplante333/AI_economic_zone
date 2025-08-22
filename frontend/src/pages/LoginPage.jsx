@@ -10,8 +10,17 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentLanguageIndex, setCurrentLanguageIndex] = useState(0);
+  const [verificationMessage, setVerificationMessage] = useState('');
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  // Check for verification message from URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('message') === 'verification_required') {
+      setVerificationMessage('Please verify your email address before logging in. Check your email for a verification link.');
+    }
+  }, []);
 
   // Available languages for cycling - use centralized language data
   const availableLanguages = getLanguageNames();
@@ -36,8 +45,15 @@ function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: username, password })
       });
-      if (response.ok) {
-        const data = await response.json();
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Check if user needs email verification
+        if (data.needsVerification) {
+          setVerificationMessage('Please verify your email address before logging in. Check your email for a verification link.');
+          return;
+        }
+        
         // Store token and user info in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify({
@@ -147,6 +163,23 @@ function LoginPage() {
           </button>
           <p className="login-subtitle">{t('signInToAccess')}</p>
           <form onSubmit={handleSubmit} className="login-form">
+            {/* Verification Message */}
+            {verificationMessage && (
+              <div className="verification-message" style={{
+                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                border: '1px solid #f59e0b',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                marginBottom: '20px',
+                color: '#92400e',
+                fontSize: '14px',
+                textAlign: 'center',
+                fontWeight: '500'
+              }}>
+                {verificationMessage}
+              </div>
+            )}
+            
             <div className="form-group">
               <label htmlFor="username" className="form-label">{t('username')}</label>
               <input

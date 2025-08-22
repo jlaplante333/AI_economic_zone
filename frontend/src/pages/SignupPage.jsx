@@ -160,9 +160,8 @@ function SignupPage() {
 
       if (response.ok) {
         const data = await response.json();
-        // Store user info and redirect
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/fullchat');
+        // Redirect to login with verification message
+        navigate('/login?message=verification_required');
       } else {
         const errorData = await response.json();
         alert(errorData.message || 'Signup failed. Please try again.');

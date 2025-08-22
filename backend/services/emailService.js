@@ -3,12 +3,14 @@ const { Resend } = require('resend');
 class EmailService {
   constructor() {
     this.resend = new Resend(process.env.RESEND_API_KEY);
-    this.fromEmail = process.env.EMAIL_FROM || 'noreply@oaklandai.com';
+    this.fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
   }
 
   // Send email verification
   async sendVerificationEmail(email, token, firstName = 'User') {
     try {
+      // Using Resend's verified domain, so we can send to any email
+      
       const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
       
       const { data, error } = await this.resend.emails.send({
@@ -63,7 +65,7 @@ class EmailService {
       });
 
       if (error) {
-        console.error('Error sending verification email:', error);
+        console.error('Resend API error details:', JSON.stringify(error, null, 2));
         throw new Error('Failed to send verification email');
       }
 
