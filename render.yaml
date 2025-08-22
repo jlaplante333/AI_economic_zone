@@ -3,7 +3,7 @@ services:
     name: oakland-ai-backend
     env: node
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node backend/index.js
     envVars:
       - key: NODE_ENV
         value: production
