@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
+    base: '/',
     server: {
       port: 3003, // Frontend on 3003
       proxy: {
@@ -24,6 +25,14 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
       },
+    },
+    build: {
+      outDir: 'dist',
+      rollupOptions: {
+        output: {
+          manualChunks: undefined
+        }
+      }
     },
     // Make only VITE_ prefixed environment variables available to the client
     define: {
