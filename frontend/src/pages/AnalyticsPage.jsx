@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
+import config from '../env';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, BarChart, Bar 
@@ -122,7 +123,7 @@ function AnalyticsPage() {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const response = await fetch(`/api/analytics/comprehensive?timeRange=${timeRange}`, {
+      const response = await fetch(`${config.VITE_API_URL}/api/analytics/comprehensive?timeRange=${timeRange}`, {
         headers
       });
 
