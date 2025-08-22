@@ -1,5 +1,4 @@
 services:
-  # Backend API Service
   - type: web
     name: oakland-ai-backend
     env: node
@@ -19,16 +18,11 @@ services:
           name: oakland-ai-db
           property: connectionString
 
-  # Frontend Service (Static Site)
   - type: static
     name: oakland-ai-frontend
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://oakland-ai-backend.onrender.com
 
 databases:
   - name: oakland-ai-db
     databaseName: oaklandai
-    user: oaklandai
