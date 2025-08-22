@@ -58,12 +58,12 @@
     "verificationError": "Xác minh thất bại"
   },
   "languageSelection": {
-    "title": "Chọn Ngôn Ngữ Của Bạn",
-    "subtitle": "Chọn ngôn ngữ ưa thích để bắt đầu hành trình AI của bạn",
-    "selectLanguage": "Chọn ngôn ngữ của bạn",
+    "title": "Chọn ngôn ngữ của bạn",
+    "subtitle": "Chọn ngôn ngữ ưa thích để bắt đầu hành trình với trí tuệ nhân tạo",
+    "selectLanguage": "Chọn ngôn ngữ",
     "languageSelected": "Đã chọn ngôn ngữ",
-    "configuringAI": "Đang cấu hình AI cho {{language}}...",
-    "preparingExperience": "Đang chuẩn bị trải nghiệm AI cá nhân hóa..."
+    "configuringAI": "Đang cấu hình trí tuệ nhân tạo cho {{language}}...",
+    "preparingExperience": "Đang chuẩn bị trải nghiệm trí tuệ nhân tạo cá nhân hóa..."
   },
   "chat": {
     "title": "Trợ lý AI Oakland",

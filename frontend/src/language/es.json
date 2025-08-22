@@ -59,11 +59,11 @@
   },
   "languageSelection": {
     "title": "Elige tu idioma",
-    "subtitle": "Selecciona tu idioma preferido para comenzar tu viaje con IA",
+    "subtitle": "Selecciona tu idioma preferido para comenzar tu viaje con inteligencia artificial",
     "selectLanguage": "Selecciona tu idioma",
     "languageSelected": "Idioma seleccionado",
-    "configuringAI": "Configurando IA para {{language}}...",
-    "preparingExperience": "Preparando tu experiencia de IA personalizada..."
+    "configuringAI": "Configurando inteligencia artificial para {{language}}...",
+    "preparingExperience": "Preparando tu experiencia de inteligencia artificial personalizada..."
   },
   "chat": {
     "title": "Asistente IA de Oakland",

@@ -14,7 +14,7 @@ function ProfessionalLanguagePage() {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { changeLanguage } = useLanguage();
+  const { changeLanguage, t } = useLanguage();
   const { theme } = useTheme();
 
   const handleLanguageSelect = async (language) => {
@@ -31,8 +31,6 @@ function ProfessionalLanguagePage() {
       navigate('/login');
     }, 500);
   };
-
-
 
   return (
     <div className="main-container">
@@ -68,12 +66,12 @@ function ProfessionalLanguagePage() {
       <div className="login-section">
         <div className="login-container">
           <h2 className="login-title">
-            {selectedLanguage ? `Welcome to ${selectedLanguage.native}` : 'Choose Your Language'}
+            {selectedLanguage ? `Welcome to ${selectedLanguage.native}` : t('languageSelection.title')}
           </h2>
           <p className="login-subtitle">
             {selectedLanguage 
-              ? 'Preparing your personalized AI experience...' 
-              : 'Select your preferred language to begin your AI-powered journey'
+              ? t('languageSelection.preparingExperience')
+              : t('languageSelection.subtitle')
             }
           </p>
 
@@ -96,7 +94,7 @@ function ProfessionalLanguagePage() {
           {isLoading && (
             <div className="loading-section">
               <div className="loading-spinner"></div>
-              <p className="loading-text">Configuring AI for {selectedLanguage?.native}...</p>
+              <p className="loading-text">{t('languageSelection.configuringAI', { language: selectedLanguage?.native })}</p>
             </div>
           )}
         </div>

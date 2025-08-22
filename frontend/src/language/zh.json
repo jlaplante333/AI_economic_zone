@@ -59,11 +59,11 @@
   },
   "languageSelection": {
     "title": "选择您的语言",
-    "subtitle": "选择您偏好的语言开始AI之旅",
-    "selectLanguage": "选择您的语言",
+    "subtitle": "选择您偏好的语言，开始您的人工智能之旅",
+    "selectLanguage": "选择语言",
     "languageSelected": "已选择语言",
-    "configuringAI": "正在为{{language}}配置AI...",
-    "preparingExperience": "正在准备您的个性化AI体验..."
+    "configuringAI": "正在为{{language}}配置人工智能...",
+    "preparingExperience": "正在准备您的个性化人工智能体验..."
   },
   "chat": {
     "title": "奥克兰AI助手",

@@ -59,7 +59,7 @@
   },
   "languageSelection": {
     "title": "اختر لغتك",
-    "subtitle": "اختر لغتك المفضلة لبدء رحلة الذكاء الاصطناعي",
+    "subtitle": "اختر لغتك المفضلة لبدء رحلتك مع الذكاء الاصطناعي",
     "selectLanguage": "اختر لغتك",
     "languageSelected": "تم اختيار اللغة",
     "configuringAI": "جاري تكوين الذكاء الاصطناعي لـ {{language}}...",
