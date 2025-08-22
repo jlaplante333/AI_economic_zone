@@ -6,7 +6,7 @@ import path from 'path';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import ProfileMenu from '../components/ProfileMenu';
-import { stopAllSpeech, setCurrentAudio, initializeSpeechCleanup } from '../utils/speechUtils';
+import { stopAllSpeech, setCurrentAudio, initializeSpeechCleanup, getCurrentAudio } from '../utils/speechUtils';
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -618,7 +618,7 @@ function FullChatPage() {
     e.preventDefault();
     setWasVoiceMessage(false); // Reset voice message flag for text input
     // Only stop speech if we're about to send a new message
-    if (currentAudio) {
+    if (getCurrentAudio()) {
       stopCurrentSpeech();
     }
     handleSendMessage(inputMessage);
@@ -627,7 +627,7 @@ function FullChatPage() {
   const handleQuickOption = (option) => {
     setWasVoiceMessage(false); // Reset voice message flag for quick options
     // Only stop speech if we're about to send a new message
-    if (currentAudio) {
+    if (getCurrentAudio()) {
       stopCurrentSpeech();
     }
     handleSendMessage(`Tell me about ${option.toLowerCase()}`);
@@ -636,7 +636,7 @@ function FullChatPage() {
   const handleBusinessTypeSelect = (type) => {
     setBusinessType(type);
     // Only stop speech if we're about to send a new message
-    if (currentAudio) {
+    if (getCurrentAudio()) {
       stopCurrentSpeech();
     }
     const userMessage = { type: 'user', content: `I own a ${type}`, timestamp: new Date() };
@@ -675,7 +675,7 @@ function FullChatPage() {
             setIsListening(true);
             recognitionRef.current.finalTranscript = '';
             // Only stop speech if there's actually audio playing
-            if (currentAudio) {
+            if (getCurrentAudio()) {
               stopCurrentSpeech();
             }
           };
@@ -751,7 +751,7 @@ function FullChatPage() {
         setInputMessage(''); // Clear input before starting
         recognitionRef.current.finalTranscript = '';
         // Only stop speech if there's actually audio playing
-        if (currentAudio) {
+        if (getCurrentAudio()) {
           stopCurrentSpeech();
         }
         recognitionRef.current.start();
@@ -897,11 +897,14 @@ function FullChatPage() {
   const stopCurrentSpeech = () => {
     console.log('🔇 Stopping current speech only');
     
-    // Only stop the current audio element, don't cancel all speech synthesis
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      setCurrentAudio(null);
+    // Use the speech utility to stop current audio
+    if (getCurrentAudio()) {
+      const currentAudio = getCurrentAudio();
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        setCurrentAudio(null);
+      }
     }
     
     // Don't call stopAllSpeech() here as it's too aggressive
