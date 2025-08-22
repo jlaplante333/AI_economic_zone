@@ -21,7 +21,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/health', (req, res) => res.json({ 
   status: 'ok', 
   timestamp: new Date().toISOString(),
-  environment: process.env.NODE_ENV || 'development'
+  environment: process.env.NODE_ENV || 'development',
+  version: 'SIMPLIFIED-VERSION-2.0',
+  message: 'This is the updated code that should work!'
 }));
 
 // Simple auth routes for testing
