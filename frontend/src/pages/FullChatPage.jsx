@@ -343,7 +343,7 @@ function FullChatPage() {
 
   // Function to get random business options
   const getRandomBusinessOptions = () => {
-    const shuffled = [...businessTypes].sort(() => 0.5 - Math.random());
+    const shuffled = [...allBusinessOptions].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 3);
   };
 
