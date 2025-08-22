@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut, Loader } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { config } from '../env';
@@ -301,8 +301,10 @@ function FullChatPage() {
     console.log('Business Modal at bottom changed:', isAtBottom);
   }, [isAtBottom]);
 
-  // All available business options
-  const allBusinessOptions = [
+  // All available business options - use useMemo to recalculate when translations change
+  const allBusinessOptions = useMemo(() => {
+    console.log('🔄 Recalculating business options with translations, t function:', typeof t);
+    return [
     { type: 'beauty salon', icon: <Scissors size={48} color="#60a5fa" />, label: t('businessTypes.beautySalon') },
     { type: 'restaurant', icon: <UtensilsCrossed size={48} color="#f59e42" />, label: t('businessTypes.restaurant') },
     { type: 'retail store', icon: <ShoppingBag size={48} color="#f472b6" />, label: t('businessTypes.retailStore') },
@@ -345,10 +347,13 @@ function FullChatPage() {
     { type: 'painting', icon: <Edit size={48} color="#f472b6" />, label: t('businessTypes.painting') },
     { type: 'carpentry', icon: <Settings size={48} color="#f59e42" />, label: t('businessTypes.carpentry') },
     { type: 'other', icon: <Building2 size={48} color="#a3a3a3" />, label: t('businessTypes.other') }
-  ];
+    ];
+  }, [t]);
 
-  // Quick options for common business questions
-  const quickOptionsData = [
+  // Quick options for common business questions - use useMemo to recalculate when translations change
+  const quickOptionsData = useMemo(() => {
+    console.log('🔄 Recalculating quick options with translations, t function:', typeof t);
+    return [
     { label: t('quickOptions.businessLicense'), icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
     { label: t('quickOptions.parkingRules'), icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
     { label: t('quickOptions.permits'), icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
@@ -376,7 +381,8 @@ function FullChatPage() {
     { label: t('quickOptions.technology'), icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
     { label: t('quickOptions.sustainability'), icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
     { label: t('quickOptions.exportImport'), icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' }
-  ];
+    ];
+  }, [t]);
 
   // Function to get random quick options (4 for pre-conversation, 8 for during conversation)
   const getRandomQuickOptions = (isConversationStarted = false) => {
