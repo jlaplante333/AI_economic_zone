@@ -75,7 +75,12 @@ function FullChatPage() {
   }, [currentThemeName]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
-  
+  const [quickOptions, setQuickOptions] = useState([]);
+  const [changingOptions, setChangingOptions] = useState(new Set());
+  const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [isQuickOptionsAtBottom, setIsQuickOptionsAtBottom] = useState(false);
+
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -244,11 +249,6 @@ function FullChatPage() {
     return () => chatMessages.removeEventListener('scroll', handleScroll);
   }, [messages, isLoading]); // Re-run when messages or loading state changes
 
-  const [changingOptions, setChangingOptions] = useState(new Set());
-  const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
-  const [isAtBottom, setIsAtBottom] = useState(false);
-  const [isQuickOptionsAtBottom, setIsQuickOptionsAtBottom] = useState(false);
-
   // Debug state changes
   useEffect(() => {
     console.log('Quick Options at bottom changed:', isQuickOptionsAtBottom);
@@ -305,7 +305,7 @@ function FullChatPage() {
   ];
 
   // Quick options for common business questions
-  const quickOptions = [
+  const quickOptionsData = [
     { label: t('quickOptions.businessLicense'), icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
     { label: t('quickOptions.parkingRules'), icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
     { label: t('quickOptions.permits'), icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
@@ -337,7 +337,7 @@ function FullChatPage() {
 
   // Function to get random quick options (4 for pre-conversation, 8 for during conversation)
   const getRandomQuickOptions = (isConversationStarted = false) => {
-    const shuffled = [...quickOptions].sort(() => 0.5 - Math.random());
+    const shuffled = [...quickOptionsData].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, isConversationStarted ? 8 : 4);
   };
 
@@ -417,12 +417,12 @@ function FullChatPage() {
     let interval;
     interval = setInterval(() => {
       // Change one random option at a time
-      const randomIndex = Math.floor(Math.random() * quickOptions.length);
+      const randomIndex = Math.floor(Math.random() * quickOptionsData.length);
       setChangingOptions(prev => new Set([...prev, randomIndex]));
       // After matrix effect duration, update the option
       setTimeout(() => {
-        const newOptions = [...quickOptions];
-        const availableOptions = quickOptions.filter(option => 
+        const newOptions = [...quickOptionsData];
+        const availableOptions = quickOptionsData.filter(option => 
           !newOptions.some(existing => existing.label === option.label)
         );
         if (availableOptions.length > 0) {
@@ -443,7 +443,7 @@ function FullChatPage() {
         clearInterval(interval);
       }
     };
-  }, [quickOptions]);
+  }, [quickOptionsData]);
 
   // Timer to change business type options individually
   useEffect(() => {
@@ -1129,7 +1129,7 @@ function FullChatPage() {
                 gap: '16px',
                 alignItems: 'center'
               }}>
-                {quickOptions.map((option, idx) => (
+                {quickOptionsData.map((option, idx) => (
                   <button
                     key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
                     className="option-pill"
@@ -1313,7 +1313,7 @@ function FullChatPage() {
                   gap: '20px',
                   alignItems: 'center',
                 }}>
-                  {quickOptions.map((option, idx) => (
+                  {quickOptionsData.map((option, idx) => (
                     <button
                       key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
                       className="option-pill"
@@ -1952,7 +1952,7 @@ function FullChatPage() {
                   gap: '16px',
                   marginBottom: '60px'
                 }}>
-                  {quickOptions.map((option, index) => (
+                  {quickOptionsData.map((option, index) => (
                     <button
                       key={index}
                       onClick={() => {
