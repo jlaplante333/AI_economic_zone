@@ -29,13 +29,35 @@ app.get('/health', (req, res) => res.json({
 // Simple auth routes for testing
 app.post('/api/auth/register', async (req, res) => {
   try {
+    const { email, password, firstName, lastName, businessType, language, ethnicity, gender } = req.body;
+    
+    // Basic validation
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required fields: email, password, firstName, lastName' 
+      });
+    }
+    
+    // Check if email already exists (in a real app, this would check the database)
+    // For now, just simulate success
+    
+    console.log('Registration attempt:', { email, firstName, lastName, businessType, language, ethnicity, gender });
+    
     res.json({
       success: true,
       message: 'User registered successfully. Please check your email to verify your account.',
-      user: { id: 1, email: req.body.email, is_verified: false }
+      user: { 
+        id: Math.floor(Math.random() * 1000) + 1, 
+        email: email, 
+        firstName: firstName,
+        lastName: lastName,
+        is_verified: false 
+      }
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Registration failed' });
+    console.error('Registration error:', error);
+    res.status(500).json({ success: false, message: 'Registration failed: ' + error.message });
   }
 });
 
