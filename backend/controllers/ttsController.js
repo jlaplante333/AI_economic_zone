@@ -1,4 +1,4 @@
-const { generateSpeech, getAvailableVoices } = require('../services/ttsService');
+const { generateSpeech, getAvailableVoices, transcribeAudio } = require('../services/ttsService');
 
 exports.generateTTS = async (req, res) => {
   try {
@@ -38,5 +38,35 @@ exports.getVoices = async (req, res) => {
   } catch (error) {
     console.error('❌ Get Voices Error:', error);
     res.status(500).json({ error: 'Failed to get available voices' });
+  }
+}; 
+
+exports.transcribeAudio = async (req, res) => {
+  try {
+    // Check if audio file is uploaded
+    if (!req.files || !req.files.audio) {
+      return res.status(400).json({ error: 'Audio file is required' });
+    }
+
+    const audioFile = req.files.audio;
+    const { language = 'en' } = req.body;
+    
+    console.log('🎤 Transcription request received:', { 
+      filename: audioFile.name, 
+      size: audioFile.size, 
+      language 
+    });
+    
+    const transcript = await transcribeAudio(audioFile.data, language);
+    
+    res.json({ 
+      success: true, 
+      transcript,
+      language 
+    });
+    
+  } catch (error) {
+    console.error('❌ Transcription Controller Error:', error);
+    res.status(500).json({ error: 'Failed to transcribe audio' });
   }
 }; 

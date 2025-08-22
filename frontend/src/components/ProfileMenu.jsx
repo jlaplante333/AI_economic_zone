@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { stopAllSpeech } from '../utils/speechUtils';
 
@@ -13,6 +14,7 @@ const ProfileMenu = ({
   currentThemeName 
 }) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   // Stop speech when navigating away
   useEffect(() => {
@@ -37,6 +39,40 @@ const ProfileMenu = ({
     };
   }, []);
 
+  const handleProfileClick = () => {
+    console.log('Profile button clicked');
+    console.log('Current location:', window.location.href);
+    console.log('Current hash:', window.location.hash);
+    console.log('Setting hash to #/profile');
+    
+    // Use hash navigation directly for HashRouter
+    window.location.hash = '#/profile';
+    
+    // Also try React Router navigation as backup
+    try {
+      navigate('/profile');
+    } catch (error) {
+      console.error('React Router navigation failed:', error);
+    }
+  };
+
+  const handleAnalyticsClick = () => {
+    console.log('Analytics button clicked');
+    console.log('Current location:', window.location.href);
+    console.log('Current hash:', window.location.hash);
+    console.log('Setting hash to #/analytics');
+    
+    // Use hash navigation directly for HashRouter
+    window.location.hash = '#/analytics';
+    
+    // Also try React Router navigation as backup
+    try {
+      navigate('/analytics');
+    } catch (error) {
+      console.error('React Router navigation failed:', error);
+    }
+  };
+
   return (
     <div
       style={{
@@ -59,14 +95,18 @@ const ProfileMenu = ({
         backdropFilter: 'blur(10px)',
       }}
     >
-      <a href="/profile" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
+      <button
+        onClick={handleProfileClick}
+        style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left', width: '100%', cursor: 'pointer' }}
         onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
-      >Profile</a>
-      <a href="/analytics" style={{ fontSize: 14, padding: 6, textDecoration: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left' }}
+      >Profile</button>
+      <button
+        onClick={handleAnalyticsClick}
+        style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 6, transition: 'background 0.2s', textAlign: 'left', width: '100%', cursor: 'pointer' }}
         onMouseEnter={e => e.currentTarget.style.background = 'rgba(59,130,246,0.16)'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
-      >Analytics</a>
+      >Analytics</button>
       <button
         type="button"
         style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: theme.primaryText, borderRadius: 6, cursor: isToggling ? 'not-allowed' : 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}

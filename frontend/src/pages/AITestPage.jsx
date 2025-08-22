@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { config } from '../env';
 
 function AITestPage() {
   const [status, setStatus] = useState(null);
@@ -10,7 +11,7 @@ function AITestPage() {
     setError(null);
     
     try {
-      const response = await fetch('/api/chat/status');
+      const response = await fetch(`${config.BACKEND_URL}/api/chat/status`);
       
       if (!response.ok) {
         if (response.status === 401) {

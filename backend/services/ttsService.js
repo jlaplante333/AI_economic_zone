@@ -59,4 +59,37 @@ exports.getAvailableVoices = () => {
     { id: 'nova', name: 'Nova', description: 'Bright and energetic' },
     { id: 'shimmer', name: 'Shimmer', description: 'Smooth and melodic' }
   ];
+};
+
+exports.transcribeAudio = async (audioBuffer, language = 'en') => {
+  try {
+    const openai = getOpenAIClient();
+    if (!openai) {
+      console.warn('OpenAI client not available - skipping transcription');
+      throw new Error('OpenAI client not available');
+    }
+    
+    console.log('🎤 Transcribing audio with Whisper, language:', language);
+    
+    // Create a file object from the buffer for OpenAI API
+    const file = {
+      buffer: audioBuffer,
+      name: 'audio.webm',
+      type: 'audio/webm'
+    };
+    
+    const transcript = await openai.audio.transcriptions.create({
+      file: file,
+      model: "whisper-1",
+      language: language,
+      response_format: "text"
+    });
+    
+    console.log('🎤 Transcription completed successfully');
+    return transcript;
+    
+  } catch (error) {
+    console.error('❌ Transcription Error:', error);
+    throw new Error('Failed to transcribe audio');
+  }
 }; 
