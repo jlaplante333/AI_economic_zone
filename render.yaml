@@ -20,10 +20,9 @@ services:
           name: oakland-ai-db
           property: connectionString
 
-  # Frontend Service
-  - type: web
+  # Frontend Service (Static Site)
+  - type: static
     name: oakland-ai-frontend
-    env: static
     plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
