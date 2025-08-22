@@ -52,9 +52,21 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Test endpoint
+// Test endpoints
 app.get('/api/test', (req, res) => {
   res.json({ success: true, message: 'API is working!' });
+});
+
+app.get('/api/auth/register', (req, res) => {
+  res.json({ success: true, message: 'Register endpoint is working!' });
+});
+
+app.get('/api/auth/login', (req, res) => {
+  res.json({ success: true, message: 'Login endpoint is working!' });
+});
+
+app.get('/api/chat', (req, res) => {
+  res.json({ success: true, message: 'Chat endpoint is working!' });
 });
 
 // 404 handler
