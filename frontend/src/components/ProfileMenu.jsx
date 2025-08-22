@@ -234,7 +234,7 @@ const ProfileMenu = ({
           }}
           title="Reset to interface language"
         >
-          Reset to Interface Language
+          RESET Language
         </button>
       )}
     </div>
