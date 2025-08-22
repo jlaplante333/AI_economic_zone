@@ -154,54 +154,6 @@ function ProfilePage() {
   }
 
   const ProfileField = ({ icon: Icon, label, value, color = '#3b82f6' }) => {
-    // Try to find the value in user object with different field name formats
-    let displayValue = value;
-    
-    if (value === undefined || value === null) {
-      // Try different field name formats
-      const fieldName = label.toLowerCase().replace(/\s+/g, '_');
-      const camelCaseName = label.toLowerCase().replace(/\s+/g, '').replace(/^[a-z]/, (c) => c.toUpperCase());
-      
-      // Check for the value in user object
-      if (user[fieldName] !== undefined && user[fieldName] !== null) {
-        displayValue = user[fieldName];
-      } else if (user[camelCaseName] !== undefined && user[camelCaseName] !== null) {
-        displayValue = user[camelCaseName];
-      } else {
-        // Handle special cases
-        if (label === 'Full Name') {
-          const firstName = user.first_name || user.firstName || '';
-          const lastName = user.last_name || user.lastName || '';
-          displayValue = `${firstName} ${lastName}`.trim() || 'N/A';
-        } else if (label === 'Email Address') {
-          displayValue = user.email || 'N/A';
-        } else if (label === 'Phone Number') {
-          displayValue = user.phone || 'N/A';
-        } else if (label === 'Language') {
-          displayValue = user.language ? user.language.toUpperCase() : 'N/A';
-        } else if (label === 'Age') {
-          displayValue = user.age ? `${user.age} years old` : 'N/A';
-        } else if (label === 'Employee Count') {
-          displayValue = user.employee_count || user.employeeCount ? `${user.employee_count || user.employeeCount} employees` : 'N/A';
-        } else if (label === 'Years in Business') {
-          displayValue = user.years_in_business || user.yearsInBusiness ? `${user.years_in_business || user.yearsInBusiness} years` : 'N/A';
-        } else if (label === 'Admin Status') {
-          displayValue = user.is_admin || user.isAdmin ? 'Administrator' : 'Regular User';
-        } else if (label === 'Email Verification') {
-          displayValue = user.is_verified || user.isVerified ? 'Verified' : 'Not Verified';
-        } else if (label === 'Last Login') {
-          displayValue = user.last_login || user.lastLogin ? formatDate(user.last_login || user.lastLogin) : 'N/A';
-        } else if (label === 'Account Created') {
-          displayValue = user.created_at || user.createdAt ? formatDate(user.created_at || user.createdAt) : 'N/A';
-        } else if (label.includes('Annual Revenue')) {
-          const revenue = user[fieldName] || user[camelCaseName];
-          displayValue = revenue ? formatCurrency(revenue) : 'N/A';
-        } else {
-          displayValue = 'N/A';
-        }
-      }
-    }
-    
     return (
       <div style={{
         display: 'flex',
@@ -281,7 +233,7 @@ function ProfilePage() {
               ? '#5d4037'
               : '#111827'
           }}>
-            {displayValue || 'N/A'}
+            {value || 'N/A'}
           </div>
         </div>
       </div>
@@ -464,36 +416,43 @@ function ProfilePage() {
           <ProfileField 
             icon={User} 
             label={t('profile.fullName')} 
+            value={`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
             color="#3b82f6"
           />
           <ProfileField 
             icon={Mail} 
             label={t('profile.emailAddress')} 
+            value={user.email || 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={Phone} 
             label={t('profile.phoneNumber')} 
+            value={user.phone || 'N/A'}
             color="#f59e0b"
           />
           <ProfileField 
             icon={Globe} 
             label={t('profile.language')} 
+            value={user.language ? user.language.toUpperCase() : 'N/A'}
             color="#8b5cf6"
           />
           <ProfileField 
             icon={Heart} 
             label={t('profile.age')} 
+            value={user.age ? `${user.age} years old` : 'N/A'}
             color="#ec4899"
           />
           <ProfileField 
             icon={Star} 
             label={t('profile.ethnicity')} 
+            value={user.ethnicity || 'N/A'}
             color="#06b6d4"
           />
           <ProfileField 
             icon={User} 
             label={t('profile.gender')} 
+            value={user.gender || 'N/A'}
             color="#8b5cf6"
           />
         </div>
@@ -509,21 +468,25 @@ function ProfilePage() {
           <ProfileField 
             icon={Building2} 
             label={t('profile.businessType')} 
+            value={user.business_type || 'N/A'}
             color="#ef4444"
           />
           <ProfileField 
             icon={Users} 
             label={t('profile.employeeCount')} 
+            value={user.employee_count ? `${user.employee_count} employees` : 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={TrendingUp} 
             label={t('profile.yearsInBusiness')} 
+            value={user.years_in_business ? `${user.years_in_business} years` : 'N/A'}
             color="#f59e0b"
           />
           <ProfileField 
             icon={Award} 
             label={t('profile.corporationType')} 
+            value={user.corporation_type || 'N/A'}
             color="#8b5cf6"
           />
         </div>
@@ -539,26 +502,31 @@ function ProfilePage() {
           <ProfileField 
             icon={Home} 
             label={t('profile.addressLine1')} 
+            value={user.address_line_1 || 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={Home} 
             label={t('profile.addressLine2')} 
+            value={user.address_line_2 || 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={MapPin} 
             label={t('profile.city')} 
+            value={user.city || 'N/A'}
             color="#f59e0b"
           />
           <ProfileField 
             icon={MapPin} 
             label={t('profile.state')} 
+            value={user.state || 'N/A'}
             color="#8b5cf6"
           />
           <ProfileField 
             icon={MapPin} 
             label={t('profile.zipCode')} 
+            value={user.zip_code || 'N/A'}
             color="#06b6d4"
           />
         </div>
@@ -574,16 +542,19 @@ function ProfilePage() {
           <ProfileField 
             icon={DollarSign} 
             label={t('profile.annualRevenue2022')} 
+            value={user.annual_revenue_2022 ? formatCurrency(user.annual_revenue_2022) : 'N/A'}
             color="#10b981"
           />
           <ProfileField 
             icon={DollarSign} 
             label={t('profile.annualRevenue2023')} 
+            value={user.annual_revenue_2023 ? formatCurrency(user.annual_revenue_2023) : 'N/A'}
             color="#f59e0b"
           />
           <ProfileField 
             icon={DollarSign} 
             label={t('profile.annualRevenue2024')} 
+            value={user.annual_revenue_2024 ? formatCurrency(user.annual_revenue_2024) : 'N/A'}
             color="#3b82f6"
           />
         </div>
@@ -599,21 +570,25 @@ function ProfilePage() {
           <ProfileField 
             icon={Shield} 
             label={t('profile.adminStatus')} 
+            value={user.is_admin ? 'Administrator' : 'Regular User'}
             color={user.is_admin ? '#10b981' : '#6b7280'}
           />
           <ProfileField 
             icon={CheckCircle} 
             label={t('profile.emailVerification')} 
+            value={user.is_verified ? 'Verified' : 'Not Verified'}
             color={user.is_verified ? '#10b981' : '#f59e0b'}
           />
           <ProfileField 
             icon={Clock} 
             label={t('profile.lastLogin')} 
+            value={user.last_login ? formatDate(user.last_login) : 'N/A'}
             color="#06b6d4"
           />
           <ProfileField 
             icon={Calendar} 
             label={t('profile.accountCreated')} 
+            value={user.created_at ? formatDate(user.created_at) : 'N/A'}
             color="#8b5cf6"
           />
         </div>
