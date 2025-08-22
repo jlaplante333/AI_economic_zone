@@ -2,23 +2,33 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const {
+  corsOptions,
+  errorHandler,
+  requestLogger,
+  securityHeaders,
+  apiRateLimit
+} = require('./backend/middleware/authMiddleware');
 
 console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
 console.log('OPENAI_API_KEY starts with sk-:', process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.startsWith('sk-') : false);
 
 const app = express();
 
-// Basic middleware
+// Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: ['https://ai-economic-zone-static.onrender.com', 'http://localhost:3003'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(securityHeaders);
+
+// CORS configuration
+app.use(cors(corsOptions));
+
+// Request logging
+app.use(requestLogger);
+
+// Rate limiting for all routes
+app.use(apiRateLimit);
+
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -27,86 +37,20 @@ app.get('/health', (req, res) => res.json({
   status: 'ok', 
   timestamp: new Date().toISOString(),
   environment: process.env.NODE_ENV || 'development',
-  version: 'SIMPLIFIED-VERSION-2.0',
-  message: 'This is the updated code that should work!'
+  version: 'REAL-BACKEND-VERSION-1.0',
+  message: 'This is the real backend with database connection!'
 }));
 
-// Simple auth routes for testing
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    console.log('=== REGISTER ENDPOINT CALLED ===');
-    console.log('Request headers:', req.headers);
-    console.log('Request body:', req.body);
-    console.log('Content-Type:', req.get('Content-Type'));
-    
-    const { email, password, firstName, lastName, businessType, language, ethnicity, gender } = req.body;
-    
-    // Basic validation
-    if (!email || !password || !firstName || !lastName) {
-      console.log('Validation failed - missing fields');
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Missing required fields: email, password, firstName, lastName' 
-      });
-    }
-    
-    // Check if email already exists (in a real app, this would check the database)
-    // For now, just simulate success
-    
-    console.log('Registration attempt:', { email, firstName, lastName, businessType, language, ethnicity, gender });
-    
-    const responseData = {
-      success: true,
-      message: 'User registered successfully. Please check your email to verify your account.',
-      user: { 
-        id: Math.floor(Math.random() * 1000) + 1, 
-        email: email, 
-        firstName: firstName,
-        lastName: lastName,
-        is_verified: false 
-      }
-    };
-    
-    console.log('Sending response:', responseData);
-    console.log('Response length:', JSON.stringify(responseData).length);
-    
-    res.json(responseData);
-    console.log('=== REGISTER ENDPOINT COMPLETED ===');
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ success: false, message: 'Registration failed: ' + error.message });
-  }
-});
+// API routes
+const chatRoutes = require('./backend/routes/chatRoutes');
+const authRoutes = require('./backend/routes/authRoutes');
+const analyticsRoutes = require('./backend/routes/analyticsRoutes');
+const ttsRoutes = require('./backend/routes/ttsRoutes');
 
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      message: 'Login successful',
-      token: 'test-token',
-      user: { id: 1, email: req.body.email, is_verified: true }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Login failed' });
-  }
-});
-
-// Test endpoints
-app.get('/api/test', (req, res) => {
-  res.json({ success: true, message: 'API is working!' });
-});
-
-app.get('/api/auth/register', (req, res) => {
-  res.json({ success: true, message: 'Register endpoint is working!' });
-});
-
-app.get('/api/auth/login', (req, res) => {
-  res.json({ success: true, message: 'Login endpoint is working!' });
-});
-
-app.get('/api/chat', (req, res) => {
-  res.json({ success: true, message: 'Chat endpoint is working!' });
-});
+app.use('/api/chat', chatRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/tts', ttsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -116,8 +60,14 @@ app.use('*', (req, res) => {
   });
 });
 
+// Error handling middleware (must be last)
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`🚀 Backend server running on port ${PORT}`);
+  console.log(`📧 Email service: ${process.env.EMAIL_SERVICE || 'Not configured'}`);
+  console.log(`📱 SMS service: ${process.env.TWILIO_ACCOUNT_SID ? 'Twilio configured' : 'Not configured'}`);
   console.log(`🔐 JWT secret: ${process.env.JWT_SECRET ? 'Configured' : 'Not configured'}`);
+  console.log(`🗄️  Database: ${process.env.DB_HOST ? 'Configured' : 'Not configured'}`);
 });
