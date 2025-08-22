@@ -95,7 +95,7 @@ function AnalyticsPage() {
       newUsersThisWeek: 0,
       totalChats: 0,
       avgSessionDuration: '0 min',
-      userSatisfaction: 0
+      userSatisfaction: 5
     },
     businessTypeData: [],
     popularQuestions: [],
@@ -144,7 +144,7 @@ function AnalyticsPage() {
           newUsersThisWeek: 2,
           totalChats: 14,
           avgSessionDuration: '12.5 min',
-          userSatisfaction: 4.8
+          userSatisfaction: 5
         },
         businessTypeData: [
           { name: 'Technology', value: 2, color: '#3b82f6' },
