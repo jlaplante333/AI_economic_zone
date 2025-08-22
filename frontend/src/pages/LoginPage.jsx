@@ -111,7 +111,7 @@ function LoginPage() {
           {t('getAnswers')}
         </p>
         <p style={{ color: '#64748b', fontSize: '16px' }}>
-          {t('noAccount')} <a href="/signup" className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>{t('signUp')}</a>
+          {t('noAccount')} <button onClick={() => navigate('/signup')} className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('signUp')}</button>
         </p>
       </div>
 
