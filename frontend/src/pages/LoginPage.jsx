@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getLanguageNames } from '../language/languages';
+import { config } from '../env';
 
 
 function LoginPage() {
@@ -39,13 +40,23 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Debug: Log what we're sending
+    console.log('Login attempt for:', username);
+    console.log('API URL:', `${config.VITE_API_URL}/api/auth/login`);
+    
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${config.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: username, password })
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (response.ok && data.success) {
         // Check if user needs email verification
