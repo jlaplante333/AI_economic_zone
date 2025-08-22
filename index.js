@@ -69,3 +69,4 @@ app.listen(PORT, () => {
   console.log(`🔐 JWT secret: ${process.env.JWT_SECRET ? 'Configured' : 'Not configured'}`);
   console.log(`🗄️  Database: ${process.env.DB_HOST ? 'Configured' : 'Not configured'}`);
 });
+// Updated: Fri Aug 22 23:30:21 JST 2025
