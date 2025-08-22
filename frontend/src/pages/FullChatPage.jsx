@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut, Loader } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { config } from '../env';
 import path from 'path';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -560,7 +561,7 @@ function FullChatPage() {
       // Get user ID from user state or localStorage
       const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
       const userId = currentUser.id || 1; // Fallback to 1 if no user ID
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -761,7 +762,7 @@ function FullChatPage() {
       const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
       const userId = currentUser.id || 1; // Fallback to 1 if no user ID
       // Send to backend
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
