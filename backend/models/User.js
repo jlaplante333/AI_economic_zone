@@ -51,15 +51,15 @@ const createUser = async ({
         age, ethnicity, gender,
         employee_count, years_in_business, corporation_type,
         annual_revenue_2022, annual_revenue_2023, annual_revenue_2024,
-        email_verification_token, email_verification_expires
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23) RETURNING *`,
+        email_verification_token, email_verification_expires, is_verified
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) RETURNING *`,
       [
         email, passwordHash, firstName, lastName, phone, language, businessType,
         addressLine1, addressLine2, city, state, zipCode,
         age, ethnicity, gender,
         employeeCount, yearsInBusiness, corporationType,
         annualRevenue2022, annualRevenue2023, annualRevenue2024,
-        emailVerificationToken, emailVerificationExpires
+        emailVerificationToken, emailVerificationExpires, true
       ]
     );
     
