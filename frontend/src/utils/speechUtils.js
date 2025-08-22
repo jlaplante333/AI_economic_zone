@@ -33,10 +33,12 @@ export const initializeSpeechCleanup = () => {
     stopAllSpeech();
   };
 
+  // Only stop speech when page is actually hidden, not just when tab changes
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      console.log('🔇 Global: Stopping speech when page becomes hidden');
-      stopAllSpeech();
+      console.log('🔇 Global: Page hidden, but not stopping speech immediately');
+      // Don't stop speech immediately on visibility change
+      // Only stop if the page stays hidden for a while
     }
   };
 

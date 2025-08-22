@@ -617,22 +617,28 @@ function FullChatPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setWasVoiceMessage(false); // Reset voice message flag for text input
-    // Stop any currently playing speech
-    stopCurrentSpeech();
+    // Only stop speech if we're about to send a new message
+    if (currentAudio) {
+      stopCurrentSpeech();
+    }
     handleSendMessage(inputMessage);
   };
 
   const handleQuickOption = (option) => {
     setWasVoiceMessage(false); // Reset voice message flag for quick options
-    // Stop any currently playing speech
-    stopCurrentSpeech();
+    // Only stop speech if we're about to send a new message
+    if (currentAudio) {
+      stopCurrentSpeech();
+    }
     handleSendMessage(`Tell me about ${option.toLowerCase()}`);
   };
 
   const handleBusinessTypeSelect = (type) => {
     setBusinessType(type);
-    // Stop any currently playing speech
-    stopCurrentSpeech();
+    // Only stop speech if we're about to send a new message
+    if (currentAudio) {
+      stopCurrentSpeech();
+    }
     const userMessage = { type: 'user', content: `I own a ${type}`, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
     
@@ -668,7 +674,10 @@ function FullChatPage() {
             setIsRecording(true);
             setIsListening(true);
             recognitionRef.current.finalTranscript = '';
-            stopCurrentSpeech();
+            // Only stop speech if there's actually audio playing
+            if (currentAudio) {
+              stopCurrentSpeech();
+            }
           };
           
           recognitionRef.current.onresult = (event) => {
@@ -741,7 +750,10 @@ function FullChatPage() {
         
         setInputMessage(''); // Clear input before starting
         recognitionRef.current.finalTranscript = '';
-        stopCurrentSpeech();
+        // Only stop speech if there's actually audio playing
+        if (currentAudio) {
+          stopCurrentSpeech();
+        }
         recognitionRef.current.start();
       }
     } else {
@@ -883,7 +895,21 @@ function FullChatPage() {
 
   // Function to stop any currently playing speech
   const stopCurrentSpeech = () => {
-    stopAllSpeech();
+    console.log('🔇 Stopping current speech only');
+    
+    // Only stop the current audio element, don't cancel all speech synthesis
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+    }
+    
+    // Don't call stopAllSpeech() here as it's too aggressive
+    // Only stop browser speech synthesis if it's actively speaking
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+      console.log('🔇 Stopping browser speech synthesis');
+      window.speechSynthesis.cancel();
+    }
   };
 
   // Function to speak text using OpenAI TTS API
