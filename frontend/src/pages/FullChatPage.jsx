@@ -341,6 +341,12 @@ function FullChatPage() {
     return shuffled.slice(0, isConversationStarted ? 8 : 4);
   };
 
+  // Function to get random business options
+  const getRandomBusinessOptions = () => {
+    const shuffled = [...businessTypes].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  };
+
   useEffect(() => {
     // Get user info from localStorage
     const userInfo = localStorage.getItem('user');
