@@ -154,6 +154,21 @@ function LanguageSelectionPage() {
           </div>
         )}
 
+        {/* Signup Link */}
+        {!selectedLanguage && (
+          <div className="signup-section">
+            <div className="signup-text">
+              Already have an account? 
+              <button 
+                className="signup-link" 
+                onClick={() => navigate('/signup')}
+              >
+                Sign up here
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Search Bar at Bottom */}
         {!selectedLanguage && (
           <div className="search-container">

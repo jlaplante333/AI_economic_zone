@@ -219,7 +219,7 @@ function LoginPage() {
             </button>
           </form>
           <div className="login-footer">
-            <p>{t('noAccount')} <a href="/signup" className="signup-link">{t('signUp')}</a></p>
+            <p>{t('noAccount')} <button onClick={() => navigate('/signup')} className="signup-link">{t('signUp')}</button></p>
             <p><a href="#" className="forgot-password">{t('forgotPassword')}</a></p>
           </div>
         </div>
