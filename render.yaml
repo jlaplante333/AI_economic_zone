@@ -3,7 +3,6 @@ services:
   - type: web
     name: oakland-ai-backend
     env: node
-    plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
@@ -23,7 +22,6 @@ services:
   # Frontend Service (Static Site)
   - type: static
     name: oakland-ai-frontend
-    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
@@ -34,4 +32,3 @@ databases:
   - name: oakland-ai-db
     databaseName: oaklandai
     user: oaklandai
-    plan: free
