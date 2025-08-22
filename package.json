@@ -21,7 +21,8 @@
     "db:migrate": "psql -d oaklandai -f database/schema.sql",
     "db:reset": "psql -d oaklandai -c \"DROP SCHEMA public CASCADE; CREATE SCHEMA public;\" && npm run db:migrate",
     "db:setup": "sudo -u postgres psql -f database/setup.sql",
-    "init": "node setup.js"
+    "init": "node setup.js",
+    "build": "cd frontend && npm install && npm run build"
   },
   "keywords": [],
   "author": "",
