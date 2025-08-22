@@ -5,10 +5,12 @@ exports.generateTTS = async (req, res) => {
     const { text, voice = 'alloy' } = req.body;
     
     if (!text || text.trim() === '') {
+      console.log('❌ TTS: No text provided');
       return res.status(400).json({ error: 'Text is required' });
     }
     
     console.log('🎤 TTS request received:', { text: text.substring(0, 100) + '...', voice });
+    console.log('🔍 TTS: OpenAI API key available:', !!process.env.OPENAI_API_KEY);
     
     const audioBuffer = await generateSpeech(text, voice);
     
@@ -21,6 +23,12 @@ exports.generateTTS = async (req, res) => {
     console.log('🎤 Audio buffer received, size:', audioBuffer.length);
     console.log('🎤 Audio buffer type:', typeof audioBuffer);
     console.log('🎤 Audio buffer is Buffer:', Buffer.isBuffer(audioBuffer));
+    
+    // Validate the audio buffer
+    if (!audioBuffer || !Buffer.isBuffer(audioBuffer) || audioBuffer.length === 0) {
+      console.error('❌ TTS: Invalid audio buffer received');
+      return res.status(500).json({ error: 'Generated audio buffer is invalid' });
+    }
     
     // Set proper headers for audio response
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -39,7 +47,13 @@ exports.generateTTS = async (req, res) => {
   } catch (error) {
     console.error('❌ TTS Controller Error:', error);
     console.error('❌ TTS Controller Error stack:', error.stack);
-    res.status(500).json({ error: 'Failed to generate speech' });
+    
+    // Send a more detailed error response
+    res.status(500).json({ 
+      error: 'Failed to generate speech',
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 };
 

@@ -915,6 +915,26 @@ function FullChatPage() {
     }
   };
 
+  // Function to test TTS endpoint
+  const testTTSEndpoint = async () => {
+    try {
+      console.log('🔍 Testing TTS endpoint...');
+      const response = await fetch(`${config.VITE_API_URL}/api/tts/test`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ TTS endpoint test successful:', data);
+        return true;
+      } else {
+        console.error('❌ TTS endpoint test failed:', response.status);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ TTS endpoint test error:', error);
+      return false;
+    }
+  };
+
   // Function to speak text using OpenAI TTS API
   const speakTextWithOpenAI = async (text) => {
     if (!text || text.trim() === '') {
@@ -930,9 +950,17 @@ function FullChatPage() {
     
     console.log('🎤 Speaking text with OpenAI TTS:', text.substring(0, 100) + '...');
     
+    // First test if the TTS endpoint is accessible
+    const ttsWorking = await testTTSEndpoint();
+    if (!ttsWorking) {
+      console.log('🔄 TTS endpoint not accessible, falling back to browser speech synthesis...');
+      speakText(text);
+      return;
+    }
+    
     try {
       console.log('🔍 Making TTS request to /api/tts/generate');
-      const response = await fetch('/api/tts/generate', {
+      const response = await fetch(`${config.VITE_API_URL}/api/tts/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
