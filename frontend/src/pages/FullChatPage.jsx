@@ -877,7 +877,8 @@ function FullChatPage() {
 
   // Helper to get kebab-case filename for business type
   function getBusinessPhoto(type) {
-    return `/src/assets/businessPhoto/${type.replace(/\s+/g, '-').toLowerCase()}.jpg`;
+    // Use public folder path that works in both development and production
+    return `/assets/businessPhoto/${type.replace(/\s+/g, '-').toLowerCase()}.jpg`;
   }
 
   const navigate = useNavigate();
