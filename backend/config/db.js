@@ -6,19 +6,33 @@ let pool = null;
 const getPool = () => {
   if (!pool) {
     try {
-      // Use individual environment variables
-      const config = {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        database: process.env.DB_NAME || 'oaklandai',
-        user: process.env.DB_USER || 'oaklandai_user',
-        password: process.env.DB_PASSWORD,
-      };
+      let config;
+      
+      // Check if we have a DATABASE_URL (Render style)
+      if (process.env.DATABASE_URL) {
+        console.log('Using DATABASE_URL for database connection');
+        config = {
+          connectionString: process.env.DATABASE_URL,
+          ssl: {
+            rejectUnauthorized: false
+          }
+        };
+      } else {
+        // Fallback to individual environment variables
+        console.log('Using individual DB environment variables');
+        config = {
+          host: process.env.DB_HOST || 'localhost',
+          port: process.env.DB_PORT || 5432,
+          database: process.env.DB_NAME || 'oaklandai',
+          user: process.env.DB_USER || 'oaklandai_user',
+          password: process.env.DB_PASSWORD,
+        };
 
-      // Validate required configuration
-      if (!config.password) {
-        console.log('Database password not configured, skipping database connection');
-        return null;
+        // Validate required configuration
+        if (!config.password) {
+          console.log('Database password not configured, skipping database connection');
+          return null;
+        }
       }
 
       pool = new Pool(config);
