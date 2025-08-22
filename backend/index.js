@@ -26,6 +26,12 @@ app.use(cors(corsOptions));
 // Request logging
 app.use(requestLogger);
 
+// Simple request logger for debugging
+app.use((req, res, next) => {
+  console.log(`🔍 ${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
+
 // Rate limiting for all routes
 app.use(apiRateLimit);
 
@@ -48,15 +54,34 @@ app.get('/health', (req, res) => res.json({
 }));
 
 // API routes
-const chatRoutes = require('./routes/chatRoutes');
-const authRoutes = require('./routes/authRoutes');
-const analyticsRoutes = require('./routes/analyticsRoutes');
-const ttsRoutes = require('./routes/ttsRoutes');
+console.log('🔍 Loading API routes...');
 
+const chatRoutes = require('./routes/chatRoutes');
+console.log('✅ Chat routes loaded');
+
+const authRoutes = require('./routes/authRoutes');
+console.log('✅ Auth routes loaded');
+
+const analyticsRoutes = require('./routes/analyticsRoutes');
+console.log('✅ Analytics routes loaded');
+
+const ttsRoutes = require('./routes/ttsRoutes');
+console.log('✅ TTS routes loaded');
+
+console.log('🔍 Mounting routes...');
 app.use('/api/chat', chatRoutes);
+console.log('✅ Chat routes mounted at /api/chat');
+
 app.use('/api/auth', authRoutes);
+console.log('✅ Auth routes mounted at /api/auth');
+
 app.use('/api/analytics', analyticsRoutes);
+console.log('✅ Analytics routes mounted at /api/analytics');
+
 app.use('/api/tts', ttsRoutes);
+console.log('✅ TTS routes mounted at /api/tts');
+
+console.log('🔍 All routes mounted successfully');
 
 // 404 handler
 app.use('*', (req, res) => {
