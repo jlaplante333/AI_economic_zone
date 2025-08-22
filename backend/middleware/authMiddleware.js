@@ -118,7 +118,28 @@ const apiRateLimit = rateLimit({
 
 // CORS middleware
 const corsOptions = {
-  origin: true, // Allow all origins during development
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Get allowed origins from environment variable
+    const allowedOrigins = process.env.CORS_ORIGINS 
+      ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
+      : [];
+    
+    // In development, allow all origins
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // In production, check against allowed origins
+    if (allowedOrigins.includes(origin) || allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+    
+    // Block the request
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
