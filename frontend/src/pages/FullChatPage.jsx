@@ -917,11 +917,16 @@ function FullChatPage() {
         throw new Error(`TTS API error: ${response.status}`);
       }
       
-      // Get the audio blob
+      // Get the audio blob with proper MIME type
       const audioBlob = await response.blob();
+      console.log('🔊 Audio blob created:', audioBlob.type, 'size:', audioBlob.size);
+      
+      // Create blob URL with proper MIME type
+      const blobUrl = URL.createObjectURL(audioBlob);
+      console.log('🔊 Blob URL created:', blobUrl);
       
       // Create an audio element and play it
-      const audio = new Audio(URL.createObjectURL(audioBlob));
+      const audio = new Audio(blobUrl);
       
       // Track the current audio element using the utility
       setCurrentAudio(audio);
@@ -932,10 +937,14 @@ function FullChatPage() {
       audio.onended = () => {
         console.log('🔊 Audio playing ended');
         setCurrentAudio(null);
+        // Clean up blob URL
+        URL.revokeObjectURL(blobUrl);
       };
       audio.onerror = (error) => {
         console.error('🔊 Audio error:', error);
         setCurrentAudio(null);
+        // Clean up blob URL on error
+        URL.revokeObjectURL(blobUrl);
       };
       
       // Play the audio

@@ -17,10 +17,12 @@ exports.generateTTS = async (req, res) => {
       return res.status(204).send(); // No content response
     }
     
-    // Set headers for audio response
+    // Set proper headers for audio response
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Content-Length', audioBuffer.length);
     res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Content-Disposition', 'inline');
     
     // Send the audio buffer
     res.send(audioBuffer);
