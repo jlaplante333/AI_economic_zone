@@ -501,17 +501,22 @@ function FullChatPage() {
     let interval;
     interval = setInterval(() => {
       // Change one random option at a time
-      const randomIndex = Math.floor(Math.random() * quickOptionsData.length);
+      const randomIndex = Math.floor(Math.random() * quickOptions.length);
       setChangingOptions(prev => new Set([...prev, randomIndex]));
       // After matrix effect duration, update the option
       setTimeout(() => {
-        const newOptions = [...quickOptionsData];
+        const newOptions = [...quickOptions];
         const availableOptions = quickOptionsData.filter(option => 
           !newOptions.some(existing => existing.label === option.label)
         );
         if (availableOptions.length > 0) {
           const randomNewOption = availableOptions[Math.floor(Math.random() * availableOptions.length)];
           newOptions[randomIndex] = randomNewOption;
+          // Ensure we maintain the correct count of quick options
+          const targetCount = messages.length > 0 || businessType ? 8 : 4;
+          if (newOptions.length > targetCount) {
+            newOptions.splice(targetCount);
+          }
           setQuickOptions(newOptions);
         }
         setChangingOptions(prev => {
@@ -527,7 +532,7 @@ function FullChatPage() {
         clearInterval(interval);
       }
     };
-  }, [quickOptionsData]);
+  }, [quickOptions, messages.length, businessType]);
 
   // Timer to change business type options individually
   useEffect(() => {
@@ -1373,7 +1378,7 @@ function FullChatPage() {
                 gap: '16px',
                 alignItems: 'center'
               }}>
-                {quickOptionsData.map((option, idx) => (
+                {quickOptions.map((option, idx) => (
                   <button
                     key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
                     className="option-pill"
@@ -1591,7 +1596,7 @@ function FullChatPage() {
                   gap: '20px',
                   alignItems: 'center',
                 }}>
-                  {quickOptionsData.map((option, idx) => (
+                  {quickOptions.map((option, idx) => (
                     <button
                       key={`${option.label}-${idx}-${changingOptions.has(idx) ? 'changing' : 'stable'}`}
                       className="option-pill"
