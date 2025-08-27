@@ -83,8 +83,8 @@ exports.handleChat = async (req, res) => {
     console.log('Calling translate...');
     const englishMessage = await translate(message, language, 'en');
     console.log('English message:', englishMessage);
-    console.log('Calling getOpenAIResponse with business type, revenue, and postal code');
-    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData);
+    console.log('Calling getOpenAIResponse with business type, revenue, postal code, and language:', language);
+    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData, language);
     console.log('OpenAI response:', openaiResponse);
     console.log('Calling translate for response...');
     const translatedResponse = await translate(openaiResponse, 'en', language);

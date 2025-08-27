@@ -66,7 +66,7 @@ function validateResponse(response, userData) {
   };
 }
 
-async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null, userData = null) {
+async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null, userData = null, language = 'en') {
   console.log('=== getOpenAIResponse called ===');
   console.log('Prompt:', prompt);
   console.log('Business Type:', businessType);
@@ -148,7 +148,31 @@ async function getOpenAIResponse(prompt, businessType, revenue = null, postalCod
       }
     }
 
+    // Language-specific instructions
+    let languageInstructions = '';
+    switch (language) {
+      case 'zh-cn':
+        languageInstructions = `IMPORTANT: Respond in MANDARIN CHINESE (Simplified Chinese). Use proper Mandarin grammar, vocabulary, and cultural context. Write in a formal but friendly tone appropriate for business communication in Chinese culture.`;
+        break;
+      case 'zh-hk':
+        languageInstructions = `IMPORTANT: Respond in CANTONESE CHINESE (Traditional Chinese). Use proper Cantonese grammar, vocabulary, and cultural context. Write in a formal but friendly tone appropriate for business communication in Hong Kong culture.`;
+        break;
+      case 'vi':
+        languageInstructions = `IMPORTANT: Respond in SOUTHERN VIETNAMESE (Saigon dialect). Use Southern Vietnamese vocabulary, grammar, and cultural context. Avoid Northern/Communist style language. Write in a warm, friendly tone typical of Southern Vietnamese business communication.`;
+        break;
+      case 'ar':
+        languageInstructions = `IMPORTANT: Respond in MODERN STANDARD ARABIC. Use proper Arabic grammar, vocabulary, and cultural context. Write in a formal but approachable tone appropriate for business communication in Arab culture.`;
+        break;
+      case 'es':
+        languageInstructions = `IMPORTANT: Respond in LATIN AMERICAN SPANISH (Mexican/Central American style). Use vocabulary and expressions common in Latin American business contexts. Write in a warm, friendly tone typical of Latin American business communication.`;
+        break;
+      default:
+        languageInstructions = `IMPORTANT: Respond in ${language.toUpperCase()}. Use proper grammar, vocabulary, and cultural context for this language.`;
+    }
+
     const systemPrompt = `You are an Oakland, California local small business expert. You help immigrant-owned businesses navigate Oakland-specific regulations, permits, and business requirements.
+
+${languageInstructions}
 
 ${contextInfo}
 
