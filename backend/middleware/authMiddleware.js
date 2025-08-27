@@ -27,6 +27,16 @@ const authenticateToken = (req, res, next) => {
       });
     }
 
+    console.log('=== JWT VERIFICATION DEBUG ===');
+    console.log('Token verified successfully');
+    console.log('Decoded user object:', user);
+    console.log('User keys:', Object.keys(user));
+    console.log('user.userId:', user.userId);
+    console.log('user.id:', user.id);
+    console.log('user.isAdmin:', user.isAdmin);
+    console.log('Setting req.user =', user);
+    console.log('================================');
+
     req.user = user;
     next();
   });

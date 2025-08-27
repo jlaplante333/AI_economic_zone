@@ -10,6 +10,12 @@ const logChat = async (userId, message, response, options = {}) => {
       return null;
     }
     
+    console.log('=== LOGCHAT DEBUG ===');
+    console.log('Saving chat message for user_id:', userId);
+    console.log('Message:', message.substring(0, 50) + '...');
+    console.log('Response:', response.substring(0, 50) + '...');
+    console.log('Options:', options);
+    
     const {
       anonymousId = null,
       businessType = null,
@@ -19,6 +25,12 @@ const logChat = async (userId, message, response, options = {}) => {
       userAgent = null
     } = options;
     
+    console.log('INSERT query parameters:');
+    console.log('user_id:', userId);
+    console.log('anonymous_id:', anonymousId);
+    console.log('business_type:', businessType);
+    console.log('language:', language);
+    
     const result = await pool.query(
       `INSERT INTO chat_logs (
         user_id, anonymous_id, message, response, business_type, language, 
@@ -27,6 +39,11 @@ const logChat = async (userId, message, response, options = {}) => {
       [userId, anonymousId, message, response, businessType, language, 
        sessionId, ipAddress, userAgent]
     );
+    
+    console.log('Chat message saved successfully. Row ID:', result.rows[0].id);
+    console.log('Saved user_id:', result.rows[0].user_id);
+    console.log('================================');
+    
     return result.rows[0];
   } catch (error) {
     console.log('Database not available, skipping chat log:', error.message);
@@ -43,10 +60,23 @@ const getChatsByUser = async (userId) => {
       return [];
     }
     
+    console.log('=== DATABASE QUERY DEBUG ===');
+    console.log('Querying chat_logs for user_id:', userId);
+    console.log('Query: SELECT * FROM chat_logs WHERE user_id = $1 ORDER BY created_at DESC');
+    console.log('Parameter:', [userId]);
+    
     const result = await pool.query(
       'SELECT * FROM chat_logs WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
+    
+    console.log('Query result rows:', result.rows.length);
+    if (result.rows.length > 0) {
+      console.log('First row user_id:', result.rows[0].user_id);
+      console.log('First row message:', result.rows[0].message.substring(0, 50) + '...');
+    }
+    console.log('================================');
+    
     return result.rows;
   } catch (error) {
     console.log('Database not available, returning empty chat history:', error.message);
