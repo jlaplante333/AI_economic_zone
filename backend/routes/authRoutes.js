@@ -65,6 +65,11 @@ router.put('/profile',
   authController.updateProfile
 );
 
+router.put('/update-language', 
+  authenticateToken,
+  authController.updateLanguage
+);
+
 router.post('/logout', 
   authenticateToken,
   authController.logout

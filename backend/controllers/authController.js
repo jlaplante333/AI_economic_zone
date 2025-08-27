@@ -741,6 +741,57 @@ exports.getUserByEmail = async (req, res) => {
   }
 };
 
+// Update user language
+exports.updateLanguage = async (req, res) => {
+  try {
+    const { language } = req.body;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
+    
+    if (!language) {
+      return res.status(400).json({
+        success: false,
+        message: 'Language is required'
+      });
+    }
+    
+    // Update user language in database
+    const pool = getPool();
+    if (pool) {
+      await pool.query(
+        'UPDATE users SET language = $1, updated_at = NOW() WHERE id = $2',
+        [language, userId]
+      );
+      
+      console.log(`Updated user ${userId} language to: ${language}`);
+      
+      res.json({
+        success: true,
+        message: 'Language updated successfully',
+        language: language
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Database not available'
+      });
+    }
+    
+  } catch (error) {
+    console.error('Update language error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update language. Please try again.'
+    });
+  }
+};
+
 // Export validation rules
 exports.registerValidation = registerValidation;
 exports.loginValidation = loginValidation;

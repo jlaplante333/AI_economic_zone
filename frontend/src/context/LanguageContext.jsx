@@ -16,9 +16,19 @@ export const LanguageProvider = ({ children }) => {
 
   // Initialize language from localStorage on startup
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('selectedLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
+    // PRIORITY: Use selected language, fallback to user profile language, then default to English
+    const selectedLanguage = localStorage.getItem('selectedLanguage');
+    const userLanguage = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).language : null;
+    
+    if (selectedLanguage) {
+      console.log('Setting language from user selection:', selectedLanguage);
+      setCurrentLanguage(selectedLanguage);
+    } else if (userLanguage) {
+      console.log('Setting language from user profile:', userLanguage);
+      setCurrentLanguage(userLanguage);
+    } else {
+      console.log('Setting language to default (English)');
+      setCurrentLanguage('en');
     }
   }, []);
 
@@ -44,10 +54,37 @@ export const LanguageProvider = ({ children }) => {
     loadTranslations();
   }, [currentLanguage]);
 
-  const changeLanguage = (languageCode) => {
+  const changeLanguage = async (languageCode) => {
     setCurrentLanguage(languageCode);
     // Store in localStorage for persistence
     localStorage.setItem('selectedLanguage', languageCode);
+    
+    // Update user's profile language in database if user is logged in
+    try {
+      const user = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (user && token) {
+        const userData = JSON.parse(user);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update-language`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ language: languageCode })
+        });
+        
+        if (response.ok) {
+          console.log('Updated user profile language to:', languageCode);
+          // Update local user data
+          const updatedUser = { ...userData, language: languageCode };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+      }
+    } catch (error) {
+      console.log('Failed to update user profile language:', error);
+    }
   };
 
   // Enhanced translation function that uses the loaded JSON translations

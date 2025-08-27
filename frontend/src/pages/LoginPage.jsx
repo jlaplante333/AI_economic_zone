@@ -67,6 +67,10 @@ function LoginPage() {
         
         // Store token and user info in localStorage
         localStorage.setItem('token', data.token);
+        
+        // PRIORITY: Keep user's selected language, don't override with profile language
+        const selectedLanguage = localStorage.getItem('selectedLanguage') || data.user.language;
+        
         localStorage.setItem('user', JSON.stringify({
           id: data.user.id,
           email: data.user.email,
@@ -78,7 +82,7 @@ function LoginPage() {
           first_name: data.user.first_name,
           last_name: data.user.last_name,
           phone: data.user.phone,
-          language: data.user.language,
+          language: selectedLanguage, // Use selected language, not profile language
           business_type: data.user.business_type,
           address_line1: data.user.address_line1,
           address_line2: data.user.address_line2,
@@ -98,6 +102,9 @@ function LoginPage() {
           last_login: data.user.last_login,
           created_at: data.user.created_at
         }));
+        
+        // Ensure the selected language persists in the context
+        localStorage.setItem('selectedLanguage', selectedLanguage);
         
         // Redirect to the originally requested page or default to fullchat
         const params = new URLSearchParams(window.location.search);
