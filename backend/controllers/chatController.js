@@ -68,11 +68,15 @@ exports.handleChat = async (req, res) => {
       console.log('Skipping user lookup - using default userId or userId is 1');
     }
     
-    // Use the business type from user profile, fallback to request business type, then default
-    const finalBusinessType = userBusinessType || requestBusinessType || 'restaurant';
-    console.log('Request business type:', requestBusinessType);
-    console.log('User profile business type:', userData?.business_type);
-    console.log('Final business type being used:', finalBusinessType);
+    // CRITICAL FIX: Prioritize request business type over everything else
+    // This ensures that when user selects a different business type, it takes precedence
+    const finalBusinessType = requestBusinessType || userBusinessType || 'restaurant';
+    console.log('=== BUSINESS TYPE DEBUGGING ===');
+    console.log('Request business type (from frontend):', requestBusinessType);
+    console.log('User profile business type (from database):', userData?.business_type);
+    console.log('userBusinessType (after processing):', userBusinessType);
+    console.log('Final business type being used (for OpenAI):', finalBusinessType);
+    console.log('=== END BUSINESS TYPE DEBUGGING ===');
     console.log('User revenue being used:', userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022);
     console.log('User postal code being used:', userData?.zip_code);
     
