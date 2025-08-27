@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import FlagDisplay from '../components/FlagDisplay';
 import { oaklandLanguages } from '../language/languages';
 import '../css/pages/ProfessionalLanguagePage.css';
@@ -16,6 +17,30 @@ function ProfessionalLanguagePage() {
   const navigate = useNavigate();
   const { changeLanguage, t } = useLanguage();
   const { theme } = useTheme();
+  const { user, token, loading } = useAuth();
+
+  // Only redirect if user is fully authenticated and not still loading
+  useEffect(() => {
+    console.log('🔍 ProfessionalLanguagePage: useEffect triggered');
+    console.log('🔍 User state:', user);
+    console.log('🔍 User ID:', user?.id);
+    console.log('🔍 Token exists:', !!token);
+    console.log('🔍 Loading state:', loading);
+    
+    // Don't redirect while still loading
+    if (loading) {
+      console.log('⏳ Still loading auth state, waiting...');
+      return;
+    }
+    
+    // Only redirect if we have both user and token (fully authenticated)
+    if (user && user.id && token) {
+      console.log('🔄 User fully authenticated, redirecting to fullchat');
+      navigate('/fullchat');
+    } else {
+      console.log('⚠️ User not authenticated or missing token');
+    }
+  }, [user, token, loading, navigate]);
 
   const handleLanguageSelect = async (language) => {
     setIsLoading(true);

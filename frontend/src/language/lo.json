@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "ຍິນດີຕ້ອນຮັບ",
     "signInToAccess": "ເຂົ້າສູ່ລະບົບເພື່ອເຂົ້າເຖິງ AI Assistant",
+    "email": "ອີເມວ",
     "username": "ຊື່ຜູ້ໃຊ້",
     "usernamePlaceholder": "ປ້ອນອີເມວຂອງທ່ານ",
+    "emailPlaceholder": "ປ້ອນອີເມວຂອງທ່ານ",
     "password": "ລະຫັດຜ່ານ",
     "passwordPlaceholder": "ປ້ອນລະຫັດຜ່ານຂອງທ່ານ",
     "signIn": "ເຂົ້າສູ່ລະບົບ",
     "signingIn": "ກຳລັງເຂົ້າສູ່ລະບົບ...",
+    "loggingIn": "ກຳລັງເຂົ້າສູ່ລະບົບ...",
     "noAccount": "ບໍ່ມີບັນຊີ?",
     "signUp": "ລົງທະບຽນ",
     "forgotPassword": "ລືມລະຫັດຜ່ານ?"

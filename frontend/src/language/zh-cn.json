@@ -60,8 +60,10 @@
     "noAccount": "没有账户？",
     "signInToAccess": "登录以访问您的奥克兰人工智能助手",
     "usernamePlaceholder": "请输入您的用户名",
+    "emailPlaceholder": "请输入您的邮箱地址",
     "passwordPlaceholder": "请输入您的密码",
-    "signingIn": "正在登录..."
+    "signingIn": "正在登录...",
+    "loggingIn": "正在登录..."
   },
   "languageSelection": {
     "title": "选择您的语言",

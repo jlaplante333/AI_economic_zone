@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "Maligayang pagdating",
     "signInToAccess": "Mag-sign in para ma-access ang AI assistant",
+    "email": "Email",
     "username": "Username",
     "usernamePlaceholder": "Ilagay ang iyong email address",
+    "emailPlaceholder": "Ilagay ang iyong email address",
     "password": "Password",
     "passwordPlaceholder": "Ilagay ang iyong password",
     "signIn": "Mag-sign in",
     "signingIn": "Nag-sign in...",
+    "loggingIn": "Nag-lo-login...",
     "noAccount": "Wala kang account?",
     "signUp": "Mag-sign up",
     "forgotPassword": "Nakalimutan ang password?"

@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "स्वागत है",
     "signInToAccess": "AI सहायक तक पहुंचने के लिए साइन इन करें",
+    "email": "ईमेल",
     "username": "उपयोगकर्ता नाम",
     "usernamePlaceholder": "अपना ईमेल पता दर्ज करें",
+    "emailPlaceholder": "अपना ईमेल पता दर्ज करें",
     "password": "पासवर्ड",
     "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
     "signIn": "साइन इन",
     "signingIn": "साइन इन हो रहा है...",
+    "loggingIn": "लॉगिन हो रहा है...",
     "noAccount": "खाता नहीं है?",
     "signUp": "साइन अप",
     "forgotPassword": "पासवर्ड भूल गए?"

@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "ようこそ",
     "signInToAccess": "AIアシスタントにアクセスするためにサインインしてください",
+    "email": "メールアドレス",
     "username": "ユーザー名",
     "usernamePlaceholder": "メールアドレスを入力してください",
+    "emailPlaceholder": "メールアドレスを入力してください",
     "password": "パスワード",
     "passwordPlaceholder": "パスワードを入力してください",
     "signIn": "サインイン",
     "signingIn": "サインイン中...",
+    "loggingIn": "ログイン中...",
     "noAccount": "アカウントをお持ちでない場合",
     "signUp": "サインアップ",
     "forgotPassword": "パスワードを忘れた場合"

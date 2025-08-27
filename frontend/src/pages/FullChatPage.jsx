@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useLayoutEffect, useMemo } from 're
 import { Send, Plus, RefreshCw, User, MessageCircle, Home, UtensilsCrossed, ShoppingBag, Coffee, Scissors, Camera, Briefcase, BookOpen, Book, Building2, Heart, Star, Shield, Edit, Trash2, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Gem, Bell, Mail, Settings, MapPin, Calendar, Lock, Unlock, Eye, EyeOff, Check, X, Minus, ArrowRight, ArrowLeft, Bookmark, Share, Upload, Download, Play, MonitorSmartphone, FileText, Car, File, DollarSign, Map, ShieldCheck, Users, Lightbulb, Gift, Droplet, Flame, KeyRound, Megaphone, ClipboardCheck, Trash, AlertTriangle, Building, BadgeCheck, Mic, MicOff, Leaf, Globe, Package, Truck, Monitor, BarChart3, Handshake, ArrowUpRight, AlertCircle, UserCheck, Sun, Moon, LogOut, Loader, Square } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { config } from '../env';
-import path from 'path';
+
 import { useNavigate, Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import ProfileMenu from '../components/ProfileMenu';
@@ -670,31 +670,79 @@ function FullChatPage() {
 
     try {
       console.log('🌐 Sending request to OpenAI...');
-      console.log('🗣️ Using language:', selectedLanguage.split('-')[0]);
-      console.log('🏢 Sending businessType:', businessType);
-      console.log('🏢 temporaryBusinessType:', temporaryBusinessType);
-      console.log('🏢 user?.business_type:', user?.business_type);
-      console.log('🏢 Effective business type (getEffectiveBusinessType):', getEffectiveBusinessType());
-      // Get user ID from user state
-      if (!user || !user.id) {
-        console.error('No user authenticated - cannot send message');
+      
+      // CRITICAL: Get ALL user data from localStorage
+      const storedUser = localStorage.getItem('user');
+      const storedToken = localStorage.getItem('authToken');
+      
+      if (!storedUser || !storedToken) {
+        console.error('❌ No user data or token in localStorage');
+        alert('Please log in again');
         return;
       }
-      const userId = user.id;
+      
+      const userData = JSON.parse(storedUser);
+      console.log('✅ User data from localStorage:', userData);
+      console.log('✅ User ethnicity:', userData.ethnicity);
+      console.log('✅ User business type:', userData.business_type);
+      console.log('✅ User employee count:', userData.employee_count);
+      
+      // Create request body with ALL user profile data
+      const effectiveBusinessType = getEffectiveBusinessType();
+      console.log('🏢 DEBUG: Effective business type being sent to OpenAI:', effectiveBusinessType);
+      console.log('🏢 DEBUG: temporaryBusinessType:', temporaryBusinessType);
+      console.log('🏢 DEBUG: user.business_type:', userData.business_type);
+      
+      const requestBody = {
+        message: message,
+        language: selectedLanguage.split('-')[0],
+        businessType: effectiveBusinessType,
+        // CRITICAL: Send ALL user profile data to OpenAI
+        userProfile: {
+          id: userData.id,
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          phone: userData.phone,
+          language: userData.language,
+          business_type: userData.business_type,
+          is_admin: userData.is_admin,
+          is_verified: userData.is_verified,
+          last_login: userData.last_login,
+          created_at: userData.created_at,
+          // Address fields
+          address_line1: userData.address_line1,
+          address_line2: userData.address_line2,
+          city: userData.city,
+          state: userData.state,
+          zip_code: userData.zip_code,
+          // Demographics
+          age: userData.age,
+          ethnicity: userData.ethnicity,
+          gender: userData.gender,
+          // Business details
+          employee_count: userData.employee_count,
+          years_in_business: userData.years_in_business,
+          corporation_type: userData.corporation_type,
+          // Financial information
+          annual_revenue_2022: userData.annual_revenue_2022,
+          annual_revenue_2023: userData.annual_revenue_2023,
+          annual_revenue_2024: userData.annual_revenue_2024
+        }
+      };
+      
+      console.log('🚀 Sending request body to OpenAI:', requestBody);
+      
       const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${storedToken}`
         },
-        body: JSON.stringify({ 
-          message, 
-          language: selectedLanguage.split('-')[0], // Extract language code (e.g., 'en' from 'en-US')
-          businessType: getEffectiveBusinessType()
-        })
+        body: JSON.stringify(requestBody)
       });
+      
       console.log('📡 Response status:', response.status);
-      console.log('📡 Response headers:', response.headers);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -720,30 +768,11 @@ function FullChatPage() {
       // Speak ALL AI responses using OpenAI TTS
       if (speechRef.current && data.response) {
         console.log('🔊 Speaking AI response...');
-        console.log('Speech synthesis available:', !!speechRef.current);
-        console.log('Response to speak:', data.response);
-        console.log('Was voice message:', wasVoiceMessage);
-        
-        // Use OpenAI TTS for natural voice
         speakTextWithOpenAI(data.response);
-        
-        // Reset the voice message flag after speaking
         setWasVoiceMessage(false);
-      } else {
-        console.log('🔇 Not speaking response. Reasons:');
-        console.log('- Speech synthesis available:', !!speechRef.current);
-        console.log('- Has response:', !!data.response);
-        console.log('- Was voice message:', wasVoiceMessage);
-        console.log('- Is recording:', isRecording);
-        console.log('- Is listening:', isListening);
       }
     } catch (error) {
       console.error('❌ Error sending message:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
       
       let errorContent = 'Sorry, I\'m having trouble connecting. Please try again.';
       
@@ -822,34 +851,7 @@ function FullChatPage() {
     setMessages(prev => [...prev, botMessage]);
   };
 
-  // Function to clear chat history (for when user wants a truly fresh start)
-  const clearChatHistory = async () => {
-    if (!user || !user.id) {
-      console.error('No user authenticated - cannot clear chat history');
-      return;
-    }
-    
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/clear-history`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      
-      if (response.ok) {
-        console.log('Chat history cleared from database');
-        setMessages([]);
-        setInputMessage('');
-        setShowProfileMenu(false);
-        setRandomBusinessOptions(getRandomBusinessOptions());
-        setQuickOptions(getRandomQuickOptions(false));
-      }
-    } catch (error) {
-      console.error('Failed to clear chat history:', error);
-    }
-  };
+
 
   // Function to reset to user's profile business type
   const resetToProfileBusinessType = () => {
@@ -1247,12 +1249,12 @@ function FullChatPage() {
     }
     
     try {
-              await fetch(`${import.meta.env.VITE_API_URL}/api/chat/log`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
+      await fetch(`${config.VITE_API_URL}/api/chat/log`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
         body: JSON.stringify({
           message,
           response,
@@ -1650,6 +1652,8 @@ function FullChatPage() {
                     // The AI will still remember previous conversations when user sends new messages
                     setMessages([]);
                     setInputMessage('');
+                    // Clear localStorage chat history to prevent auto-restoration
+                    localStorage.removeItem('chatHistory');
                     // Don't clear businessType - maintain the current business context
                     setShowProfileMenu(false);
                     setRandomBusinessOptions(getRandomBusinessOptions());
@@ -1683,38 +1687,6 @@ function FullChatPage() {
                 >
                   <Plus size={14} />
                   New Chat
-                </button>
-                
-                {/* Clear Chat History Button - For truly fresh start */}
-                <button
-                  onClick={clearChatHistory}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '16px',
-                    padding: '8px 16px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.3)';
-                  }}
-                >
-                  <Trash2 size={14} />
-                  Clear History
                 </button>
                 
                 {/* Reset to Profile Business Type Button - Only show when temporary override is active */}

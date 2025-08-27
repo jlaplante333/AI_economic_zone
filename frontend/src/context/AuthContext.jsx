@@ -24,12 +24,21 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('user');
         
+        console.log('🔐 AuthContext: Initializing from localStorage');
+        console.log('🔐 Stored token:', storedToken ? 'EXISTS' : 'MISSING');
+        console.log('🔐 Stored user:', storedUser ? 'EXISTS' : 'MISSING');
+        
         if (storedToken && storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          console.log('🔐 Parsed user data:', parsedUser);
           setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          setUser(parsedUser);
+          console.log('✅ AuthContext: User state initialized from localStorage');
+        } else {
+          console.log('⚠️ AuthContext: No stored auth data found');
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('❌ Error initializing auth:', error);
         // Clear corrupted data
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
@@ -61,12 +70,21 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message || 'Login failed');
       }
 
+      console.log('🔐 AuthContext: Login successful, storing data');
+      console.log('🔐 User data to store:', data.user);
+      
       // Store auth data
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
+      console.log('✅ AuthContext: Data stored in localStorage');
+      console.log('🔐 authToken stored:', data.token ? 'EXISTS' : 'MISSING');
+      console.log('🔐 user stored:', data.user ? 'EXISTS' : 'MISSING');
+      
       setToken(data.token);
       setUser(data.user);
+      
+      console.log('✅ AuthContext: State updated, user:', data.user);
       
       return { success: true, user: data.user };
     } catch (error) {

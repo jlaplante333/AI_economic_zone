@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "እንቋዕ ብደሓን መጻእኩም",
     "signInToAccess": "AI ሓጋዚ ክትረኽብ እንተደሊኻ እተኽ",
+    "email": "ኢመይል",
     "username": "ስም ተጠቃሚ",
     "usernamePlaceholder": "ኢመይልካ ኣእትው",
+    "emailPlaceholder": "ኢመይልካ ኣእትው",
     "password": "መሕለፊ ቃል",
     "passwordPlaceholder": "መሕለፊ ቃልካ ኣእትው",
     "signIn": "እተኽ",
     "signingIn": "ይእተኽ ኣሎ...",
+    "loggingIn": "ይእተኽ ኣሎ...",
     "noAccount": "ኣካውነት የብልካን?",
     "signUp": "ክትመዝገብ",
     "forgotPassword": "መሕለፊ ቃልካ ረሲዕካዶ?"

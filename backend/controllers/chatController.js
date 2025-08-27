@@ -37,7 +37,12 @@ exports.handleChat = async (req, res) => {
     return res.status(401).json({ error: 'User not authenticated' });
   }
   
-  const { message, language = 'en', businessType: requestBusinessType = '' } = req.body;
+  const { message, language = 'en', businessType: requestBusinessType = '', userProfile } = req.body;
+  
+  // DEBUG: Log the entire request body
+  console.log('🔍 DEBUG: Full request body received:', req.body);
+  console.log('🔍 DEBUG: userProfile received:', userProfile);
+  console.log('🔍 DEBUG: userProfile.ethnicity:', userProfile?.ethnicity);
   
   try {
     // Fetch ALL user data from database using authenticated user ID
@@ -45,61 +50,108 @@ exports.handleChat = async (req, res) => {
     let userData = null;
     console.log('Attempting to fetch user data for authenticated userId:', userId);
     
-    try {
-      console.log('Calling findById for userId:', userId);
-      const user = await findById(userId);
-      console.log('User found:', user ? 'Yes' : 'No');
-      if (user) {
-        console.log('User object keys:', Object.keys(user));
-        console.log('Raw user data from database:', user);
-        
-        // Get ALL user data
-        userData = {
-          id: user.id,
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          phone: user.phone,
-          language: user.language,
-          business_type: user.business_type,
-          is_admin: user.is_admin,
-          is_verified: user.is_verified,
-          last_login: user.last_login,
-          created_at: user.created_at,
-          // Address fields
-          address_line1: user.address_line1,
-          address_line2: user.address_line2,
-          city: user.city,
-          state: user.state,
-          zip_code: user.zip_code,
-          // Demographics
-          age: user.age,
-          ethnicity: user.ethnicity,
-          gender: user.gender,
-          // Business details
-          employee_count: user.employee_count,
-          years_in_business: user.years_in_business,
-          corporation_type: user.corporation_type,
-          // Financial information
-          annual_revenue_2022: user.annual_revenue_2022,
-          annual_revenue_2023: user.annual_revenue_2023,
-          annual_revenue_2024: user.annual_revenue_2024
-        };
-        
-        // Prioritize the request business type over profile business type
-        // This allows users to temporarily override their profile business type
-        userBusinessType = requestBusinessType || user.business_type;
-        console.log('Complete user data fetched:', userData);
-        console.log('Key profile fields:');
-        console.log('- Ethnicity:', userData.ethnicity);
-        console.log('- Gender:', userData.gender);
-        console.log('- Age:', userData.age);
-        console.log('- Business Type:', userData.business_type);
-        console.log('- Revenue 2024:', userData.annual_revenue_2024);
+    // PRIORITY: Use userProfile data sent from frontend if available
+    if (userProfile) {
+      console.log('🎯 Using userProfile data sent from frontend:', userProfile);
+      userData = {
+        id: userProfile.id,
+        email: userProfile.email,
+        first_name: userProfile.first_name,
+        last_name: userProfile.last_name,
+        phone: null, // Not sent from frontend
+        language: language, // Use request language
+        business_type: userProfile.business_type,
+        is_admin: false, // Default for security
+        is_verified: true, // Assume verified if they can chat
+        last_login: new Date(),
+        created_at: new Date(),
+        // Address fields
+        address_line1: userProfile.address_line1,
+        address_line2: userProfile.address_line2,
+        city: userProfile.city,
+        state: userProfile.state,
+        zip_code: userProfile.zip_code,
+        // Demographics
+        age: userProfile.age,
+        ethnicity: userProfile.ethnicity,
+        gender: userProfile.gender,
+        // Business details
+        employee_count: userProfile.employee_count,
+        years_in_business: userProfile.years_in_business,
+        corporation_type: userProfile.corporation_type,
+        // Financial information
+        annual_revenue_2022: null, // Not sent from frontend
+        annual_revenue_2023: null, // Not sent from frontend
+        annual_revenue_2024: userProfile.annual_revenue_2024
+      };
+      
+      // Prioritize the request business type over profile business type
+      userBusinessType = requestBusinessType || userProfile.business_type;
+      console.log('✅ Using frontend userProfile data:', userData);
+      console.log('🎯 Key profile fields from frontend:');
+      console.log('- Ethnicity:', userData.ethnicity);
+      console.log('- Gender:', userData.gender);
+      console.log('- Age:', userData.age);
+      console.log('- Business Type:', userData.business_type);
+      console.log('- Revenue 2024:', userData.annual_revenue_2024);
+    } else {
+      // Fallback: Fetch from database
+      try {
+        console.log('Calling findById for userId:', userId);
+        const user = await findById(userId);
+        console.log('User found:', user ? 'Yes' : 'No');
+        if (user) {
+          console.log('User object keys:', Object.keys(user));
+          console.log('Raw user data from database:', user);
+          
+          // Get ALL user data
+          userData = {
+            id: user.id,
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            phone: user.phone,
+            language: user.language,
+            business_type: user.business_type,
+            is_admin: user.is_admin,
+            is_verified: user.is_verified,
+            last_login: user.last_login,
+            created_at: user.created_at,
+            // Address fields
+            address_line1: user.address_line1,
+            address_line2: user.address_line2,
+            city: user.city,
+            state: user.state,
+            zip_code: user.zip_code,
+            // Demographics
+            age: user.age,
+            ethnicity: user.ethnicity,
+            gender: user.gender,
+            // Business details
+            employee_count: user.employee_count,
+            years_in_business: user.years_in_business,
+            corporation_type: user.corporation_type,
+            // Financial information
+            annual_revenue_2022: user.annual_revenue_2022,
+            annual_revenue_2023: user.annual_revenue_2023,
+            annual_revenue_2024: user.annual_revenue_2024
+          };
+          
+          // Prioritize the request business type over profile business type
+          // This allows users to temporarily override their profile business type
+          userBusinessType = requestBusinessType || user.business_type;
+          console.log('Complete user data fetched from database:', userData);
+          console.log('Key profile fields from database:');
+          console.log('- Ethnicity:', userData.ethnicity);
+          console.log('- Gender:', userData.gender);
+          console.log('- Age:', userData.age);
+          console.log('- Business Type:', userData.business_type);
+          console.log('- Revenue 2024:', userData.annual_revenue_2024);
+        }
+      } catch (userError) {
+        console.log('Could not fetch user data, using request business type:', userError.message);
+        console.log('Error details:', userError);
       }
-    } catch (userError) {
-      console.log('Could not fetch user data, using request business type:', userError.message);
-      console.log('Error details:', userError);
     }
     
     // CRITICAL FIX: Prioritize request business type over everything else
@@ -128,6 +180,10 @@ exports.handleChat = async (req, res) => {
     const englishMessage = await translate(message, language, 'en');
     console.log('English message:', englishMessage);
     console.log('Calling getOpenAIResponse with business type, revenue, postal code, language, and chat history');
+    console.log('🔍 DEBUG: userData being passed to OpenAI:', userData);
+    console.log('🔍 DEBUG: userData.ethnicity:', userData?.ethnicity);
+    console.log('🔍 DEBUG: userData.gender:', userData?.gender);
+    console.log('🔍 DEBUG: userData.age:', userData?.age);
     const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData, language, chatHistory);
     console.log('OpenAI response:', openaiResponse);
     console.log('Calling translate for response...');

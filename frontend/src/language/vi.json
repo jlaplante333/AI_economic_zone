@@ -60,8 +60,10 @@
     "noAccount": "Chưa có tài khoản?",
     "signInToAccess": "Đăng nhập để truy cập trợ lý trí tuệ nhân tạo Oakland của bạn",
     "usernamePlaceholder": "Nhập tên đăng nhập của bạn",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
     "passwordPlaceholder": "Nhập mật khẩu của bạn",
-    "signingIn": "Đang đăng nhập..."
+    "signingIn": "Đang đăng nhập...",
+    "loggingIn": "Đang đăng nhập..."
   },
   "languageSelection": {
     "title": "Chọn ngôn ngữ của bạn",

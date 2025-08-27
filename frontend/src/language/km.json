@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "សូមស្វាគមន៍",
     "signInToAccess": "ចូលដើម្បីចូលប្រើ AI Assistant",
+    "email": "អ៊ីមែល",
     "username": "ឈ្មោះអ្នកប្រើប្រាស់",
     "usernamePlaceholder": "បញ្ចូលអ៊ីមែលរបស់អ្នក",
+    "emailPlaceholder": "បញ្ចូលអ៊ីមែលរបស់អ្នក",
     "password": "ពាក្យសម្ងាត់",
     "passwordPlaceholder": "បញ្ចូលពាក្យសម្ងាត់របស់អ្នក",
     "signIn": "ចូល",
     "signingIn": "កំពុងចូល...",
+    "loggingIn": "កំពុងចូល...",
     "noAccount": "មិនមានគណនីទេ?",
     "signUp": "ចុះឈ្មោះ",
     "forgotPassword": "ភ្លេចពាក្យសម្ងាត់?"

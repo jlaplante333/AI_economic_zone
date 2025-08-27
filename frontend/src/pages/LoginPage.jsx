@@ -5,7 +5,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { getLanguageNames } from '../language/languages';
 import { config } from '../env';
 
-
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -51,11 +50,20 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🔐 Form submitted!');
+    console.log('🔐 Username:', username);
+    console.log('🔐 Password length:', password.length);
+    
+    if (!username || !password) {
+      console.error('❌ Missing username or password');
+      alert('Please enter both email and password');
+      return;
+    }
+    
     setIsLoading(true);
     
-    // Debug: Log what we're sending
-    console.log('Login attempt for:', username);
-    console.log('API URL:', `${config.VITE_API_URL}/api/auth/login`);
+    console.log('🔐 Login attempt for:', username);
+    console.log('🔐 API URL:', config.VITE_API_URL);
     
     try {
       const response = await fetch(`${config.VITE_API_URL}/api/auth/login`, {
@@ -64,11 +72,11 @@ function LoginPage() {
         body: JSON.stringify({ email: username, password })
       });
       
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      console.log('🔐 Response status:', response.status);
+      console.log('🔐 Response headers:', response.headers);
       
       const data = await response.json();
-      console.log('Response data:', data);
+      console.log('🔐 Login response:', data);
       
       if (response.ok && data.success) {
         // Check if user needs email verification
@@ -77,68 +85,70 @@ function LoginPage() {
           return;
         }
         
-        // Store token and user info in localStorage
-        localStorage.setItem('authToken', data.token);
-        
-        // PRIORITY: Keep user's selected language, don't override with profile language
-        const selectedLanguage = localStorage.getItem('selectedLanguage') || data.user.language;
-        
-        localStorage.setItem('user', JSON.stringify({
+        // CRITICAL: Store ALL user data in localStorage
+        const userData = {
           id: data.user.id,
           email: data.user.email,
-          name: `${data.user.first_name} ${data.user.last_name}`,
-          firstName: data.user.first_name,
-          lastName: data.user.last_name,
-          isAdmin: data.user.is_admin,
-          // Store ALL user data for profile page
           first_name: data.user.first_name,
           last_name: data.user.last_name,
           phone: data.user.phone,
-          language: selectedLanguage, // Use selected language, not profile language
+          language: data.user.language,
           business_type: data.user.business_type,
+          is_admin: data.user.is_admin,
+          is_verified: data.user.is_verified,
+          last_login: data.user.last_login,
+          created_at: data.user.created_at,
+          // Address fields
           address_line1: data.user.address_line1,
           address_line2: data.user.address_line2,
           city: data.user.city,
           state: data.user.state,
           zip_code: data.user.zip_code,
+          // Demographics
           age: data.user.age,
           ethnicity: data.user.ethnicity,
           gender: data.user.gender,
+          // Business details
           employee_count: data.user.employee_count,
           years_in_business: data.user.years_in_business,
           corporation_type: data.user.corporation_type,
+          // Financial information
           annual_revenue_2022: data.user.annual_revenue_2022,
           annual_revenue_2023: data.user.annual_revenue_2023,
           annual_revenue_2024: data.user.annual_revenue_2024,
-          is_verified: data.user.is_verified,
-          last_login: data.user.last_login,
-          created_at: data.user.created_at
-        }));
+          // Additional fields for profile
+          name: `${data.user.first_name} ${data.user.last_name}`,
+          firstName: data.user.first_name,
+          lastName: data.user.last_name
+        };
         
-        // Ensure the selected language persists in the context
-        localStorage.setItem('selectedLanguage', selectedLanguage);
+        // Store token and user data
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(userData));
         
-        // Redirect to the originally requested page or default to fullchat
-        const params = new URLSearchParams(window.location.search);
-        const redirectTo = params.get('redirect') || '/fullchat';
-        navigate(redirectTo);
+        console.log('✅ User data saved to localStorage:', userData);
+        console.log('✅ Token saved to localStorage');
+        
+        // Redirect to chat
+        console.log('🔄 Navigating to /fullchat...');
+        navigate('/fullchat');
+        // Also try window.location as fallback
+        setTimeout(() => {
+          if (window.location.pathname !== '/fullchat') {
+            console.log('🔄 Fallback navigation using window.location...');
+            window.location.href = '/fullchat';
+          }
+        }, 100);
       } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Login failed. Please try again.');
+        console.error('❌ Login failed:', data.message);
+        alert(data.message || 'Login failed. Please try again.');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       alert('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleChangeLanguage = () => {
-    // Cycle to next language when clicked
-    const nextIndex = (currentLanguageIndex + 1) % availableLanguages.length;
-    const nextLanguage = availableLanguages[nextIndex];
-    handleLanguageChange(nextLanguage.code);
   };
 
   return (
@@ -167,116 +177,96 @@ function LoginPage() {
           {t('welcome.getAnswers')}
         </p>
         <p style={{ color: '#64748b', fontSize: '16px' }}>
-          {t('auth.noAccount')} <button onClick={() => navigate('/signup')} className="signup-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('auth.signUp')}</button>
+          {t('auth.noAccount')} <a href="/signup" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', cursor: 'pointer' }}>{t('auth.signUp')}</a>
         </p>
       </div>
 
       {/* Right side - Login form */}
       <div className="login-section">
         <div className="login-container">
-          <h2 className="login-title">{t('auth.welcome')}</h2>
+          <div className="language-selector" style={{ position: 'absolute', top: '20px', right: '20px' }}>
+            <button
+              onClick={() => handleLanguageChange(availableLanguages[currentLanguageIndex]?.code)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '20px',
+                padding: '8px 16px',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Globe size={16} />
+              {availableLanguages[currentLanguageIndex]?.name || 'English'}
+            </button>
+          </div>
+
+          <h2 className="login-title">Login</h2>
           
-          {/* Change Language Button */}
-          <button 
-            onClick={handleChangeLanguage}
-            className="change-language-button"
-            style={{
-              position: 'absolute',
-              top: '15px',
-              right: '15px',
+          {verificationMessage && (
+            <div className="verification-message" style={{
               background: 'rgba(59, 130, 246, 0.1)',
               border: '1px solid rgba(59, 130, 246, 0.3)',
               borderRadius: '8px',
-              padding: '6px 10px',
+              padding: '12px',
+              marginBottom: '20px',
               color: '#3b82f6',
-              fontSize: '12px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.2s ease',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              zIndex: 10
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(59, 130, 246, 0.2)';
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-              e.target.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(59, 130, 246, 0.1)';
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.3)';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            <Globe size={14} />
-            <span style={{ fontSize: '16px', marginRight: '4px' }}>
-              {availableLanguages[currentLanguageIndex].flag}
-            </span>
-            {availableLanguages[currentLanguageIndex].name}
-          </button>
-          <p className="login-subtitle">{t('auth.signInToAccess')}</p>
+              fontSize: '14px'
+            }}>
+              {verificationMessage}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="login-form">
-            {/* Verification Message */}
-            {verificationMessage && (
-              <div className="verification-message" style={{
-                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                border: '1px solid #f59e0b',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                marginBottom: '20px',
-                color: '#92400e',
-                fontSize: '14px',
-                textAlign: 'center',
-                fontWeight: '500'
-              }}>
-                {verificationMessage}
-              </div>
-            )}
-            
             <div className="form-group">
-              <label htmlFor="username" className="form-label">{t('auth.username')}</label>
+              <label htmlFor="username">{t('auth.email')}</label>
               <input
-                type="text"
+                type="email"
                 id="username"
-                className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={t('auth.usernamePlaceholder')}
                 required
-                disabled={isLoading}
+                placeholder={t('auth.emailPlaceholder')}
+                className="form-input"
               />
             </div>
+
             <div className="form-group">
-              <label htmlFor="password" className="form-label">{t('auth.password')}</label>
+              <label htmlFor="password">{t('auth.password')}</label>
               <input
                 type="password"
                 id="password"
-                className="form-input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('auth.passwordPlaceholder')}
                 required
-                disabled={isLoading}
+                placeholder={t('auth.passwordPlaceholder')}
+                className="form-input"
               />
             </div>
-            <button 
-              type="submit" 
-              className="login-button"
+
+            <button
+              type="submit"
               disabled={isLoading}
+              className="login-button"
               style={{
                 opacity: isLoading ? 0.7 : 1,
                 cursor: isLoading ? 'not-allowed' : 'pointer'
               }}
             >
-              {isLoading ? t('auth.signingIn') : t('auth.signIn')}
+              {isLoading ? 'Logging In...' : 'Login'}
             </button>
           </form>
+
           <div className="login-footer">
-            <p>{t('auth.noAccount')} <button onClick={() => navigate('/signup')} className="signup-link">{t('auth.signUp')}</button></p>
-            <p><a href="#" className="forgot-password">{t('auth.forgotPassword')}</a></p>
+            <p style={{ color: '#64748b', fontSize: '14px' }}>
+              {t('auth.forgotPassword')} <button onClick={() => navigate('/forgot-password')} className="forgot-password-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('auth.resetPassword')}</button>
+            </p>
           </div>
         </div>
       </div>

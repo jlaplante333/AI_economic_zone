@@ -1,12 +1,15 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
+  const { user, token, loading } = useAuth();
   
-  // Check if user is logged in by looking for token and user data in localStorage
-  const token = localStorage.getItem('authToken');
-  const user = localStorage.getItem('user');
+  // Show loading while AuthContext initializes
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   
   // If no token or user data, redirect to login with current location as redirect parameter
   if (!token || !user) {

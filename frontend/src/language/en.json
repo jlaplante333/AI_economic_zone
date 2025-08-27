@@ -60,8 +60,10 @@
     "noAccount": "Don't have an account?",
     "signInToAccess": "Sign in to access your Oakland AI assistant",
     "usernamePlaceholder": "Enter your username",
+    "emailPlaceholder": "Enter your email address",
     "passwordPlaceholder": "Enter your password",
-    "signingIn": "Signing In..."
+    "signingIn": "Signing In...",
+    "loggingIn": "Logging In..."
   },
   "languageSelection": {
     "title": "Choose Your Language",

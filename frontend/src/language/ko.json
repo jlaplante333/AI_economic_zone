@@ -15,12 +15,15 @@
   "auth": {
     "welcome": "환영합니다",
     "signInToAccess": "AI 어시스턴트에 접근하려면 로그인하세요",
+    "email": "이메일",
     "username": "사용자명",
     "usernamePlaceholder": "이메일 주소를 입력하세요",
+    "emailPlaceholder": "이메일 주소를 입력하세요",
     "password": "비밀번호",
     "passwordPlaceholder": "비밀번호를 입력하세요",
     "signIn": "로그인",
     "signingIn": "로그인 중...",
+    "loggingIn": "로그인 중...",
     "noAccount": "계정이 없으신가요?",
     "signUp": "회원가입",
     "forgotPassword": "비밀번호를 잊으셨나요?"

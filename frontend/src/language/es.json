@@ -60,8 +60,10 @@
     "noAccount": "¿No tienes una cuenta?",
     "signInToAccess": "Inicia sesión para acceder a tu asistente de inteligencia artificial de Oakland",
     "usernamePlaceholder": "Ingresa tu nombre de usuario",
+    "emailPlaceholder": "Ingresa tu dirección de correo electrónico",
     "passwordPlaceholder": "Ingresa tu contraseña",
-    "signingIn": "Iniciando sesión..."
+    "signingIn": "Iniciando sesión...",
+    "loggingIn": "Iniciando sesión..."
   },
   "languageSelection": {
     "title": "Elige tu idioma",
