@@ -129,22 +129,69 @@ function FullChatPage() {
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem('chatHistory', JSON.stringify(messages));
+      console.log('💾 Saved chat history to localStorage:', messages.length, 'messages');
     }
   }, [messages]);
 
-  // Load chat history from localStorage on component mount (for persistence during navigation)
+  // Load chat history from localStorage on component mount and when user changes (for persistence during navigation)
   useEffect(() => {
-    const savedHistory = localStorage.getItem('chatHistory');
-    if (savedHistory && messages.length === 0) {
-      try {
-        const parsedHistory = JSON.parse(savedHistory);
-        setMessages(parsedHistory);
-        console.log('📚 Loaded chat history from localStorage:', parsedHistory.length, 'messages');
-      } catch (error) {
-        console.error('Failed to parse saved chat history:', error);
+    if (user && user.id) {
+      const savedHistory = localStorage.getItem('chatHistory');
+      if (savedHistory && messages.length === 0) {
+        try {
+          const parsedHistory = JSON.parse(savedHistory);
+          setMessages(parsedHistory);
+          console.log('📚 Loaded chat history from localStorage:', parsedHistory.length, 'messages');
+        } catch (error) {
+          console.error('Failed to parse saved chat history:', error);
+          // Clear corrupted localStorage data
+          localStorage.removeItem('chatHistory');
+        }
       }
     }
-  }, []);
+  }, [user, messages.length]);
+
+  // Restore chat history when page becomes visible again (navigation back from profile)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user && user.id && messages.length === 0) {
+        const savedHistory = localStorage.getItem('chatHistory');
+        if (savedHistory) {
+          try {
+            const parsedHistory = JSON.parse(savedHistory);
+            setMessages(parsedHistory);
+            console.log('🔄 Restored chat history from localStorage on visibility change:', parsedHistory.length, 'messages');
+          } catch (error) {
+            console.error('Failed to parse saved chat history on visibility change:', error);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user, messages.length]);
+
+  // Restore chat history when navigating back to chat page (hash change)
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#/chat' && user && user.id && messages.length === 0) {
+        const savedHistory = localStorage.getItem('chatHistory');
+        if (savedHistory) {
+          try {
+            const parsedHistory = JSON.parse(savedHistory);
+            setMessages(parsedHistory);
+            console.log('🔄 Restored chat history from localStorage on hash change:', parsedHistory.length, 'messages');
+          } catch (error) {
+            console.error('Failed to parse saved chat history on hash change:', error);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [user, messages.length]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   const [quickOptions, setQuickOptions] = useState([]);
