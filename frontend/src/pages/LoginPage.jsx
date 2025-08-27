@@ -78,7 +78,7 @@ function LoginPage() {
         }
         
         // Store token and user info in localStorage
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('authToken', data.token);
         
         // PRIORITY: Keep user's selected language, don't override with profile language
         const selectedLanguage = localStorage.getItem('selectedLanguage') || data.user.language;

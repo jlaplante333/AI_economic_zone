@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import ProfileMenu from '../components/ProfileMenu';
 import { stopAllSpeech, setCurrentAudio, initializeSpeechCleanup, getCurrentAudio } from '../utils/speechUtils';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 function FullChatPage() {
   // Add bounce animation CSS
@@ -46,7 +47,7 @@ function FullChatPage() {
   const { theme, toggleTheme, isToggling, currentThemeName } = useTheme();
   const { t, currentLanguage } = useLanguage();
   
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [isRecording, setIsRecording] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isProcessingVoice, setIsProcessingVoice] = useState(false);
@@ -432,12 +433,6 @@ function FullChatPage() {
   };
 
   useEffect(() => {
-    // Get user info from localStorage
-    const userInfo = localStorage.getItem('user');
-    if (userInfo) {
-      setUser(JSON.parse(userInfo));
-    }
-    
     // Set random business options
     setRandomBusinessOptions(getRandomBusinessOptions());
   }, []);
@@ -633,14 +628,17 @@ function FullChatPage() {
       console.log('🏢 temporaryBusinessType:', temporaryBusinessType);
       console.log('🏢 user?.business_type:', user?.business_type);
       console.log('🏢 Effective business type (getEffectiveBusinessType):', getEffectiveBusinessType());
-      // Get user ID from user state or localStorage
-      const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = currentUser.id || 1; // Fallback to 1 if no user ID
+      // Get user ID from user state
+      if (!user || !user.id) {
+        console.error('No user authenticated - cannot send message');
+        return;
+      }
+      const userId = user.id;
       const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify({ 
           message, 
@@ -753,14 +751,17 @@ function FullChatPage() {
 
   // Function to clear chat history (for when user wants a truly fresh start)
   const clearChatHistory = async () => {
-    if (!user || !user.id) return;
+    if (!user || !user.id) {
+      console.error('No user authenticated - cannot clear chat history');
+      return;
+    }
     
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/clear-history`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       
@@ -940,9 +941,12 @@ function FullChatPage() {
       // Add user voice message to chat
       const userMessage = { type: 'user', content: message, timestamp: new Date() };
       setMessages(prev => [...prev, userMessage]);
-      // Get user ID from user state or localStorage
-      const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = currentUser.id || 1; // Fallback to 1 if no user ID
+      // Get user ID from user state
+      if (!user || !user.id) {
+        console.error('No user authenticated - cannot send message');
+        return;
+      }
+      const userId = user.id;
       // Send to backend
       const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
@@ -953,8 +957,7 @@ function FullChatPage() {
         body: JSON.stringify({
           message: message,
           language: selectedLanguage.split('-')[0], // Use selected language
-          businessType: businessType,
-          userId: userId
+          businessType: businessType
         })
       });
 
@@ -1125,11 +1128,11 @@ function FullChatPage() {
     if (!user || !user.id) return;
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/history`, {
+      const response = await fetch(`${import.meta.env.VITE_URL}/api/chat/history`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       
@@ -1157,31 +1160,26 @@ function FullChatPage() {
       }
     } catch (error) {
       console.error('Failed to load chat history from database:', error);
-      // Fallback to localStorage if database fails
-      const savedHistory = localStorage.getItem('chatHistory');
-      if (savedHistory) {
-        try {
-          const parsedHistory = JSON.parse(savedHistory);
-          setMessages(parsedHistory);
-          console.log('📚 Loaded chat history from localStorage (fallback):', parsedHistory.length, 'messages');
-        } catch (parseError) {
-          console.error('Failed to parse saved chat history:', parseError);
-        }
-      }
+      // Don't fallback to localStorage for security - only show empty state
+      console.log('📚 No chat history available - starting fresh');
+      setMessages([]);
     }
   };
 
   // Save message to database
   const saveMessageToDatabase = async (message, response, businessType) => {
-    if (!user || !user.id) return;
+    if (!user || !user.id) {
+      console.error('No user authenticated - cannot save message');
+      return;
+    }
     
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/chat/log`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+              await fetch(`${import.meta.env.VITE_API_URL}/api/chat/log`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
         body: JSON.stringify({
           message,
           response,
