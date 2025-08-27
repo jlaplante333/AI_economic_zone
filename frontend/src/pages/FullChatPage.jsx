@@ -629,6 +629,10 @@ function FullChatPage() {
     try {
       console.log('🌐 Sending request to OpenAI...');
       console.log('🗣️ Using language:', selectedLanguage.split('-')[0]);
+      console.log('🏢 Sending businessType:', businessType);
+      console.log('🏢 temporaryBusinessType:', temporaryBusinessType);
+      console.log('🏢 user?.business_type:', user?.business_type);
+      console.log('🏢 Effective business type (getEffectiveBusinessType):', getEffectiveBusinessType());
       // Get user ID from user state or localStorage
       const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
       const userId = currentUser.id || 1; // Fallback to 1 if no user ID
@@ -638,7 +642,7 @@ function FullChatPage() {
         body: JSON.stringify({ 
           message, 
           language: selectedLanguage.split('-')[0], // Extract language code (e.g., 'en' from 'en-US')
-          businessType, 
+          businessType: getEffectiveBusinessType(), 
           userId: userId 
         })
       });
@@ -710,6 +714,7 @@ function FullChatPage() {
 
   const handleBusinessTypeSelect = (type) => {
     console.log('🏢 Business type selected:', type);
+    console.log('🏢 Current user business_type:', user?.business_type);
     
     // If this is a different business type than the user's profile, set temporary override
     if (type !== user?.business_type) {
@@ -724,6 +729,7 @@ function FullChatPage() {
     }
     
     setBusinessType(type);
+    console.log('🏢 businessType state set to:', type);
     setShowBusinessOptionsModal(false);
     
     // Only stop speech if we're about to send a new message
@@ -1509,7 +1515,7 @@ function FullChatPage() {
                   onClick={() => {
                     setMessages([]);
                     setInputMessage('');
-                    setBusinessType('');
+                    // Don't clear businessType - maintain the current business context
                     setShowProfileMenu(false);
                     setRandomBusinessOptions(getRandomBusinessOptions());
                     setQuickOptions(getRandomQuickOptions(false));
