@@ -65,8 +65,10 @@ const getChatsByUser = async (userId) => {
     console.log('Query: SELECT * FROM chat_logs WHERE user_id = $1 ORDER BY created_at DESC');
     console.log('Parameter:', [userId]);
     
+    // CRITICAL SECURITY: Only return messages for the authenticated user
+    // Also check that user_id is not NULL to prevent data leakage
     const result = await pool.query(
-      'SELECT * FROM chat_logs WHERE user_id = $1 ORDER BY created_at DESC',
+      'SELECT * FROM chat_logs WHERE user_id = $1 AND user_id IS NOT NULL ORDER BY created_at DESC',
       [userId]
     );
     
@@ -74,6 +76,18 @@ const getChatsByUser = async (userId) => {
     if (result.rows.length > 0) {
       console.log('First row user_id:', result.rows[0].user_id);
       console.log('First row message:', result.rows[0].message.substring(0, 50) + '...');
+      
+      // CRITICAL SECURITY CHECK: Verify all rows belong to the authenticated user
+      const allUserIds = result.rows.map(row => row.user_id);
+      const uniqueUserIds = [...new Set(allUserIds)];
+      console.log('All user_ids in result:', allUserIds);
+      console.log('Unique user_ids in result:', uniqueUserIds);
+      
+      if (uniqueUserIds.length > 1 || uniqueUserIds[0] !== userId) {
+        console.error('🚨 CRITICAL SECURITY BREACH: Found messages from other users!');
+        console.error('Authenticated user ID:', userId);
+        console.error('User IDs in result:', uniqueUserIds);
+      }
     }
     console.log('================================');
     
@@ -101,6 +115,54 @@ const getChatsByAnonymousId = async (anonymousId) => {
   } catch (error) {
     console.log('Database not available, returning empty chat history:', error.message);
     return [];
+  }
+};
+
+// CRITICAL SECURITY: Check database state for data isolation issues
+const checkDatabaseSecurity = async () => {
+  try {
+    const pool = getPool();
+    if (!pool) {
+      console.log('Database not available for security check');
+      return null;
+    }
+    
+    console.log('🔒 === DATABASE SECURITY AUDIT ===');
+    
+    // Check total chat logs
+    const totalResult = await pool.query('SELECT COUNT(*) as total FROM chat_logs');
+    console.log('Total chat logs in database:', totalResult.rows[0].total);
+    
+    // Check chat logs with NULL user_id (potential security risk)
+    const nullUserIdResult = await pool.query('SELECT COUNT(*) as count FROM chat_logs WHERE user_id IS NULL');
+    console.log('Chat logs with NULL user_id:', nullUserIdResult.rows[0].count);
+    
+    // Check unique users with chat logs
+    const uniqueUsersResult = await pool.query('SELECT COUNT(DISTINCT user_id) as unique_users FROM chat_logs WHERE user_id IS NOT NULL');
+    console.log('Unique users with chat logs:', uniqueUsersResult.rows[0].unique_users);
+    
+    // Sample of user_id distribution
+    const userDistributionResult = await pool.query(`
+      SELECT user_id, COUNT(*) as message_count 
+      FROM chat_logs 
+      WHERE user_id IS NOT NULL 
+      GROUP BY user_id 
+      ORDER BY message_count DESC 
+      LIMIT 5
+    `);
+    console.log('Top 5 users by message count:', userDistributionResult.rows);
+    
+    console.log('🔒 === END SECURITY AUDIT ===');
+    
+    return {
+      total: totalResult.rows[0].total,
+      nullUserIdCount: nullUserIdResult.rows[0].count,
+      uniqueUsers: uniqueUsersResult.rows[0].unique_users,
+      userDistribution: userDistributionResult.rows
+    };
+  } catch (error) {
+    console.error('Error during security audit:', error);
+    return null;
   }
 };
 

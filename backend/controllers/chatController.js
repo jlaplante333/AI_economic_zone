@@ -203,6 +203,10 @@ exports.getChatHistory = async (req, res) => {
     
     console.log('Fetching chat history for user ID:', userId);
     
+    // CRITICAL SECURITY: Run database security audit
+    const { checkDatabaseSecurity } = require('../models/ChatLog');
+    await checkDatabaseSecurity();
+    
     // Get chat history from database
     const { getChatsByUser } = require('../models/ChatLog');
     const messages = await getChatsByUser(userId);
