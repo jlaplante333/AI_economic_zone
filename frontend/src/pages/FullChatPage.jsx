@@ -693,13 +693,23 @@ function FullChatPage() {
           businessType: getEffectiveBusinessType()
         })
       });
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', response.headers);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ HTTP error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
+      
       const data = await response.json();
+      console.log('📡 Raw response data:', data);
+      
       if (!data || !data.response) {
+        console.error('❌ Invalid response format:', data);
         throw new Error('Invalid response format from server');
       }
+      
       console.log('🤖 Received AI response:', data.response);
       const botMessage = { type: 'answer', content: data.response, timestamp: new Date() };
       setMessages(prev => [...prev, botMessage]);
@@ -729,9 +739,25 @@ function FullChatPage() {
       }
     } catch (error) {
       console.error('❌ Error sending message:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      let errorContent = 'Sorry, I\'m having trouble connecting. Please try again.';
+      
+      if (error.message.includes('Failed to fetch')) {
+        errorContent = 'Cannot connect to the server. Please check if the backend is running.';
+      } else if (error.message.includes('401')) {
+        errorContent = 'Authentication failed. Please log in again.';
+      } else if (error.message.includes('500')) {
+        errorContent = 'Server error. Please try again later.';
+      }
+      
       const errorMessage = { 
         type: 'answer', 
-        content: 'Sorry, I\'m having trouble connecting. Please try again.', 
+        content: errorContent, 
         timestamp: new Date() 
       };
       setMessages(prev => [...prev, errorMessage]);
