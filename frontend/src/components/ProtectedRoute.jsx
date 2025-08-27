@@ -5,7 +5,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   
   // Check if user is logged in by looking for token and user data in localStorage
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
   const user = localStorage.getItem('user');
   
   // If no token or user data, redirect to login with current location as redirect parameter

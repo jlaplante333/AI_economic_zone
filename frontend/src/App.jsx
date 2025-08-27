@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProfessionalLanguagePage from './pages/ProfessionalLanguagePage';
 import LoginPage from './pages/LoginPage';
@@ -19,9 +20,10 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <Router>
-          <div className="App">
-            <Routes>
+        <AuthProvider>
+          <Router>
+            <div className="App">
+              <Routes>
               {/* Public routes - accessible without login */}
               <Route path="/" element={<ProfessionalLanguagePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -67,6 +69,7 @@ function App() {
             </Routes>
           </div>
         </Router>
+          </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
