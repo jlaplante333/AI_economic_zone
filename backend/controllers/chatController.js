@@ -51,6 +51,7 @@ exports.handleChat = async (req, res) => {
       console.log('User found:', user ? 'Yes' : 'No');
       if (user) {
         console.log('User object keys:', Object.keys(user));
+        console.log('Raw user data from database:', user);
         
         // Get ALL user data
         userData = {
@@ -89,6 +90,12 @@ exports.handleChat = async (req, res) => {
         // This allows users to temporarily override their profile business type
         userBusinessType = requestBusinessType || user.business_type;
         console.log('Complete user data fetched:', userData);
+        console.log('Key profile fields:');
+        console.log('- Ethnicity:', userData.ethnicity);
+        console.log('- Gender:', userData.gender);
+        console.log('- Age:', userData.age);
+        console.log('- Business Type:', userData.business_type);
+        console.log('- Revenue 2024:', userData.annual_revenue_2024);
       }
     } catch (userError) {
       console.log('Could not fetch user data, using request business type:', userError.message);
