@@ -6,66 +6,69 @@ const { findById } = require('../models/User');
 exports.handleChat = async (req, res) => {
   console.log('=== handleChat called ===');
   console.log('Request body:', req.body);
-  const { message, language = 'en', businessType: requestBusinessType = '', userId = 1 } = req.body;
+  
+  // SECURITY FIX: Get user ID from JWT token, not from request body
+  const userId = req.user?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+  
+  const { message, language = 'en', businessType: requestBusinessType = '' } = req.body;
   
   try {
-    // Fetch ALL user data from database if userId is provided
+    // Fetch ALL user data from database using authenticated user ID
     let userBusinessType = requestBusinessType;
     let userData = null;
-    console.log('Attempting to fetch user data for userId:', userId);
+    console.log('Attempting to fetch user data for authenticated userId:', userId);
     
-    if (userId && userId !== 1) { // Skip for default user ID 1
-      try {
-        console.log('Calling findById for userId:', userId);
-        const user = await findById(userId);
-        console.log('User found:', user ? 'Yes' : 'No');
-        if (user) {
-          console.log('User object keys:', Object.keys(user));
-          
-          // Get ALL user data
-          userData = {
-            id: user.id,
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            phone: user.phone,
-            language: user.language,
-            business_type: user.business_type,
-            is_admin: user.is_admin,
-            is_verified: user.is_verified,
-            last_login: user.last_login,
-            created_at: user.created_at,
-            // Address fields
-            address_line1: user.address_line1,
-            address_line2: user.address_line2,
-            city: user.city,
-            state: user.state,
-            zip_code: user.zip_code,
-            // Demographics
-            age: user.age,
-            ethnicity: user.ethnicity,
-            gender: user.gender,
-            // Business details
-            employee_count: user.employee_count,
-            years_in_business: user.years_in_business,
-            corporation_type: user.corporation_type,
-            // Financial information
-            annual_revenue_2022: user.annual_revenue_2022,
-            annual_revenue_2023: user.annual_revenue_2023,
-            annual_revenue_2024: user.annual_revenue_2024
-          };
-          
-          // Prioritize the request business type over profile business type
-          // This allows users to temporarily override their profile business type
-          userBusinessType = requestBusinessType || user.business_type;
-          console.log('Complete user data fetched:', userData);
-        }
-      } catch (userError) {
-        console.log('Could not fetch user data, using request business type:', userError.message);
-        console.log('Error details:', userError);
+    try {
+      console.log('Calling findById for userId:', userId);
+      const user = await findById(userId);
+      console.log('User found:', user ? 'Yes' : 'No');
+      if (user) {
+        console.log('User object keys:', Object.keys(user));
+        
+        // Get ALL user data
+        userData = {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          phone: user.phone,
+          language: user.language,
+          business_type: user.business_type,
+          is_admin: user.is_admin,
+          is_verified: user.is_verified,
+          last_login: user.last_login,
+          created_at: user.created_at,
+          // Address fields
+          address_line1: user.address_line1,
+          address_line2: user.address_line2,
+          city: user.city,
+          state: user.state,
+          zip_code: user.zip_code,
+          // Demographics
+          age: user.age,
+          ethnicity: user.ethnicity,
+          gender: user.gender,
+          // Business details
+          employee_count: user.employee_count,
+          years_in_business: user.years_in_business,
+          corporation_type: user.corporation_type,
+          // Financial information
+          annual_revenue_2022: user.annual_revenue_2022,
+          annual_revenue_2023: user.annual_revenue_2023,
+          annual_revenue_2024: user.annual_revenue_2024
+        };
+        
+        // Prioritize the request business type over profile business type
+        // This allows users to temporarily override their profile business type
+        userBusinessType = requestBusinessType || user.business_type;
+        console.log('Complete user data fetched:', userData);
       }
-    } else {
-      console.log('Skipping user lookup - using default userId or userId is 1');
+    } catch (userError) {
+      console.log('Could not fetch user data, using request business type:', userError.message);
+      console.log('Error details:', userError);
     }
     
     // CRITICAL FIX: Prioritize request business type over everything else
@@ -177,7 +180,7 @@ exports.getChatHistory = async (req, res) => {
   
   try {
     // Get user ID from auth token
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
@@ -203,7 +206,7 @@ exports.logChatMessage = async (req, res) => {
   
   try {
     const { message, response, businessType, language } = req.body;
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });

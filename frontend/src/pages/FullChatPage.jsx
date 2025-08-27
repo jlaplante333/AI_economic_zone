@@ -638,12 +638,14 @@ function FullChatPage() {
       const userId = currentUser.id || 1; // Fallback to 1 if no user ID
       const response = await fetch(`${config.VITE_API_URL}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify({ 
           message, 
           language: selectedLanguage.split('-')[0], // Extract language code (e.g., 'en' from 'en-US')
-          businessType: getEffectiveBusinessType(), 
-          userId: userId 
+          businessType: getEffectiveBusinessType()
         })
       });
       if (!response.ok) {

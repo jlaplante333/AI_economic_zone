@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const chatController = require('../controllers/chatController');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
-router.post('/', chatController.handleChat);
-router.get('/status', chatController.getAIStatus);
-router.get('/history', chatController.getChatHistory);
-router.post('/log', chatController.logChatMessage);
+// All chat endpoints require authentication
+router.post('/', authenticateToken, chatController.handleChat);
+router.get('/status', chatController.getAIStatus); // Keep this public for health checks
+router.get('/history', authenticateToken, chatController.getChatHistory);
+router.post('/log', authenticateToken, chatController.logChatMessage);
 
 module.exports = router; 
