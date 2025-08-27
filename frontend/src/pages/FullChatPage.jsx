@@ -751,6 +751,32 @@ function FullChatPage() {
     setMessages(prev => [...prev, botMessage]);
   };
 
+  // Function to clear chat history (for when user wants a truly fresh start)
+  const clearChatHistory = async () => {
+    if (!user || !user.id) return;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/clear-history`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        console.log('Chat history cleared from database');
+        setMessages([]);
+        setInputMessage('');
+        setShowProfileMenu(false);
+        setRandomBusinessOptions(getRandomBusinessOptions());
+        setQuickOptions(getRandomQuickOptions(false));
+      }
+    } catch (error) {
+      console.error('Failed to clear chat history:', error);
+    }
+  };
+
   // Function to reset to user's profile business type
   const resetToProfileBusinessType = () => {
     if (temporaryBusinessType) {
@@ -1549,7 +1575,8 @@ function FullChatPage() {
                 {/* New Chat Button - Next to Change Business */}
                 <button
                   onClick={() => {
-                    setMessages([]);
+                    // Load chat history from database instead of clearing
+                    loadChatHistory();
                     setInputMessage('');
                     // Don't clear businessType - maintain the current business context
                     setShowProfileMenu(false);
@@ -1583,6 +1610,38 @@ function FullChatPage() {
                 >
                   <Plus size={14} />
                   New Chat
+                </button>
+                
+                {/* Clear Chat History Button - For truly fresh start */}
+                <button
+                  onClick={clearChatHistory}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '16px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.3)';
+                  }}
+                >
+                  <Trash2 size={14} />
+                  Clear History
                 </button>
                 
                 {/* Reset to Profile Business Type Button - Only show when temporary override is active */}

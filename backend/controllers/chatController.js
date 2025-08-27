@@ -83,11 +83,21 @@ exports.handleChat = async (req, res) => {
     console.log('User revenue being used:', userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022);
     console.log('User postal code being used:', userData?.zip_code);
     
+    // Fetch user's chat history to provide context to OpenAI
+    let chatHistory = [];
+    try {
+      const { getChatsByUser } = require('../models/ChatLog');
+      chatHistory = await getChatsByUser(userId);
+      console.log(`Fetched ${chatHistory.length} previous chat messages for context`);
+    } catch (historyError) {
+      console.log('Failed to fetch chat history for context:', historyError.message);
+    }
+    
     console.log('Calling translate...');
     const englishMessage = await translate(message, language, 'en');
     console.log('English message:', englishMessage);
-    console.log('Calling getOpenAIResponse with business type, revenue, postal code, and language:', language);
-    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData, language);
+    console.log('Calling getOpenAIResponse with business type, revenue, postal code, language, and chat history');
+    const openaiResponse = await getOpenAIResponse(englishMessage, finalBusinessType, userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022, userData?.zip_code, userData, language, chatHistory);
     console.log('OpenAI response:', openaiResponse);
     console.log('Calling translate for response...');
     const translatedResponse = await translate(openaiResponse, 'en', language);
@@ -140,7 +150,7 @@ exports.getAIStatus = async (req, res) => {
     const startTime = Date.now();
     
     // Test with a simple prompt
-    const testResponse = await getOpenAIResponse(status.test.simplePrompt, status.test.businessType);
+    const testResponse = await getOpenAIResponse(status.test.simplePrompt, status.test.businessType, null, null, null, 'en', []);
     const responseTime = Date.now() - startTime;
     
     console.log('Test response received:', testResponse);
@@ -197,6 +207,43 @@ exports.getChatHistory = async (req, res) => {
   } catch (error) {
     console.error('Error fetching chat history:', error);
     res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+};
+
+// Clear chat history for a user
+exports.clearChatHistory = async (req, res) => {
+  console.log('=== clearChatHistory called ===');
+  
+  try {
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    
+    // Clear chat history from database
+    const pool = getPool();
+    if (pool) {
+      await pool.query('DELETE FROM chat_logs WHERE user_id = $1', [userId]);
+      console.log(`Cleared chat history for user ${userId}`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Chat history cleared successfully' 
+      });
+    } else {
+      res.status(500).json({ 
+        success: false, 
+        message: 'Database not available' 
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error clearing chat history:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to clear chat history' 
+    });
   }
 };
 

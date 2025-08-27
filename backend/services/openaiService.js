@@ -66,7 +66,7 @@ function validateResponse(response, userData) {
   };
 }
 
-async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null, userData = null, language = 'en') {
+async function getOpenAIResponse(prompt, businessType, revenue = null, postalCode = null, userData = null, language = 'en', chatHistory = []) {
   console.log('=== getOpenAIResponse called ===');
   console.log('Prompt:', prompt);
   console.log('Business Type:', businessType);
@@ -247,16 +247,41 @@ CONTEXTUAL ADVICE: Use the complete user profile information to provide highly p
 - For language-specific resources, consider the user's preferred language
 - Tailor all recommendations based on the business's financial capacity, location, and specific circumstances
 
-Provide helpful, accurate, and practical advice specific to Oakland, California. Be friendly, supportive, and explain things clearly. If you don't know something specific about Oakland, suggest contacting the relevant Oakland city department or the Oakland Business Assistance Center.`;
+Provide helpful, accurate, and practical advice specific to Oakland, California. Be friendly, supportive, and explain things clearly. If you don't know something specific about Oakland, suggest contacting the relevant Oakland city department or the Oakland Business Assistance Center.
 
+CHAT HISTORY CONTEXT: You have access to the user's previous conversation history. Use this context to:
+- Remember what questions they've asked before
+- Provide consistent and contextual responses
+- Reference previous discussions when relevant
+- Avoid repeating information you've already given
+- Build upon previous conversations
+- If they ask "what specific questions have I asked so far?", list their previous questions
+- If they ask about something you've already explained, reference the previous explanation`;
+
+    // Build messages array with chat history context
+    const messages = [
+      { role: "system", content: systemPrompt }
+    ];
+    
+    // Add chat history context (last 10 messages to stay within token limits)
+    if (chatHistory && chatHistory.length > 0) {
+      const recentHistory = chatHistory.slice(-10); // Last 10 messages
+      recentHistory.forEach(chat => {
+        messages.push({ role: "user", content: chat.message });
+        messages.push({ role: "assistant", content: chat.response });
+      });
+    }
+    
+    // Add current user message
+    messages.push({ role: "user", content: prompt });
+    
+    console.log(`Sending ${messages.length} messages to OpenAI (including ${chatHistory ? chatHistory.length : 0} chat history items)`);
+    
     const response = await axios.post(
       `${apiUrl}/chat/completions`,
       {
         model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: prompt }
-        ],
+        messages: messages,
         max_tokens: 500,
         temperature: 0.7
       },
