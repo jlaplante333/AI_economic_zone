@@ -10,7 +10,6 @@ function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentLanguageIndex, setCurrentLanguageIndex] = useState(0);
   const [verificationMessage, setVerificationMessage] = useState('');
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -23,19 +22,32 @@ function LoginPage() {
     }
   }, []);
 
-  // Available languages for cycling - use centralized language data
+  // Available languages - use centralized language data
   const availableLanguages = getLanguageNames();
-
-  // Cycle through languages every 3 seconds
+  
+  // Get user's selected language from localStorage
+  const selectedLanguage = localStorage.getItem('selectedLanguage') || 'en';
+  
+  // Find the index of the selected language
+  const selectedLanguageIndex = availableLanguages.findIndex(lang => lang.code === selectedLanguage);
+  const [currentLanguageIndex, setCurrentLanguageIndex] = useState(selectedLanguageIndex >= 0 ? selectedLanguageIndex : 0);
+  
+  // Update language index when selected language changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentLanguageIndex((prevIndex) => 
-        (prevIndex + 1) % availableLanguages.length
-      );
-    }, 3000);
+    const newIndex = availableLanguages.findIndex(lang => lang.code === selectedLanguage);
+    if (newIndex >= 0) {
+      setCurrentLanguageIndex(newIndex);
+    }
+  }, [selectedLanguage, availableLanguages]);
 
-    return () => clearInterval(interval);
-  }, []);
+  // Function to manually change language
+  const handleLanguageChange = (languageCode) => {
+    const newIndex = availableLanguages.findIndex(lang => lang.code === languageCode);
+    if (newIndex >= 0) {
+      setCurrentLanguageIndex(newIndex);
+      localStorage.setItem('selectedLanguage', languageCode);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,7 +135,10 @@ function LoginPage() {
   };
 
   const handleChangeLanguage = () => {
-    navigate('/');
+    // Cycle to next language when clicked
+    const nextIndex = (currentLanguageIndex + 1) % availableLanguages.length;
+    const nextLanguage = availableLanguages[nextIndex];
+    handleLanguageChange(nextLanguage.code);
   };
 
   return (
