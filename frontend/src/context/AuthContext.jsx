@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { config } from '../env';
 
 const AuthContext = createContext();
 
@@ -46,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${config.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${config.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Call logout endpoint if token exists
       if (token) {
-        await fetch('/api/auth/logout', {
+        await fetch(`${config.VITE_API_URL}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -136,7 +137,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch(`${config.VITE_API_URL}/api/auth/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
