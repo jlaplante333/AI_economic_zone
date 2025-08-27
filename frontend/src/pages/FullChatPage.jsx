@@ -117,12 +117,47 @@ function FullChatPage() {
     }
   }, [selectedLanguage]);
 
+  // Load chat history from database on component mount
+  useEffect(() => {
+    if (user && user.id) {
+      loadChatHistory();
+    }
+  }, [user]);
+
+  // Save chat history to localStorage when messages change (for persistence during navigation)
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('chatHistory', JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Load chat history from localStorage on component mount (for persistence during navigation)
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('chatHistory');
+    if (savedHistory && messages.length === 0) {
+      try {
+        const parsedHistory = JSON.parse(savedHistory);
+        setMessages(parsedHistory);
+        console.log('📚 Loaded chat history from localStorage:', parsedHistory.length, 'messages');
+      } catch (error) {
+        console.error('Failed to parse saved chat history:', error);
+      }
+    }
+  }, []);
+
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
   const [quickOptions, setQuickOptions] = useState([]);
   const [changingOptions, setChangingOptions] = useState(new Set());
   const [changingBusinessOptions, setChangingBusinessOptions] = useState(new Set());
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isQuickOptionsAtBottom, setIsQuickOptionsAtBottom] = useState(false);
+  
+  // New state for temporary business type override
+  const [temporaryBusinessType, setTemporaryBusinessType] = useState(null);
+  const [originalBusinessType, setOriginalBusinessType] = useState(null);
+  
+  // New state for STOP button
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -612,6 +647,10 @@ function FullChatPage() {
       console.log('🤖 Received AI response:', data.response);
       const botMessage = { type: 'answer', content: data.response, timestamp: new Date() };
       setMessages(prev => [...prev, botMessage]);
+      
+      // Save message to database
+      await saveMessageToDatabase(message, data.response, businessType);
+      
       // Speak ALL AI responses using OpenAI TTS
       if (speechRef.current && data.response) {
         console.log('🔊 Speaking AI response...');
@@ -665,17 +704,78 @@ function FullChatPage() {
   };
 
   const handleBusinessTypeSelect = (type) => {
+    console.log('🏢 Business type selected:', type);
+    
+    // If this is a different business type than the user's profile, set temporary override
+    if (type !== user?.business_type) {
+      setTemporaryBusinessType(type);
+      setOriginalBusinessType(user?.business_type || '');
+      console.log('🔄 Setting temporary business type override:', type);
+    } else {
+      // If user selects their own business type, clear temporary override
+      setTemporaryBusinessType(null);
+      setOriginalBusinessType(null);
+      console.log('🔄 Clearing temporary business type override, using profile type');
+    }
+    
     setBusinessType(type);
+    setShowBusinessOptionsModal(false);
+    
     // Only stop speech if we're about to send a new message
     if (getCurrentAudio()) {
       stopCurrentSpeech();
     }
+    
     const userMessage = { type: 'user', content: `I own a ${type}`, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
     
-    // Add a follow-up question
-    const botMessage = { type: 'question', content: 'Great! What would you like to know about running your business in Oakland?', timestamp: new Date() };
+    // Add a system message about the business type change
+    const systemMessage = type !== user?.business_type 
+      ? `I'm now helping you with ${type} business questions. You can ask me anything about running a ${type} business in Oakland.`
+      : `I'm now helping you with your ${type} business. You can ask me anything about your business in Oakland.`;
+    
+    const botMessage = { type: 'question', content: systemMessage, timestamp: new Date() };
     setMessages(prev => [...prev, botMessage]);
+  };
+
+  // Function to reset to user's profile business type
+  const resetToProfileBusinessType = () => {
+    if (temporaryBusinessType) {
+      setTemporaryBusinessType(null);
+      setOriginalBusinessType(null);
+      setBusinessType(user?.business_type || '');
+      
+      const resetMessage = `I'm now helping you with your ${user?.business_type} business again.`;
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: resetMessage,
+        isUser: false,
+        timestamp: new Date()
+      }]);
+      
+      console.log('🔄 Reset to profile business type:', user?.business_type);
+    }
+  };
+
+  // STOP button functionality
+  const handleStopSpeech = () => {
+    console.log('🛑 STOP button clicked - stopping all speech');
+    setIsSpeaking(false);
+    
+    // Stop current audio if playing
+    const currentAudio = getCurrentAudio();
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setCurrentAudio(null);
+    }
+    
+    // Stop browser speech synthesis
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    
+    console.log('🔇 All speech stopped');
   };
 
   const handleVoiceToggle = () => {
@@ -903,6 +1003,7 @@ function FullChatPage() {
       return;
     }
     
+    setIsSpeaking(true);
     console.log('🔊 Speaking text:', text);
     
     try {
@@ -911,17 +1012,25 @@ function FullChatPage() {
       utterance.pitch = 1.0;
       utterance.volume = 0.8;
       
-      utterance.onstart = () => console.log('🔊 Speech started');
-      utterance.onend = () => console.log('🔊 Speech ended');
+      utterance.onstart = () => {
+        console.log('🔊 Speech started');
+        setIsSpeaking(true);
+      };
+      utterance.onend = () => {
+        console.log('🔊 Speech ended');
+        setIsSpeaking(false);
+      };
       utterance.onerror = (event) => {
         console.error('🔊 Speech error:', event.error);
         console.error('🔊 Error details:', event);
+        setIsSpeaking(false);
       };
       
       speechRef.current.speak(utterance);
       console.log('🔊 Speech synthesis initiated');
     } catch (error) {
       console.error('🔊 Error with speech synthesis:', error);
+      setIsSpeaking(false);
     }
   };
 
@@ -967,6 +1076,85 @@ function FullChatPage() {
     }
   };
 
+  // Get the effective business type (temporary override or user's profile type)
+  const getEffectiveBusinessType = () => {
+    return temporaryBusinessType || user?.business_type || '';
+  };
+
+  // Load chat history from database
+  const loadChatHistory = async () => {
+    if (!user || !user.id) return;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/history`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.messages && data.messages.length > 0) {
+          // Convert database format to frontend format
+          const formattedMessages = data.messages.map(msg => ({
+            id: msg.id,
+            text: msg.message,
+            isUser: true,
+            timestamp: new Date(msg.created_at)
+          })).concat(
+            data.messages.map(msg => ({
+              id: `response-${msg.id}`,
+              text: msg.response,
+              isUser: false,
+              timestamp: new Date(msg.created_at)
+            }))
+          ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+          
+          setMessages(formattedMessages);
+          console.log('📚 Loaded chat history from database:', formattedMessages.length, 'messages');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chat history from database:', error);
+      // Fallback to localStorage if database fails
+      const savedHistory = localStorage.getItem('chatHistory');
+      if (savedHistory) {
+        try {
+          const parsedHistory = JSON.parse(savedHistory);
+          setMessages(parsedHistory);
+          console.log('📚 Loaded chat history from localStorage (fallback):', parsedHistory.length, 'messages');
+        } catch (parseError) {
+          console.error('Failed to parse saved chat history:', parseError);
+        }
+      }
+    }
+  };
+
+  // Save message to database
+  const saveMessageToDatabase = async (message, response, businessType) => {
+    if (!user || !user.id) return;
+    
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/chat/log`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          message,
+          response,
+          businessType: businessType || temporaryBusinessType || user.business_type,
+          language: currentLanguage
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save message to database:', error);
+    }
+  };
+
   // Function to speak text using OpenAI TTS API
   const speakTextWithOpenAI = async (text) => {
     if (!text || text.trim() === '') {
@@ -980,6 +1168,7 @@ function FullChatPage() {
       return;
     }
     
+    setIsSpeaking(true);
     console.log('🎤 Speaking text with OpenAI TTS:', text.substring(0, 100) + '...');
     
     // First test if the TTS endpoint is accessible
@@ -1036,6 +1225,7 @@ function FullChatPage() {
       audio.onplay = () => console.log('🔊 Audio playing started');
       audio.onended = () => {
         console.log('🔊 Audio playing ended');
+        setIsSpeaking(false);
         setCurrentAudio(null);
         // Clean up blob URL
         URL.revokeObjectURL(blobUrl);
@@ -1047,6 +1237,7 @@ function FullChatPage() {
           networkState: error.target.networkState,
           readyState: error.target.readyState
         });
+        setIsSpeaking(false);
         setCurrentAudio(null);
         // Clean up blob URL on error
         URL.revokeObjectURL(blobUrl);
@@ -1060,6 +1251,7 @@ function FullChatPage() {
     } catch (error) {
       console.error('❌ OpenAI TTS Error:', error);
       console.error('❌ Error stack:', error.stack);
+      setIsSpeaking(false);
       // Fallback to browser speech synthesis
       console.log('🔄 Falling back to browser speech synthesis...');
       speakText(text);
@@ -1345,6 +1537,40 @@ function FullChatPage() {
                   <Plus size={14} />
                   New Chat
                 </button>
+                
+                {/* Reset to Profile Business Type Button - Only show when temporary override is active */}
+                {temporaryBusinessType && (
+                  <button
+                    onClick={resetToProfileBusinessType}
+                    style={{
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '16px',
+                      padding: '8px 16px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(139, 92, 246, 0.4)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.3)';
+                    }}
+                  >
+                    <ArrowLeft size={14} />
+                    Reset to Profile
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -1612,6 +1838,44 @@ function FullChatPage() {
                       <Settings size={16} />
                       View More
                     </button>
+                    
+                    {/* Reset to Profile Business Type Button - Only show when temporary override is active */}
+                    {temporaryBusinessType && (
+                      <button
+                        onClick={resetToProfileBusinessType}
+                        style={{
+                          background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '14px',
+                          padding: '10px 18px',
+                          fontSize: '15px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 12px 0 rgba(139, 92, 246, 0.18)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'all 0.2s',
+                          outline: 'none',
+                          borderBottom: '2px solid #7c3aed',
+                          margin: '16px auto 0 auto',
+                          justifyContent: 'center',
+                          minWidth: '160px'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 4px 20px 0 rgba(139, 92, 246, 0.25)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 2px 12px 0 rgba(139, 92, 246, 0.18)';
+                        }}
+                      >
+                        <ArrowLeft size={16} />
+                        Reset to Profile
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1763,67 +2027,114 @@ function FullChatPage() {
               e.currentTarget.style.boxShadow = `0 8px 32px ${theme.primaryShadow}`;
               e.currentTarget.style.transform = 'translateY(0)';
             }}>
-              <button 
-                type="button" 
-                className="voice-btn"
-                onClick={handleVoiceToggle}
-                disabled={isProcessingVoice}
-                style={{
-                  background: isRecording 
-                    ? theme.voiceButtonRecording
-                    : isProcessingVoice
-                    ? theme.primaryButton
-                    : theme.voiceButtonIdle,
-                  border: 'none',
-                  color: 'white',
-                  padding: '12px',
-                  borderRadius: '50%',
-                  cursor: isProcessingVoice ? 'not-allowed' : 'pointer',
-                  width: '44px',
-                  height: '44px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.3s ease',
-                  boxShadow: isRecording 
-                    ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
-                    : isProcessingVoice
-                    ? '0 4px 16px rgba(59, 130, 246, 0.4)'
-                    : `0 2px 8px ${theme.accentShadow}`,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                  opacity: isProcessingVoice ? 0.7 : 1
-                }}
-                onMouseEnter={e => {
-                  if (!isRecording && !isProcessingVoice) {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!isRecording && !isProcessingVoice) {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
-                  }
-                }}
-              >
-                {(isRecording || isProcessingVoice) && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: isProcessingVoice 
-                      ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
-                      : 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
-                    animation: 'pulse 1.5s infinite',
-                    borderRadius: '50%'
-                  }} />
-                )}
-                {isProcessingVoice ? <Loader size={20} /> : isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-              </button>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button 
+                  type="button" 
+                  className="voice-btn"
+                  onClick={handleVoiceToggle}
+                  disabled={isProcessingVoice}
+                  style={{
+                    background: isRecording 
+                      ? theme.voiceButtonRecording
+                      : isProcessingVoice
+                      ? theme.primaryButton
+                      : theme.voiceButtonIdle,
+                    border: 'none',
+                    color: 'white',
+                    padding: '12px',
+                    borderRadius: '50%',
+                    cursor: isProcessingVoice ? 'not-allowed' : 'pointer',
+                    width: '44px',
+                    height: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                    boxShadow: isRecording 
+                      ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
+                      : isProcessingVoice
+                      ? '0 4px 16px rgba(59, 130, 246, 0.4)'
+                      : `0 2px 8px ${theme.accentShadow}`,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    opacity: isProcessingVoice ? 0.7 : 1
+                  }}
+                  onMouseEnter={e => {
+                    if (!isRecording && !isProcessingVoice) {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.boxShadow = `0 4px 16px ${theme.accentShadow}`;
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isRecording && !isProcessingVoice) {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accentShadow}`;
+                    }
+                  }}
+                >
+                  {(isRecording || isProcessingVoice) && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: isProcessingVoice 
+                        ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
+                        : 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                      animation: 'pulse 1.5s infinite',
+                      borderRadius: '50%'
+                    }} />
+                  )}
+                  {isProcessingVoice ? <Loader size={20} /> : isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                </button>
+                
+                {/* STOP Button */}
+                <button 
+                  type="button" 
+                  className="stop-btn"
+                  onClick={handleStopSpeech}
+                  disabled={!isSpeaking}
+                  style={{
+                    background: isSpeaking 
+                      ? '#ef4444'
+                      : '#6b7280',
+                    border: 'none',
+                    color: 'white',
+                    padding: '12px',
+                    borderRadius: '50%',
+                    cursor: isSpeaking ? 'pointer' : 'not-allowed',
+                    width: '44px',
+                    height: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                    boxShadow: isSpeaking 
+                      ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
+                      : '0 2px 8px rgba(107, 114, 128, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    opacity: isSpeaking ? 1 : 0.5
+                  }}
+                  onMouseEnter={e => {
+                    if (isSpeaking) {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.6)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (isSpeaking) {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
+                    }
+                  }}
+                >
+                  <Square size={20} />
+                </button>
+              </div>
               <input
                 type="text"
                                         placeholder={t('chat.inputPlaceholder')}

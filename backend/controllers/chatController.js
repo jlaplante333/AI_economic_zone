@@ -161,4 +161,71 @@ exports.getAIStatus = async (req, res) => {
   
   console.log('AI Status result:', status.connection.status);
   res.json(status);
+};
+
+// Get chat history for a user
+exports.getChatHistory = async (req, res) => {
+  console.log('=== getChatHistory called ===');
+  
+  try {
+    // Get user ID from auth token
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    
+    console.log('Fetching chat history for user:', userId);
+    
+    // Get chat history from database
+    const { getChatsByUser } = require('../models/ChatLog');
+    const messages = await getChatsByUser(userId);
+    
+    console.log('Found', messages.length, 'chat messages');
+    res.json({ messages });
+    
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+};
+
+// Log a chat message to database
+exports.logChatMessage = async (req, res) => {
+  console.log('=== logChatMessage called ===');
+  
+  try {
+    const { message, response, businessType, language } = req.body;
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    
+    if (!message || !response) {
+      return res.status(400).json({ error: 'Message and response are required' });
+    }
+    
+    console.log('Logging chat message for user:', userId);
+    console.log('Business type:', businessType);
+    console.log('Language:', language);
+    
+    // Log to database
+    const { logChat } = require('../models/ChatLog');
+    const result = await logChat(userId, message, response, {
+      businessType,
+      language: language || 'en'
+    });
+    
+    if (result) {
+      console.log('Chat message logged successfully');
+      res.json({ success: true, messageId: result.id });
+    } else {
+      console.log('Chat message logging failed');
+      res.status(500).json({ error: 'Failed to log chat message' });
+    }
+    
+  } catch (error) {
+    console.error('Error logging chat message:', error);
+    res.status(500).json({ error: 'Failed to log chat message' });
+  }
 }; 
