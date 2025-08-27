@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "ቋንቋኻ ምረጽ",
+    "subtitle": "ናብ AI-ዝምራር ጕዕዞኻ ክትጀምር ዝሕግዝ ቋንቋኻ ምረጽ",
+    "preparingExperience": "ውልቀ-ሰብ ዝኾነ AI ሓልዮትካ ይዳሎ...",
+    "configuringAI": "AI ን {{language}} ይዳሎ..."
+  },
+  "welcome": {
+    "smartHelp": "ሰብኣዊ ሓጋዝ",
+    "smallBusinesses": "ንንኡስ ንጥፈታት",
+    "inOakland": "ኣብ Oakland",
+    "speakYourLanguage": "ቋንቋኻ ተዛረብ",
+    "getAnswers": "ሓሳባት ረኽብ"
+  },
+  "auth": {
+    "welcome": "እንቋዕ ብደሓን መጻእኩም",
+    "signInToAccess": "AI ሓጋዚ ክትረኽብ እንተደሊኻ እተኽ",
+    "username": "ስም ተጠቃሚ",
+    "usernamePlaceholder": "ኢመይልካ ኣእትው",
+    "password": "መሕለፊ ቃል",
+    "passwordPlaceholder": "መሕለፊ ቃልካ ኣእትው",
+    "signIn": "እተኽ",
+    "signingIn": "ይእተኽ ኣሎ...",
+    "noAccount": "ኣካውነት የብልካን?",
+    "signUp": "ክትመዝገብ",
+    "forgotPassword": "መሕለፊ ቃልካ ረሲዕካዶ?"
+  },
+  "common": {
+    "loading": "ይጽዓን ኣሎ...",
+    "error": "ጌጋ ኣጋጢሙ",
+    "success": "ዕውት",
+    "cancel": "ሰርዝ",
+    "save": "ኣቐምጥ",
+    "delete": "ሰርዝ",
+    "edit": "ሰበር",
+    "close": "ዕጸድ",
+    "back": "ምስሕራት",
+    "next": "ቀጸል",
+    "previous": "ቅድሚ",
+    "submit": "ሰድድ",
+    "search": "ደልዪ",
+    "filter": "ፊልተር",
+    "sort": "ሰርድ",
+    "refresh": "ኣድስ",
+    "settings": "ምትእስሳራት",
+    "profile": "ፕሮፋይል",
+    "logout": "ውጻእ",
+    "help": "ሓጋዝ",
+    "about": "ብዛዕባ",
+    "contact": "ርክብ",
+    "privacy": "ግሉጽነት",
+    "terms": "ስምምዕ"
+  },
+  "chat": {
+    "sendMessage": "መልእኽቲ ሰድድ",
+    "typeMessage": "መልእኽቲኻ ጽሓፍ...",
+    "newChat": "ሓድሽ ዘራይቲ",
+    "clearHistory": "ታሪኽ ኣጽድቕ",
+    "voiceInput": "ድምጺ ኣእትው",
+    "stopVoice": "ድምጺ ኣቁም",
+    "listening": "ይሰምዕ ኣሎ...",
+    "processing": "ይሰርሕ ኣሎ...",
+    "thinking": "ይሓስብ ኣሎ...",
+    "noMessages": "መልእኽቲ የብሉን",
+    "startConversation": "ዘራይቲ ጀምር"
+  },
+  "business": {
+    "selectType": "ዓይነት ንጥፈት ምረጽ",
+    "restaurant": "ምግብ ቤት",
+    "retail": "ዕዳጋ",
+    "service": "ግልጋሎት",
+    "manufacturing": "ምምሕራሽ",
+    "consulting": "ምኽር",
+    "technology": "ተክኖሎጂ",
+    "healthcare": "ሕክምና",
+    "education": "ትምህርቲ",
+    "construction": "ህንጸት",
+    "other": "ካልእ"
+  },
+  "profile": {
+    "title": "ፕሮፋይል",
+    "personalInfo": "ውልቃዊ ሓበሬታ",
+    "businessInfo": "ሓበሬታ ንጥፈት",
+    "contactInfo": "ሓበሬታ ርክብ",
+    "preferences": "ምርጫታት",
+    "editProfile": "ፕሮፋይል ሰበር",
+    "saveChanges": "ለውጥታት ኣቐምጥ",
+    "cancelEdit": "ምምሕያሽ ሰርዝ"
+  }
+}

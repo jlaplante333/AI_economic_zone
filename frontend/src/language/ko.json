@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "언어를 선택하세요",
+    "subtitle": "AI 기반 여정을 시작하기 위해 선호하는 언어를 선택하세요",
+    "preparingExperience": "개인화된 AI 경험을 준비 중...",
+    "configuringAI": "{{language}}용 AI를 구성 중..."
+  },
+  "welcome": {
+    "smartHelp": "스마트 도움",
+    "smallBusinesses": "소규모 사업자를 위한",
+    "inOakland": "오클랜드에서",
+    "speakYourLanguage": "당신의 언어로 말하세요",
+    "getAnswers": "답변을 받으세요"
+  },
+  "auth": {
+    "welcome": "환영합니다",
+    "signInToAccess": "AI 어시스턴트에 접근하려면 로그인하세요",
+    "username": "사용자명",
+    "usernamePlaceholder": "이메일 주소를 입력하세요",
+    "password": "비밀번호",
+    "passwordPlaceholder": "비밀번호를 입력하세요",
+    "signIn": "로그인",
+    "signingIn": "로그인 중...",
+    "noAccount": "계정이 없으신가요?",
+    "signUp": "회원가입",
+    "forgotPassword": "비밀번호를 잊으셨나요?"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "성공했습니다",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "close": "닫기",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "submit": "제출",
+    "search": "검색",
+    "filter": "필터",
+    "sort": "정렬",
+    "refresh": "새로고침",
+    "settings": "설정",
+    "profile": "프로필",
+    "logout": "로그아웃",
+    "help": "도움말",
+    "about": "정보",
+    "contact": "연락처",
+    "privacy": "개인정보",
+    "terms": "이용약관"
+  },
+  "chat": {
+    "sendMessage": "메시지 보내기",
+    "typeMessage": "메시지를 입력하세요...",
+    "newChat": "새 채팅",
+    "clearHistory": "기록 지우기",
+    "voiceInput": "음성 입력",
+    "stopVoice": "음성 중지",
+    "listening": "듣는 중...",
+    "processing": "처리 중...",
+    "thinking": "생각 중...",
+    "noMessages": "메시지가 없습니다",
+    "startConversation": "대화를 시작하세요"
+  },
+  "business": {
+    "selectType": "사업 유형 선택",
+    "restaurant": "레스토랑",
+    "retail": "소매",
+    "service": "서비스",
+    "manufacturing": "제조",
+    "consulting": "컨설팅",
+    "technology": "기술",
+    "healthcare": "의료",
+    "education": "교육",
+    "construction": "건설",
+    "other": "기타"
+  },
+  "profile": {
+    "title": "프로필",
+    "personalInfo": "개인 정보",
+    "businessInfo": "사업 정보",
+    "contactInfo": "연락처 정보",
+    "preferences": "환경설정",
+    "editProfile": "프로필 편집",
+    "saveChanges": "변경사항 저장",
+    "cancelEdit": "편집 취소"
+  }
+}

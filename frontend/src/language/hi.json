@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "अपनी भाषा चुनें",
+    "subtitle": "अपनी AI-संचालित यात्रा शुरू करने के लिए अपनी पसंदीदा भाषा चुनें",
+    "preparingExperience": "आपका व्यक्तिगत AI अनुभव तैयार किया जा रहा है...",
+    "configuringAI": "{{language}} के लिए AI को कॉन्फ़िगर किया जा रहा है..."
+  },
+  "welcome": {
+    "smartHelp": "स्मार्ट सहायता",
+    "smallBusinesses": "छोटे व्यवसायों के लिए",
+    "inOakland": "ओकलैंड में",
+    "speakYourLanguage": "अपनी भाषा में बोलें",
+    "getAnswers": "जवाब प्राप्त करें"
+  },
+  "auth": {
+    "welcome": "स्वागत है",
+    "signInToAccess": "AI सहायक तक पहुंचने के लिए साइन इन करें",
+    "username": "उपयोगकर्ता नाम",
+    "usernamePlaceholder": "अपना ईमेल पता दर्ज करें",
+    "password": "पासवर्ड",
+    "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+    "signIn": "साइन इन",
+    "signingIn": "साइन इन हो रहा है...",
+    "noAccount": "खाता नहीं है?",
+    "signUp": "साइन अप",
+    "forgotPassword": "पासवर्ड भूल गए?"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "success": "सफल",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "next": "अगला",
+    "previous": "पिछला",
+    "submit": "सबमिट करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "sort": "क्रमबद्ध करें",
+    "refresh": "रिफ्रेश करें",
+    "settings": "सेटिंग्स",
+    "profile": "प्रोफ़ाइल",
+    "logout": "लॉगआउट",
+    "help": "सहायता",
+    "about": "के बारे में",
+    "contact": "संपर्क",
+    "privacy": "गोपनीयता",
+    "terms": "शर्तें"
+  },
+  "chat": {
+    "sendMessage": "संदेश भेजें",
+    "typeMessage": "अपना संदेश टाइप करें...",
+    "newChat": "नई चैट",
+    "clearHistory": "इतिहास साफ़ करें",
+    "voiceInput": "आवाज़ इनपुट",
+    "stopVoice": "आवाज़ रोकें",
+    "listening": "सुन रहा है...",
+    "processing": "प्रोसेसिंग...",
+    "thinking": "सोच रहा है...",
+    "noMessages": "कोई संदेश नहीं",
+    "startConversation": "बातचीत शुरू करें"
+  },
+  "business": {
+    "selectType": "व्यवसाय का प्रकार चुनें",
+    "restaurant": "रेस्तरां",
+    "retail": "खुदरा",
+    "service": "सेवा",
+    "manufacturing": "उत्पादन",
+    "consulting": "परामर्श",
+    "technology": "प्रौद्योगिकी",
+    "healthcare": "स्वास्थ्य देखभाल",
+    "education": "शिक्षा",
+    "construction": "निर्माण",
+    "other": "अन्य"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "businessInfo": "व्यवसाय की जानकारी",
+    "contactInfo": "संपर्क जानकारी",
+    "preferences": "प्राथमिकताएं",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "saveChanges": "परिवर्तन सहेजें",
+    "cancelEdit": "संपादन रद्द करें"
+  }
+}

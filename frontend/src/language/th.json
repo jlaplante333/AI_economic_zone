@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "เลือกภาษาของคุณ",
+    "subtitle": "เลือกภาษาที่คุณต้องการเพื่อเริ่มต้นการเดินทางด้วย AI",
+    "preparingExperience": "กำลังเตรียมประสบการณ์ AI ที่ปรับแต่งเฉพาะบุคคล...",
+    "configuringAI": "กำลังกำหนดค่า AI สำหรับ {{language}}..."
+  },
+  "welcome": {
+    "smartHelp": "ความช่วยเหลืออัจฉริยะ",
+    "smallBusinesses": "สำหรับธุรกิจขนาดเล็ก",
+    "inOakland": "ในโอ๊คแลนด์",
+    "speakYourLanguage": "พูดในภาษาของคุณ",
+    "getAnswers": "รับคำตอบ"
+  },
+  "auth": {
+    "welcome": "ยินดีต้อนรับ",
+    "signInToAccess": "เข้าสู่ระบบเพื่อเข้าถึง AI Assistant",
+    "username": "ชื่อผู้ใช้",
+    "usernamePlaceholder": "ป้อนอีเมลของคุณ",
+    "password": "รหัสผ่าน",
+    "passwordPlaceholder": "ป้อนรหัสผ่านของคุณ",
+    "signIn": "เข้าสู่ระบบ",
+    "signingIn": "กำลังเข้าสู่ระบบ...",
+    "noAccount": "ไม่มีบัญชี?",
+    "signUp": "สมัครสมาชิก",
+    "forgotPassword": "ลืมรหัสผ่าน?"
+  },
+  "common": {
+    "loading": "กำลังโหลด...",
+    "error": "เกิดข้อผิดพลาด",
+    "success": "สำเร็จ",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "close": "ปิด",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "previous": "ก่อนหน้า",
+    "submit": "ส่ง",
+    "search": "ค้นหา",
+    "filter": "กรอง",
+    "sort": "เรียงลำดับ",
+    "refresh": "รีเฟรช",
+    "settings": "การตั้งค่า",
+    "profile": "โปรไฟล์",
+    "logout": "ออกจากระบบ",
+    "help": "ช่วยเหลือ",
+    "about": "เกี่ยวกับ",
+    "contact": "ติดต่อ",
+    "privacy": "ความเป็นส่วนตัว",
+    "terms": "เงื่อนไข"
+  },
+  "chat": {
+    "sendMessage": "ส่งข้อความ",
+    "typeMessage": "พิมพ์ข้อความของคุณ...",
+    "newChat": "แชทใหม่",
+    "clearHistory": "ล้างประวัติ",
+    "voiceInput": "ป้อนเสียง",
+    "stopVoice": "หยุดเสียง",
+    "listening": "กำลังฟัง...",
+    "processing": "กำลังประมวลผล...",
+    "thinking": "กำลังคิด...",
+    "noMessages": "ไม่มีข้อความ",
+    "startConversation": "เริ่มการสนทนา"
+  },
+  "business": {
+    "selectType": "เลือกประเภทธุรกิจ",
+    "restaurant": "ร้านอาหาร",
+    "retail": "ค้าปลีก",
+    "service": "บริการ",
+    "manufacturing": "การผลิต",
+    "consulting": "ที่ปรึกษา",
+    "technology": "เทคโนโลยี",
+    "healthcare": "การดูแลสุขภาพ",
+    "education": "การศึกษา",
+    "construction": "การก่อสร้าง",
+    "other": "อื่นๆ"
+  },
+  "profile": {
+    "title": "โปรไฟล์",
+    "personalInfo": "ข้อมูลส่วนตัว",
+    "businessInfo": "ข้อมูลธุรกิจ",
+    "contactInfo": "ข้อมูลติดต่อ",
+    "preferences": "การตั้งค่า",
+    "editProfile": "แก้ไขโปรไฟล์",
+    "saveChanges": "บันทึกการเปลี่ยนแปลง",
+    "cancelEdit": "ยกเลิกการแก้ไข"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "ជ្រើសរើសភាសារបស់អ្នក",
+    "subtitle": "ជ្រើសរើសភាសាដែលអ្នកចូលចិត្តដើម្បីចាប់ផ្តើមដំណើរឆ្នេរដែលដំណើរការដោយ AI",
+    "preparingExperience": "កំពុងរៀបចំបទពិសោធន៍ AI ផ្ទាល់ខ្លួន...",
+    "configuringAI": "កំពុងកំណត់រចនាសម្ព័ន្ធ AI សម្រាប់ {{language}}..."
+  },
+  "welcome": {
+    "smartHelp": "ជំនួយឆ្លាត",
+    "smallBusinesses": "សម្រាប់អាជីវកម្មតូច",
+    "inOakland": "នៅក្នុង Oakland",
+    "speakYourLanguage": "និយាយជាភាសារបស់អ្នក",
+    "getAnswers": "ទទួលបានចម្លើយ"
+  },
+  "auth": {
+    "welcome": "សូមស្វាគមន៍",
+    "signInToAccess": "ចូលដើម្បីចូលប្រើ AI Assistant",
+    "username": "ឈ្មោះអ្នកប្រើប្រាស់",
+    "usernamePlaceholder": "បញ្ចូលអ៊ីមែលរបស់អ្នក",
+    "password": "ពាក្យសម្ងាត់",
+    "passwordPlaceholder": "បញ្ចូលពាក្យសម្ងាត់របស់អ្នក",
+    "signIn": "ចូល",
+    "signingIn": "កំពុងចូល...",
+    "noAccount": "មិនមានគណនីទេ?",
+    "signUp": "ចុះឈ្មោះ",
+    "forgotPassword": "ភ្លេចពាក្យសម្ងាត់?"
+  },
+  "common": {
+    "loading": "កំពុងផ្ទុក...",
+    "error": "មានបញ្ហាកើតឡើង",
+    "success": "ជោគជ័យ",
+    "cancel": "បោះបង់",
+    "save": "រក្សាទុក",
+    "delete": "លុប",
+    "edit": "កែប្រែ",
+    "close": "បិទ",
+    "back": "ត្រឡប់",
+    "next": "បន្ទាប់",
+    "previous": "មុន",
+    "submit": "ដាក់ស្នើ",
+    "search": "ស្វែងរក",
+    "filter": "តម្រង",
+    "sort": "តម្រៀប",
+    "refresh": "ធ្វើឱ្យថ្មី",
+    "settings": "ការកំណត់",
+    "profile": "ព័ត៌មានផ្ទាល់ខ្លួន",
+    "logout": "ចាកចេញ",
+    "help": "ជំនួយ",
+    "about": "អំពី",
+    "contact": "ទំនាក់ទំនង",
+    "privacy": "ភាពឯកជន",
+    "terms": "លក្ខខណ្ឌ"
+  },
+  "chat": {
+    "sendMessage": "ផ្ញើសារ",
+    "typeMessage": "វាយបញ្ចូលសាររបស់អ្នក...",
+    "newChat": "ជាមួយថ្មី",
+    "clearHistory": "សម្អាតប្រវត្តិ",
+    "voiceInput": "ការបញ្ចូលសំឡេង",
+    "stopVoice": "ឈប់សំឡេង",
+    "listening": "កំពុងស្តាប់...",
+    "processing": "កំពុងដំណើរការ...",
+    "thinking": "កំពុងគិត...",
+    "noMessages": "គ្មានសារ",
+    "startConversation": "ចាប់ផ្តើមការសន្ទនា"
+  },
+  "business": {
+    "selectType": "ជ្រើសរើសប្រភេទអាជីវកម្ម",
+    "restaurant": "ភោជនីយដ្ឋាន",
+    "retail": "លក់រាយ",
+    "service": "សេវា",
+    "manufacturing": "ការផលិត",
+    "consulting": "ការពិគ្រោះយោបល់",
+    "technology": "បច្ចេកវិទ្យា",
+    "healthcare": "ការថែទាំសុខភាព",
+    "education": "ការអប់រំ",
+    "construction": "ការកសាង",
+    "other": "ផ្សេងទៀត"
+  },
+  "profile": {
+    "title": "ព័ត៌មានផ្ទាល់ខ្លួន",
+    "personalInfo": "ព័ត៌មានផ្ទាល់ខ្លួន",
+    "businessInfo": "ព័ត៌មានអាជីវកម្ម",
+    "contactInfo": "ព័ត៌មានទំនាក់ទំនង",
+    "preferences": "ចំណូលចិត្ត",
+    "editProfile": "កែប្រែព័ត៌មានផ្ទាល់ខ្លួន",
+    "saveChanges": "រក្សាទុកការផ្លាស់ប្តូរ",
+    "cancelEdit": "បោះបង់ការកែប្រែ"
+  }
+}

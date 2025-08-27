@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "ເລືອກພາສາຂອງທ່ານ",
+    "subtitle": "ເລືອກພາສາທີ່ທ່ານຕ້ອງການເພື່ອເລີ່ມການເດີນທາງທີ່ຂັບເຄື່ອນໂດຍ AI",
+    "preparingExperience": "ກຳລັງກະກຽມປະສົບການ AI ສະເພາະບຸກຄົນ...",
+    "configuringAI": "ກຳລັງຕັ້ງຄ່າ AI ສຳລັບ {{language}}..."
+  },
+  "welcome": {
+    "smartHelp": "ການຊ່ວຍເຫຼືອອັດສະລິຍະ",
+    "smallBusinesses": "ສຳລັບທຸລະກິດຂະໜາດນ້ອຍ",
+    "inOakland": "ໃນ Oakland",
+    "speakYourLanguage": "ເວົ້າເປັນພາສາຂອງທ່ານ",
+    "getAnswers": "ຮັບຄຳຕອບ"
+  },
+  "auth": {
+    "welcome": "ຍິນດີຕ້ອນຮັບ",
+    "signInToAccess": "ເຂົ້າສູ່ລະບົບເພື່ອເຂົ້າເຖິງ AI Assistant",
+    "username": "ຊື່ຜູ້ໃຊ້",
+    "usernamePlaceholder": "ປ້ອນອີເມວຂອງທ່ານ",
+    "password": "ລະຫັດຜ່ານ",
+    "passwordPlaceholder": "ປ້ອນລະຫັດຜ່ານຂອງທ່ານ",
+    "signIn": "ເຂົ້າສູ່ລະບົບ",
+    "signingIn": "ກຳລັງເຂົ້າສູ່ລະບົບ...",
+    "noAccount": "ບໍ່ມີບັນຊີ?",
+    "signUp": "ລົງທະບຽນ",
+    "forgotPassword": "ລືມລະຫັດຜ່ານ?"
+  },
+  "common": {
+    "loading": "ກຳລັງໂຫຼດ...",
+    "error": "ເກີດຂໍ້ຜິດພາດ",
+    "success": "ສຳເລັດ",
+    "cancel": "ຍົກເລີກ",
+    "save": "ບັນທຶກ",
+    "delete": "ລຶບ",
+    "edit": "ແກ້ໄຂ",
+    "close": "ປິດ",
+    "back": "ກັບ",
+    "next": "ຕໍ່ໄປ",
+    "previous": "ກ່ອນໜ້າ",
+    "submit": "ສົ່ງ",
+    "search": "ຄົ້ນຫາ",
+    "filter": "ກັ່ນຕອງ",
+    "sort": "ຈັດລຽງ",
+    "refresh": "ຟື້ນຟູ",
+    "settings": "ການຕັ້ງຄ່າ",
+    "profile": "ໂປຣໄຟລ໌",
+    "logout": "ອອກຈາກລະບົບ",
+    "help": "ການຊ່ວຍເຫຼືອ",
+    "about": "ກ່ຽວກັບ",
+    "contact": "ຕິດຕໍ່",
+    "privacy": "ຄວາມເປັນສ່ວນຕົວ",
+    "terms": "ເງື່ອນໄຂ"
+  },
+  "chat": {
+    "sendMessage": "ສົ່ງຂໍ້ຄວາມ",
+    "typeMessage": "ພິມຂໍ້ຄວາມຂອງທ່ານ...",
+    "newChat": "ສົນທະນາໃໝ່",
+    "clearHistory": "ລຶບປະຫວັດ",
+    "voiceInput": "ການປ້ອນສຽງ",
+    "stopVoice": "ຢຸດສຽງ",
+    "listening": "ກຳລັງຟັງ...",
+    "processing": "ກຳລັງປະມວນຜົນ...",
+    "thinking": "ກຳລັງຄິດ...",
+    "noMessages": "ບໍ່ມີຂໍ້ຄວາມ",
+    "startConversation": "ເລີ່ມການສົນທະນາ"
+  },
+  "business": {
+    "selectType": "ເລືອກປະເພດທຸລະກິດ",
+    "restaurant": "ຮ້ານອາຫານ",
+    "retail": "ຂາຍຍ່ອຍ",
+    "service": "ບໍລິການ",
+    "manufacturing": "ການຜະລິດ",
+    "consulting": "ການປຶກສາ",
+    "technology": "ເທັກໂນໂລຊີ",
+    "healthcare": "ການດູແລສຸຂະພາບ",
+    "education": "ການສຶກສາ",
+    "construction": "ການກໍ່ສ້າງ",
+    "other": "ອື່ນໆ"
+  },
+  "profile": {
+    "title": "ໂປຣໄຟລ໌",
+    "personalInfo": "ຂໍ້ມູນສ່ວນຕົວ",
+    "businessInfo": "ຂໍ້ມູນທຸລະກິດ",
+    "contactInfo": "ຂໍ້ມູນການຕິດຕໍ່",
+    "preferences": "ຄວາມມັກ",
+    "editProfile": "ແກ້ໄຂໂປຣໄຟລ໌",
+    "saveChanges": "ບັນທຶກການປ່ຽນແປງ",
+    "cancelEdit": "ຍົກເລີກການແກ້ໄຂ"
+  }
+}

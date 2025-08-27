@@ -1,0 +1,90 @@
+{
+  "languageSelection": {
+    "title": "Pumili ng Iyong Wika",
+    "subtitle": "Piliin ang iyong gustong wika upang simulan ang iyong AI-powered na paglalakbay",
+    "preparingExperience": "Inihahanda ang iyong personalized na AI experience...",
+    "configuringAI": "Inaayos ang AI para sa {{language}}..."
+  },
+  "welcome": {
+    "smartHelp": "Smart na Tulong",
+    "smallBusinesses": "para sa Maliit na Negosyo",
+    "inOakland": "sa Oakland",
+    "speakYourLanguage": "Magsalita sa iyong wika",
+    "getAnswers": "Kumuha ng mga sagot"
+  },
+  "auth": {
+    "welcome": "Maligayang pagdating",
+    "signInToAccess": "Mag-sign in para ma-access ang AI assistant",
+    "username": "Username",
+    "usernamePlaceholder": "Ilagay ang iyong email address",
+    "password": "Password",
+    "passwordPlaceholder": "Ilagay ang iyong password",
+    "signIn": "Mag-sign in",
+    "signingIn": "Nag-sign in...",
+    "noAccount": "Wala kang account?",
+    "signUp": "Mag-sign up",
+    "forgotPassword": "Nakalimutan ang password?"
+  },
+  "common": {
+    "loading": "Naglo-load...",
+    "error": "May naganap na error",
+    "success": "Matagumpay",
+    "cancel": "Kanselahin",
+    "save": "I-save",
+    "delete": "Tanggalin",
+    "edit": "I-edit",
+    "close": "Isara",
+    "back": "Bumalik",
+    "next": "Susunod",
+    "previous": "Nakaraan",
+    "submit": "I-submit",
+    "search": "Maghanap",
+    "filter": "I-filter",
+    "sort": "I-sort",
+    "refresh": "I-refresh",
+    "settings": "Mga setting",
+    "profile": "Profile",
+    "logout": "Mag-logout",
+    "help": "Tulong",
+    "about": "Tungkol sa",
+    "contact": "Makipag-ugnayan",
+    "privacy": "Privacy",
+    "terms": "Mga tuntunin"
+  },
+  "chat": {
+    "sendMessage": "Magpadala ng mensahe",
+    "typeMessage": "I-type ang iyong mensahe...",
+    "newChat": "Bagong chat",
+    "clearHistory": "I-clear ang history",
+    "voiceInput": "Voice input",
+    "stopVoice": "I-stop ang voice",
+    "listening": "Nakikinig...",
+    "processing": "Pinoproseso...",
+    "thinking": "Nag-iisip...",
+    "noMessages": "Walang mensahe",
+    "startConversation": "Simulan ang conversation"
+  },
+  "business": {
+    "selectType": "Pumili ng uri ng negosyo",
+    "restaurant": "Restaurant",
+    "retail": "Retail",
+    "service": "Serbisyo",
+    "manufacturing": "Manufacturing",
+    "consulting": "Consulting",
+    "technology": "Technology",
+    "healthcare": "Healthcare",
+    "education": "Edukasyon",
+    "construction": "Construction",
+    "other": "Iba pa"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal na impormasyon",
+    "businessInfo": "Impormasyon ng negosyo",
+    "contactInfo": "Contact information",
+    "preferences": "Mga kagustuhan",
+    "editProfile": "I-edit ang profile",
+    "saveChanges": "I-save ang mga pagbabago",
+    "cancelEdit": "Kanselahin ang pag-edit"
+  }
+}
