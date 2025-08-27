@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { config } from '../env';
 
 const LanguageContext = createContext();
 
@@ -20,6 +21,8 @@ export const LanguageProvider = ({ children }) => {
     const selectedLanguage = localStorage.getItem('selectedLanguage');
     const userLanguage = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).language : null;
     
+    console.log('Language initialization - selectedLanguage:', selectedLanguage, 'userLanguage:', userLanguage);
+    
     if (selectedLanguage) {
       console.log('Setting language from user selection:', selectedLanguage);
       setCurrentLanguage(selectedLanguage);
@@ -36,14 +39,17 @@ export const LanguageProvider = ({ children }) => {
   useEffect(() => {
     const loadTranslations = async () => {
       try {
+        console.log('Loading translations for language:', currentLanguage);
         // Import the translation file for the current language
         const translationModule = await import(`../language/${currentLanguage}.json`);
         setTranslations(translationModule.default || translationModule);
+        console.log('Successfully loaded translations for:', currentLanguage);
       } catch (error) {
-        console.warn(`Failed to load translations for ${currentLanguage}, falling back to English`);
+        console.warn(`Failed to load translations for ${currentLanguage}, falling back to English:`, error);
         try {
           const fallbackModule = await import('../language/en.json');
           setTranslations(fallbackModule.default || fallbackModule);
+          console.log('Successfully loaded fallback English translations');
         } catch (fallbackError) {
           console.error('Failed to load fallback translations:', fallbackError);
           setTranslations({});
@@ -62,11 +68,11 @@ export const LanguageProvider = ({ children }) => {
     // Update user's profile language in database if user is logged in
     try {
       const user = localStorage.getItem('user');
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken'); // Fixed: use correct token key
       
       if (user && token) {
         const userData = JSON.parse(user);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update-language`, {
+        const response = await fetch(`${config.VITE_API_URL}/api/auth/update-language`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -80,10 +86,12 @@ export const LanguageProvider = ({ children }) => {
           // Update local user data
           const updatedUser = { ...userData, language: languageCode };
           localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+          console.error('Failed to update user profile language, status:', response.status);
         }
       }
     } catch (error) {
-      console.log('Failed to update user profile language:', error);
+      console.error('Failed to update user profile language:', error);
     }
   };
 
