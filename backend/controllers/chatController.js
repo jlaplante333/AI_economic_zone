@@ -170,8 +170,25 @@ exports.handleChat = async (req, res) => {
     let chatHistory = [];
     try {
       const { getChatsByUser } = require('../models/ChatLog');
-      chatHistory = await getChatsByUser(userId);
-      console.log(`Fetched ${chatHistory.length} previous chat messages for context`);
+      const allChatHistory = await getChatsByUser(userId);
+      
+      // Filter chat history to prioritize messages with the same business type
+      // This prevents OpenAI from being confused by previous business type contexts
+      const relevantHistory = allChatHistory.filter(chat => {
+        // If the chat has a business type, check if it matches current request
+        if (chat.business_type && chat.business_type !== finalBusinessType) {
+          console.log(`🔍 Filtering out chat with different business type: ${chat.business_type} vs ${finalBusinessType}`);
+          return false;
+        }
+        return true;
+      });
+      
+      // Limit to last 5 messages to avoid overwhelming context
+      chatHistory = relevantHistory.slice(-5);
+      
+      console.log(`Fetched ${allChatHistory.length} total chat messages, using ${chatHistory.length} relevant messages for context`);
+      console.log(`🔍 Current business type: ${finalBusinessType}`);
+      console.log(`🔍 Relevant chat history business types:`, chatHistory.map(c => c.business_type || 'unspecified'));
     } catch (historyError) {
       console.log('Failed to fetch chat history for context:', historyError.message);
     }

@@ -763,7 +763,7 @@ function FullChatPage() {
       setMessages(prev => [...prev, botMessage]);
       
       // Save message to database
-      await saveMessageToDatabase(message, data.response, businessType);
+      await saveMessageToDatabase(message, data.response, effectiveBusinessType);
       
       // Speak ALL AI responses using OpenAI TTS
       if (speechRef.current && data.response) {
@@ -1195,7 +1195,14 @@ function FullChatPage() {
 
   // Get the effective business type (temporary override or user's profile type)
   const getEffectiveBusinessType = () => {
-    return temporaryBusinessType || user?.business_type || '';
+    const effective = temporaryBusinessType || user?.business_type || '';
+    console.log('🔍 getEffectiveBusinessType called:', {
+      temporaryBusinessType,
+      userBusinessType: user?.business_type,
+      effective,
+      timestamp: new Date().toISOString()
+    });
+    return effective;
   };
 
   // Load chat history from database

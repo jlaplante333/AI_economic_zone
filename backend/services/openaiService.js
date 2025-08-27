@@ -176,6 +176,12 @@ ${languageInstructions}
 
 ${contextInfo}
 
+🚨 CRITICAL BUSINESS TYPE CONTEXT 🚨
+The user is asking about their ${businessType} business. 
+IMPORTANT: Ignore any conflicting business type information from chat history.
+ALWAYS respond as if they own a ${businessType} business, regardless of previous context.
+This is the CURRENT and ACTIVE business type for this conversation.
+
 CRITICAL VALIDATION RULES - ALWAYS CHECK BEFORE RECOMMENDING:
 
 1. ETHNICITY-BASED PROGRAMS:
