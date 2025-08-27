@@ -872,25 +872,49 @@ function FullChatPage() {
     }
   };
 
-  // STOP button functionality
+  // STOP button functionality - ALWAYS AVAILABLE to stop ALL voice sources
   const handleStopSpeech = () => {
-    console.log('🛑 STOP button clicked - stopping all speech');
-    setIsSpeaking(false);
+    console.log('🛑 STOP button clicked - stopping ALL speech sources');
     
-    // Stop current audio if playing
+    // Stop OpenAI TTS audio if playing
     const currentAudio = getCurrentAudio();
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
       setCurrentAudio(null);
+      console.log('🔇 Stopped OpenAI TTS audio');
     }
     
-    // Stop browser speech synthesis
-    if (window.speechSynthesis && window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
+    // Stop browser speech synthesis (multiple instances)
+    if (window.speechSynthesis) {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        console.log('🔇 Stopped browser speech synthesis');
+      }
+      
+      // Also stop any pending speech
+      if (window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+        console.log('🔇 Stopped pending speech synthesis');
+      }
     }
     
-    console.log('🔇 All speech stopped');
+    // Stop ALL audio elements on the page (in case there are multiple)
+    const allAudioElements = document.querySelectorAll('audio');
+    allAudioElements.forEach((audio, index) => {
+      if (!audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+        console.log(`🔇 Stopped audio element ${index + 1}`);
+      }
+    });
+    
+    // Reset all voice-related states
+    setIsSpeaking(false);
+    setIsRecording(false);
+    setIsListening(false);
+    
+    console.log('🔇 ALL speech sources stopped and states reset');
   };
 
   const handleVoiceToggle = () => {
@@ -1149,6 +1173,15 @@ function FullChatPage() {
       console.error('🔊 Error with speech synthesis:', error);
       setIsSpeaking(false);
     }
+  };
+
+  // Function to check if there's any voice activity happening
+  const isAnyVoiceActive = () => {
+    const hasOpenAIAudio = getCurrentAudio() && !getCurrentAudio().paused;
+    const hasBrowserSpeech = window.speechSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending);
+    const hasOtherAudio = document.querySelectorAll('audio:not([paused])').length > 0;
+    
+    return hasOpenAIAudio || hasBrowserSpeech || hasOtherAudio || isSpeaking || isRecording || isListening;
   };
 
   // Function to stop any currently playing speech
@@ -2248,47 +2281,39 @@ function FullChatPage() {
                   {isProcessingVoice ? <Loader size={20} /> : isRecording ? <MicOff size={20} /> : <Mic size={20} />}
                 </button>
                 
-                {/* STOP Button */}
+                {/* STOP Button - ALWAYS AVAILABLE to stop ALL voice sources */}
                 <button 
                   type="button" 
                   className="stop-btn"
                   onClick={handleStopSpeech}
-                  disabled={!isSpeaking}
                   style={{
-                    background: isSpeaking 
-                      ? '#ef4444'
-                      : '#6b7280',
+                    background: '#ef4444', // Always red to indicate it's a stop button
                     border: 'none',
                     color: 'white',
                     padding: '12px',
                     borderRadius: '50%',
-                    cursor: isSpeaking ? 'pointer' : 'not-allowed',
+                    cursor: 'pointer', // Always clickable
                     width: '44px',
                     height: '44px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'all 0.3s ease',
-                    boxShadow: isSpeaking 
-                      ? '0 4px 16px rgba(239, 68, 68, 0.4)' 
-                      : '0 2px 8px rgba(107, 114, 128, 0.2)',
+                    boxShadow: '0 4px 16px rgba(239, 68, 68, 0.4)', // Always visible shadow
                     position: 'relative',
                     overflow: 'hidden',
                     flexShrink: 0,
-                    opacity: isSpeaking ? 1 : 0.5
+                    opacity: 1 // Always fully visible
                   }}
                   onMouseEnter={e => {
-                    if (isSpeaking) {
-                      e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.6)';
-                    }
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.6)';
                   }}
                   onMouseLeave={e => {
-                    if (isSpeaking) {
-                      e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
-                    }
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
                   }}
+                  title="Stop all voice reading (always available)"
                 >
                   <Square size={20} />
                 </button>
