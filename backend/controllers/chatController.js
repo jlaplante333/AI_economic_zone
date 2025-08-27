@@ -5,11 +5,35 @@ const { findById } = require('../models/User');
 
 exports.handleChat = async (req, res) => {
   console.log('=== handleChat called ===');
-  console.log('Request body:', req.body);
   
-  // SECURITY FIX: Get user ID from JWT token, not from request body
-  const userId = req.user?.userId;
+  // SIMPLE, DIRECT USER ID EXTRACTION
+  let userId = null;
+  
+  // Method 1: Try to get from JWT payload
+  if (req.user && req.user.userId) {
+    userId = req.user.userId;
+    console.log('Got userId from JWT payload:', userId);
+  } else if (req.user && req.user.id) {
+    userId = req.user.id;
+    console.log('Got userId from JWT payload (id field):', userId);
+  } else {
+    // Method 2: Extract directly from JWT token
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.userId || decoded.id;
+        console.log('Extracted userId from JWT token:', userId);
+      } catch (jwtError) {
+        console.error('JWT decode error:', jwtError);
+      }
+    }
+  }
+  
   if (!userId) {
+    console.error('No user ID found - authentication failed');
     return res.status(401).json({ error: 'User not authenticated' });
   }
   
@@ -187,33 +211,46 @@ exports.getAIStatus = async (req, res) => {
 // Get chat history for a user
 exports.getChatHistory = async (req, res) => {
   console.log('=== getChatHistory called ===');
-  console.log('Request headers:', req.headers);
-  console.log('req.user object:', req.user);
-  console.log('req.user keys:', req.user ? Object.keys(req.user) : 'undefined');
-  console.log('req.user.userId:', req.user?.userId);
-  console.log('req.user.id:', req.user?.id);
   
   try {
-    // Get user ID from auth token
-    const userId = req.user?.userId || req.user?.id;
+    // SIMPLE, DIRECT USER ID EXTRACTION
+    let userId = null;
+    
+    // Method 1: Try to get from JWT payload
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+      console.log('Got userId from JWT payload:', userId);
+    } else if (req.user && req.user.id) {
+      userId = req.user.id;
+      console.log('Got userId from JWT payload (id field):', userId);
+    } else {
+      // Method 2: Extract directly from JWT token
+      const authHeader = req.headers['authorization'];
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const jwt = require('jsonwebtoken');
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          userId = decoded.userId || decoded.id;
+          console.log('Extracted userId from JWT token:', userId);
+        } catch (jwtError) {
+          console.error('JWT decode error:', jwtError);
+        }
+      }
+    }
+    
     if (!userId) {
-      console.error('No user ID found in request. req.user:', req.user);
+      console.error('No user ID found - authentication failed');
       return res.status(401).json({ error: 'User not authenticated' });
     }
     
     console.log('Fetching chat history for user ID:', userId);
-    
-    // CRITICAL SECURITY: Run database security audit
-    const { checkDatabaseSecurity } = require('../models/ChatLog');
-    await checkDatabaseSecurity();
     
     // Get chat history from database
     const { getChatsByUser } = require('../models/ChatLog');
     const messages = await getChatsByUser(userId);
     
     console.log('Found', messages.length, 'chat messages for user', userId);
-    console.log('First message user_id:', messages[0]?.user_id);
-    console.log('Sample message:', messages[0]);
     
     res.json({ messages });
     
@@ -228,9 +265,34 @@ exports.clearChatHistory = async (req, res) => {
   console.log('=== clearChatHistory called ===');
   
   try {
-    const userId = req.user?.userId;
+    // SIMPLE, DIRECT USER ID EXTRACTION
+    let userId = null;
+    
+    // Method 1: Try to get from JWT payload
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+      console.log('Got userId from JWT payload:', userId);
+    } else if (req.user && req.user.id) {
+      userId = req.user.id;
+      console.log('Got userId from JWT payload (id field):', userId);
+    } else {
+      // Method 2: Extract directly from JWT token
+      const authHeader = req.headers['authorization'];
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const jwt = require('jsonwebtoken');
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          userId = decoded.userId || decoded.id;
+          console.log('Extracted userId from JWT token:', userId);
+        } catch (jwtError) {
+          console.error('JWT decode error:', jwtError);
+        }
+      }
+    }
     
     if (!userId) {
+      console.error('No user ID found - authentication failed');
       return res.status(401).json({ error: 'User not authenticated' });
     }
     
@@ -263,18 +325,38 @@ exports.clearChatHistory = async (req, res) => {
 // Log a chat message to database
 exports.logChatMessage = async (req, res) => {
   console.log('=== logChatMessage called ===');
-  console.log('Request body:', req.body);
-  console.log('req.user object:', req.user);
-  console.log('req.user keys:', req.user ? Object.keys(req.user) : 'undefined');
-  console.log('req.user.userId:', req.user?.userId);
-  console.log('req.user.id:', req.user?.id);
   
   try {
     const { message, response, businessType, language } = req.body;
-    const userId = req.user?.userId || req.user?.id;
+    
+    // SIMPLE, DIRECT USER ID EXTRACTION
+    let userId = null;
+    
+    // Method 1: Try to get from JWT payload
+    if (req.user && req.user.userId) {
+      userId = req.user.userId;
+      console.log('Got userId from JWT payload:', userId);
+    } else if (req.user && req.user.id) {
+      userId = req.user.id;
+      console.log('Got userId from JWT payload (id field):', userId);
+    } else {
+      // Method 2: Extract directly from JWT token
+      const authHeader = req.headers['authorization'];
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const jwt = require('jsonwebtoken');
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          userId = decoded.userId || decoded.id;
+          console.log('Extracted userId from JWT token:', userId);
+        } catch (jwtError) {
+          console.error('JWT decode error:', jwtError);
+        }
+      }
+    }
     
     if (!userId) {
-      console.error('No user ID found in request. req.user:', req.user);
+      console.error('No user ID found - authentication failed');
       return res.status(401).json({ error: 'User not authenticated' });
     }
     
