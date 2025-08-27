@@ -1573,13 +1573,15 @@ function FullChatPage() {
                 {/* New Chat Button - Next to Change Business */}
                 <button
                   onClick={() => {
-                    // Load chat history from database instead of clearing
-                    loadChatHistory();
+                    // Clear current chat display but keep history in database for OpenAI context
+                    // The AI will still remember previous conversations when user sends new messages
+                    setMessages([]);
                     setInputMessage('');
                     // Don't clear businessType - maintain the current business context
                     setShowProfileMenu(false);
                     setRandomBusinessOptions(getRandomBusinessOptions());
                     setQuickOptions(getRandomQuickOptions(false));
+                    console.log('🔄 New Chat started - display cleared, history preserved for OpenAI context');
                   }}
                   style={{
                     display: 'flex',
