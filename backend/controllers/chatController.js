@@ -55,7 +55,9 @@ exports.handleChat = async (req, res) => {
             annual_revenue_2024: user.annual_revenue_2024
           };
           
-          userBusinessType = user.business_type || requestBusinessType;
+          // Prioritize the request business type over profile business type
+          // This allows users to temporarily override their profile business type
+          userBusinessType = requestBusinessType || user.business_type;
           console.log('Complete user data fetched:', userData);
         }
       } catch (userError) {
@@ -68,6 +70,8 @@ exports.handleChat = async (req, res) => {
     
     // Use the business type from user profile, fallback to request business type, then default
     const finalBusinessType = userBusinessType || requestBusinessType || 'restaurant';
+    console.log('Request business type:', requestBusinessType);
+    console.log('User profile business type:', userData?.business_type);
     console.log('Final business type being used:', finalBusinessType);
     console.log('User revenue being used:', userData?.annual_revenue_2024 || userData?.annual_revenue_2023 || userData?.annual_revenue_2022);
     console.log('User postal code being used:', userData?.zip_code);
