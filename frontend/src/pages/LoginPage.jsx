@@ -73,7 +73,30 @@ function LoginPage() {
           name: `${data.user.first_name} ${data.user.last_name}`,
           firstName: data.user.first_name,
           lastName: data.user.last_name,
-          isAdmin: data.user.is_admin
+          isAdmin: data.user.is_admin,
+          // Store ALL user data for profile page
+          first_name: data.user.first_name,
+          last_name: data.user.last_name,
+          phone: data.user.phone,
+          language: data.user.language,
+          business_type: data.user.business_type,
+          address_line1: data.user.address_line1,
+          address_line2: data.user.address_line2,
+          city: data.user.city,
+          state: data.user.state,
+          zip_code: data.user.zip_code,
+          age: data.user.age,
+          ethnicity: data.user.ethnicity,
+          gender: data.user.gender,
+          employee_count: data.user.employee_count,
+          years_in_business: data.user.years_in_business,
+          corporation_type: data.user.corporation_type,
+          annual_revenue_2022: data.user.annual_revenue_2022,
+          annual_revenue_2023: data.user.annual_revenue_2023,
+          annual_revenue_2024: data.user.annual_revenue_2024,
+          is_verified: data.user.is_verified,
+          last_login: data.user.last_login,
+          created_at: data.user.created_at
         }));
         
         // Redirect to the originally requested page or default to fullchat

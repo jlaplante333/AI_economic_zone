@@ -26,18 +26,21 @@ function ProfilePage() {
           const userData = JSON.parse(localUser);
           console.log('Parsed user data:', userData);
           
-          // Always fetch complete data from database using test endpoint
+          // Always fetch complete data from database using current user's email
           try {
-            const response = await fetch('/api/auth/get-user-by-email', {
+            console.log('Fetching user data for email:', userData.email);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/get-user-by-email`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ email: 'jonathanlaplante@gmail.com' })
+              body: JSON.stringify({ email: userData.email })
             });
             
+            console.log('Response status:', response.status);
             if (response.ok) {
               const data = await response.json();
+              console.log('Response data:', data);
               if (data.success) {
                 console.log('Got complete data from database:', data.user);
                 // Store complete data in localStorage
@@ -46,7 +49,13 @@ function ProfilePage() {
                 setUser(completeUserData);
                 setLoading(false);
                 return;
+              } else {
+                console.log('Database response not successful:', data);
               }
+            } else {
+              console.log('Database fetch failed with status:', response.status);
+              const errorText = await response.text();
+              console.log('Error response:', errorText);
             }
           } catch (error) {
             console.log('Database fetch failed, using localStorage:', error);
