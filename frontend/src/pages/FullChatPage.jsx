@@ -1272,7 +1272,20 @@ function FullChatPage() {
   // Initialize global speech cleanup
   useEffect(() => {
     const cleanup = initializeSpeechCleanup();
-    return cleanup;
+    return () => {
+      console.log('🔇 Final cleanup - stopping all speech');
+      cleanup();
+      stopAllSpeech();
+      setIsSpeaking(false);
+      
+      // Also stop any current audio
+      const currentAudio = getCurrentAudio();
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        setCurrentAudio(null);
+      }
+    };
   }, []);
 
   // Cleanup speech synthesis when component unmounts or navigates away
@@ -1280,6 +1293,7 @@ function FullChatPage() {
     return () => {
       console.log('🔇 Cleaning up speech synthesis on component unmount');
       stopAllSpeech();
+      setIsSpeaking(false);
     };
   }, []);
 
@@ -1288,21 +1302,41 @@ function FullChatPage() {
     const handleBeforeUnload = () => {
       console.log('🔇 Stopping speech before page unload');
       stopAllSpeech();
+      setIsSpeaking(false);
     };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         console.log('🔇 Stopping speech when page becomes hidden');
         stopAllSpeech();
+        setIsSpeaking(false);
       }
+    };
+
+    // Also handle hash changes (navigation within the app)
+    const handleHashChange = () => {
+      console.log('🔇 Stopping speech on hash change (navigation)');
+      stopAllSpeech();
+      setIsSpeaking(false);
+    };
+
+    // Handle popstate (browser back/forward)
+    const handlePopState = () => {
+      console.log('🔇 Stopping speech on popstate (browser navigation)');
+      stopAllSpeech();
+      setIsSpeaking(false);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
