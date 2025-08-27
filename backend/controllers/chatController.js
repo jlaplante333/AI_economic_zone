@@ -187,21 +187,30 @@ exports.getAIStatus = async (req, res) => {
 // Get chat history for a user
 exports.getChatHistory = async (req, res) => {
   console.log('=== getChatHistory called ===');
+  console.log('Request headers:', req.headers);
+  console.log('req.user object:', req.user);
+  console.log('req.user keys:', req.user ? Object.keys(req.user) : 'undefined');
+  console.log('req.user.userId:', req.user?.userId);
+  console.log('req.user.id:', req.user?.id);
   
   try {
     // Get user ID from auth token
-    const userId = req.user?.userId;
+    const userId = req.user?.userId || req.user?.id;
     if (!userId) {
+      console.error('No user ID found in request. req.user:', req.user);
       return res.status(401).json({ error: 'User not authenticated' });
     }
     
-    console.log('Fetching chat history for user:', userId);
+    console.log('Fetching chat history for user ID:', userId);
     
     // Get chat history from database
     const { getChatsByUser } = require('../models/ChatLog');
     const messages = await getChatsByUser(userId);
     
-    console.log('Found', messages.length, 'chat messages');
+    console.log('Found', messages.length, 'chat messages for user', userId);
+    console.log('First message user_id:', messages[0]?.user_id);
+    console.log('Sample message:', messages[0]);
+    
     res.json({ messages });
     
   } catch (error) {
@@ -250,12 +259,18 @@ exports.clearChatHistory = async (req, res) => {
 // Log a chat message to database
 exports.logChatMessage = async (req, res) => {
   console.log('=== logChatMessage called ===');
+  console.log('Request body:', req.body);
+  console.log('req.user object:', req.user);
+  console.log('req.user keys:', req.user ? Object.keys(req.user) : 'undefined');
+  console.log('req.user.userId:', req.user?.userId);
+  console.log('req.user.id:', req.user?.id);
   
   try {
     const { message, response, businessType, language } = req.body;
-    const userId = req.user?.userId;
+    const userId = req.user?.userId || req.user?.id;
     
     if (!userId) {
+      console.error('No user ID found in request. req.user:', req.user);
       return res.status(401).json({ error: 'User not authenticated' });
     }
     
@@ -263,7 +278,7 @@ exports.logChatMessage = async (req, res) => {
       return res.status(400).json({ error: 'Message and response are required' });
     }
     
-    console.log('Logging chat message for user:', userId);
+    console.log('Logging chat message for user ID:', userId);
     console.log('Business type:', businessType);
     console.log('Language:', language);
     
@@ -275,7 +290,7 @@ exports.logChatMessage = async (req, res) => {
     });
     
     if (result) {
-      console.log('Chat message logged successfully');
+      console.log('Chat message logged successfully for user', userId);
       res.json({ success: true, messageId: result.id });
     } else {
       console.log('Chat message logging failed');
