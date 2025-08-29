@@ -4,13 +4,10 @@ import { useTheme } from '../context/ThemeContext';
 import { stopAllSpeech } from '../utils/speechUtils';
 
 const ProfileMenu = ({ 
-  selectedVoice, 
-  setSelectedVoice, 
   selectedLanguage, 
   setSelectedLanguage, 
   hasManuallyChangedLanguage,
   setHasManuallyChangedLanguage,
-  testSpeechSynthesis, 
   toggleTheme, 
   isToggling, 
   currentThemeName 
@@ -137,25 +134,7 @@ const ProfileMenu = ({
         onMouseEnter={e => e.currentTarget.style.background = '#fee2e2'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
       >Logout</button>
-      <button
-        onClick={testSpeechSynthesis}
-        style={{ fontSize: 14, padding: 6, background: 'none', border: 'none', color: '#10b981', borderRadius: 6, cursor: 'pointer', transition: 'background 0.2s', textAlign: 'left', width: '100%' }}
-        onMouseEnter={e => e.currentTarget.style.background = '#d1fae5'}
-        onMouseLeave={e => e.currentTarget.style.background = 'none'}
-      >Test Speech</button>
-      <select
-        value={selectedVoice}
-        onChange={(e) => setSelectedVoice(e.target.value)}
-        style={{ fontSize: 12, padding: 4, borderRadius: 4, border: '1px solid #ccc', background: 'white', color: '#333', textAlign: 'left', width: '100%' }}
-      >
-        <option value="none">No Voice</option>
-        <option value="alloy">Alloy - Balanced</option>
-        <option value="echo">Echo - Professional</option>
-        <option value="fable">Fable - Friendly</option>
-        <option value="onyx">Onyx - Authoritative</option>
-        <option value="nova">Nova - Energetic</option>
-        <option value="shimmer">Shimmer - Melodic</option>
-      </select>
+
       <div style={{ fontSize: 11, color: '#666', textAlign: 'left', marginTop: 4, marginBottom: 2 }}>
         🎤 Speech Language
         <div style={{ fontSize: 9, color: '#999', marginTop: 2 }}>

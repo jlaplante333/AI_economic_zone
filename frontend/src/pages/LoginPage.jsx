@@ -176,9 +176,7 @@ function LoginPage() {
           {t('welcome.speakYourLanguage')}<br />
           {t('welcome.getAnswers')}
         </p>
-        <p style={{ color: '#64748b', fontSize: '16px' }}>
-          {t('auth.noAccount')} <a href="/signup" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', cursor: 'pointer' }}>{t('auth.signUp')}</a>
-        </p>
+
       </div>
 
       {/* Right side - Login form */}
@@ -266,6 +264,9 @@ function LoginPage() {
           <div className="login-footer">
             <p style={{ color: '#64748b', fontSize: '14px' }}>
               {t('auth.forgotPassword')} <button onClick={() => navigate('/forgot-password')} className="forgot-password-link" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('auth.resetPassword')}</button>
+            </p>
+            <p style={{ color: '#64748b', fontSize: '14px', marginTop: '10px' }}>
+              {t('auth.noAccount')} <button onClick={() => navigate('/signup')} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>{t('auth.signUp')}</button>
             </p>
           </div>
         </div>

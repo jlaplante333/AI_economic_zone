@@ -29,7 +29,7 @@ function ProfilePage() {
           // Always fetch complete data from database using current user's email
           try {
             console.log('Fetching user data for email:', userData.email);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/get-user-by-email`, {
+            const response = await fetch(`${config.VITE_API_URL}/api/auth/get-user-by-email`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

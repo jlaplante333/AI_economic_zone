@@ -118,79 +118,72 @@ function FullChatPage() {
     }
   }, [selectedLanguage]);
 
-  // Load chat history from database on component mount
+  // Consolidated chat history management - load from database first, then localStorage as fallback
   useEffect(() => {
     if (user && user.id) {
+      console.log('🔄 User authenticated, loading chat history...');
+      
+      // First try to load from database
       loadChatHistory();
-    }
-  }, [user]);
-
-  // Save chat history to localStorage when messages change (for persistence during navigation)
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('chatHistory', JSON.stringify(messages));
-      console.log('💾 Saved chat history to localStorage:', messages.length, 'messages');
-    }
-  }, [messages]);
-
-  // Load chat history from localStorage on component mount and when user changes (for persistence during navigation)
-  useEffect(() => {
-    if (user && user.id) {
+      
+      // Also try localStorage as fallback (in case database is slow or fails)
       const savedHistory = localStorage.getItem('chatHistory');
-      if (savedHistory && messages.length === 0) {
+      if (savedHistory) {
         try {
           const parsedHistory = JSON.parse(savedHistory);
-          setMessages(parsedHistory);
-          console.log('📚 Loaded chat history from localStorage:', parsedHistory.length, 'messages');
+          // Only set messages if we don't have any yet
+          if (messages.length === 0) {
+            setMessages(parsedHistory);
+            console.log('📚 Loaded chat history from localStorage as fallback:', parsedHistory.length, 'messages');
+          }
         } catch (error) {
           console.error('Failed to parse saved chat history:', error);
-          // Clear corrupted localStorage data
           localStorage.removeItem('chatHistory');
         }
       }
     }
-  }, [user, messages.length]);
+  }, [user]); // Only depend on user, not messages.length to avoid infinite loops
 
-  // Restore chat history when page becomes visible again (navigation back from profile)
+  // Save chat history to localStorage when messages change (for persistence during navigation)
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && user && user.id && messages.length === 0) {
+    console.log('🔄 Messages state changed:', messages.length, 'messages');
+    if (messages.length > 0) {
+      localStorage.setItem('chatHistory', JSON.stringify(messages));
+      console.log('💾 Saved chat history to localStorage:', messages.length, 'messages');
+    } else if (messages.length === 0) {
+      console.log('⚠️ Messages state is empty - this might indicate a problem');
+    }
+  }, [messages]);
+
+  // Restore chat history when navigating back to chat page (hash change or visibility change)
+  useEffect(() => {
+    const handleNavigationBack = () => {
+      // Check if we're on the fullchat page and have no messages but should have them
+      if (user && user.id && messages.length === 0) {
         const savedHistory = localStorage.getItem('chatHistory');
         if (savedHistory) {
           try {
             const parsedHistory = JSON.parse(savedHistory);
             setMessages(parsedHistory);
-            console.log('🔄 Restored chat history from localStorage on visibility change:', parsedHistory.length, 'messages');
+            console.log('🔄 Restored chat history from localStorage on navigation back:', parsedHistory.length, 'messages');
           } catch (error) {
-            console.error('Failed to parse saved chat history on visibility change:', error);
+            console.error('Failed to parse saved chat history on navigation back:', error);
           }
         }
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [user, messages.length]);
-
-  // Restore chat history when navigating back to chat page (hash change)
-  useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === '#/chat' && user && user.id && messages.length === 0) {
-        const savedHistory = localStorage.getItem('chatHistory');
-        if (savedHistory) {
-          try {
-            const parsedHistory = JSON.parse(savedHistory);
-            setMessages(parsedHistory);
-            console.log('🔄 Restored chat history from localStorage on hash change:', parsedHistory.length, 'messages');
-          } catch (error) {
-            console.error('Failed to parse saved chat history on hash change:', error);
-          }
-        }
-      }
+    // Listen for both hash changes and visibility changes
+    window.addEventListener('hashchange', handleNavigationBack);
+    document.addEventListener('visibilitychange', handleNavigationBack);
+    
+    // Also try to restore immediately when the effect runs
+    handleNavigationBack();
+    
+    return () => {
+      window.removeEventListener('hashchange', handleNavigationBack);
+      document.removeEventListener('visibilitychange', handleNavigationBack);
     };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
   }, [user, messages.length]);
 
   const [randomBusinessOptions, setRandomBusinessOptions] = useState([]);
@@ -435,37 +428,36 @@ function FullChatPage() {
 
   // Quick options for common business questions - use useMemo to recalculate when translations change
   const quickOptionsData = useMemo(() => {
-    console.log('🔄 Recalculating quick options with translations, t function:', typeof t);
     return [
-    { label: t('quickOptions.businessLicense'), icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
-    { label: t('quickOptions.parkingRules'), icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
-    { label: t('quickOptions.permits'), icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
-    { label: t('quickOptions.taxes'), icon: <DollarSign size={32} color="#93c5fd" />, value: 'Taxes' },
-    { label: t('quickOptions.zoning'), icon: <Map size={32} color="#93c5fd" />, value: 'Zoning' },
-    { label: t('quickOptions.healthSafety'), icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Health & Safety' },
-    { label: t('quickOptions.employmentLaw'), icon: <Users size={32} color="#93c5fd" />, value: 'Employment Law' },
-    { label: t('quickOptions.insurance'), icon: <Shield size={32} color="#93c5fd" />, value: 'Insurance' },
-    { label: t('quickOptions.accessibility'), icon: <KeyRound size={32} color="#93c5fd" />, value: 'Accessibility' },
-    { label: t('quickOptions.marketing'), icon: <Megaphone size={32} color="#93c5fd" />, value: 'Marketing' },
-    { label: t('quickOptions.grants'), icon: <Gift size={32} color="#93c5fd" />, value: 'Grants' },
-    { label: t('quickOptions.utilities'), icon: <Droplet size={32} color="#93c5fd" />, value: 'Utilities' },
-    { label: t('quickOptions.inspections'), icon: <ClipboardCheck size={32} color="#93c5fd" />, value: 'Inspections' },
-    { label: t('quickOptions.wasteDisposal'), icon: <Trash size={32} color="#93c5fd" />, value: 'Waste Disposal' },
-    { label: t('quickOptions.fireSafety'), icon: <Flame size={32} color="#93c5fd" />, value: 'Fire Safety' },
-    { label: t('quickOptions.security'), icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Security' },
-    { label: t('quickOptions.buildingCodes'), icon: <Building size={32} color="#93c5fd" />, value: 'Building Codes' },
-    { label: t('quickOptions.certifications'), icon: <BadgeCheck size={32} color="#93c5fd" />, value: 'Certifications' },
-    { label: t('quickOptions.emergencies'), icon: <AlertTriangle size={32} color="#93c5fd" />, value: 'Emergencies' },
-    { label: t('quickOptions.innovation'), icon: <Lightbulb size={32} color="#93c5fd" />, value: 'Innovation' },
-    { label: t('quickOptions.networking'), icon: <Users size={32} color="#93c5fd" />, value: 'Business Networking' },
-    { label: t('quickOptions.financing'), icon: <DollarSign size={32} color="#93c5fd" />, value: 'Business Financing' },
-    { label: t('quickOptions.legalHelp'), icon: <Briefcase size={32} color="#93c5fd" />, value: 'Legal Assistance' },
-    { label: t('quickOptions.accounting'), icon: <FileText size={32} color="#93c5fd" />, value: 'Accounting Services' },
-    { label: t('quickOptions.technology'), icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
-    { label: t('quickOptions.sustainability'), icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
-    { label: t('quickOptions.exportImport'), icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' }
+    { label: 'Business License', icon: <FileText size={32} color="#93c5fd" />, value: 'Business License' },
+    { label: 'Parking Rules', icon: <Car size={32} color="#93c5fd" />, value: 'Parking Rules' },
+    { label: 'Permits', icon: <File size={32} color="#93c5fd" />, value: 'Permits' },
+    { label: 'Taxes', icon: <DollarSign size={32} color="#93c5fd" />, value: 'Taxes' },
+    { label: 'Zoning', icon: <Map size={32} color="#93c5fd" />, value: 'Zoning' },
+    { label: 'Health & Safety', icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Health & Safety' },
+    { label: 'Employment Law', icon: <Users size={32} color="#93c5fd" />, value: 'Employment Law' },
+    { label: 'Insurance', icon: <Shield size={32} color="#93c5fd" />, value: 'Insurance' },
+    { label: 'Accessibility', icon: <KeyRound size={32} color="#93c5fd" />, value: 'Accessibility' },
+    { label: 'Marketing', icon: <Megaphone size={32} color="#93c5fd" />, value: 'Marketing' },
+    { label: 'Grants', icon: <Gift size={32} color="#93c5fd" />, value: 'Grants' },
+    { label: 'Utilities', icon: <Droplet size={32} color="#93c5fd" />, value: 'Utilities' },
+    { label: 'Inspections', icon: <ClipboardCheck size={32} color="#93c5fd" />, value: 'Inspections' },
+    { label: 'Waste Disposal', icon: <Trash size={32} color="#93c5fd" />, value: 'Waste Disposal' },
+    { label: 'Fire Safety', icon: <Flame size={32} color="#93c5fd" />, value: 'Fire Safety' },
+    { label: 'Security', icon: <ShieldCheck size={32} color="#93c5fd" />, value: 'Security' },
+    { label: 'Building Codes', icon: <Building size={32} color="#93c5fd" />, value: 'Building Codes' },
+    { label: 'Certifications', icon: <BadgeCheck size={32} color="#93c5fd" />, value: 'Certifications' },
+    { label: 'Emergencies', icon: <AlertTriangle size={32} color="#93c5fd" />, value: 'Emergencies' },
+    { label: 'Innovation', icon: <Lightbulb size={32} color="#93c5fd" />, value: 'Innovation' },
+    { label: 'Business Networking', icon: <Users size={32} color="#93c5fd" />, value: 'Business Networking' },
+    { label: 'Business Financing', icon: <DollarSign size={32} color="#93c5fd" />, value: 'Business Financing' },
+    { label: 'Legal Assistance', icon: <Briefcase size={32} color="#93c5fd" />, value: 'Legal Assistance' },
+    { label: 'Accounting Services', icon: <FileText size={32} color="#93c5fd" />, value: 'Accounting Services' },
+    { label: 'Technology Support', icon: <MonitorSmartphone size={32} color="#93c5fd" />, value: 'Technology Support' },
+    { label: 'Green Business', icon: <Leaf size={32} color="#93c5fd" />, value: 'Green Business' },
+    { label: 'International Trade', icon: <Globe size={32} color="#93c5fd" />, value: 'International Trade' }
     ];
-  }, [t]);
+  }, []);
 
   // Function to get random quick options (4 for pre-conversation, 8 for during conversation)
   const getRandomQuickOptions = (isConversationStarted = false) => {
@@ -1243,7 +1235,7 @@ function FullChatPage() {
     if (!user || !user.id) return;
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_URL}/api/chat/history`, {
+      const response = await fetch(`${config.VITE_API_URL}/api/chat/history`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -1257,14 +1249,14 @@ function FullChatPage() {
           // Convert database format to frontend format
           const formattedMessages = data.messages.map(msg => ({
             id: msg.id,
-            text: msg.message,
-            isUser: true,
+            type: 'user',
+            content: msg.message,
             timestamp: new Date(msg.created_at)
           })).concat(
             data.messages.map(msg => ({
               id: `response-${msg.id}`,
-              text: msg.response,
-              isUser: false,
+                          type: 'answer',
+            content: msg.response,
               timestamp: new Date(msg.created_at)
             }))
           ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -1484,13 +1476,10 @@ function FullChatPage() {
   return (
     <>
       <ProfileMenu 
-        selectedVoice={selectedVoice}
-        setSelectedVoice={setSelectedVoice}
         selectedLanguage={selectedLanguage}
         setSelectedLanguage={setSelectedLanguage}
         hasManuallyChangedLanguage={hasManuallyChangedLanguage}
         setHasManuallyChangedLanguage={setHasManuallyChangedLanguage}
-        testSpeechSynthesis={testSpeechSynthesis}
         toggleTheme={toggleTheme}
         isToggling={isToggling}
         currentThemeName={currentThemeName}
@@ -2106,6 +2095,21 @@ function FullChatPage() {
                 }}>{t('chat.welcomeMessage')}</p>
               </div>
             )}
+            
+            {/* Debug: Show messages count */}
+            <div style={{ 
+              position: 'fixed', 
+              top: '100px', 
+              right: '20px', 
+              background: 'rgba(0,0,0,0.8)', 
+              color: 'white', 
+              padding: '8px', 
+              borderRadius: '4px', 
+              fontSize: '12px',
+              zIndex: 1000
+            }}>
+              Messages: {messages.length} | User: {user?.id}
+            </div>
             
             {messages.map((message, index) => (
               <div key={index} className={`message ${message.type === 'question' ? 'chat-question' : message.type === 'answer' ? 'chat-answer' : message.type === 'processing' ? 'processing-message' : 'user-message'}`} style={{
