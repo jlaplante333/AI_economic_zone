@@ -2,13 +2,14 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { FirebaseAuthProvider } from './context/FirebaseAuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProfessionalLanguagePage from './pages/ProfessionalLanguagePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import PasswordResetPage from './pages/PasswordResetPage';
 import ChatPage from './pages/ChatPage';
 import FullChatPage from './pages/FullChatPage';
 import AdminPage from './pages/AdminPage';
@@ -21,7 +22,7 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <AuthProvider>
+        <FirebaseAuthProvider>
           <Router>
             <div className="App">
               <Routes>
@@ -30,7 +31,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/verify-email/:token" element={<EmailVerificationPage />} />
+              <Route path="/auth/verify" element={<EmailVerificationPage />} />
+              <Route path="/auth/reset" element={<PasswordResetPage />} />
               
               {/* Protected routes - require authentication */}
               <Route path="/chat" element={
@@ -71,7 +73,7 @@ function App() {
             </Routes>
           </div>
         </Router>
-          </AuthProvider>
+          </FirebaseAuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

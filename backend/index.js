@@ -62,6 +62,9 @@ console.log('✅ Chat routes loaded');
 const authRoutes = require('./routes/authRoutes');
 console.log('✅ Auth routes loaded');
 
+const firebaseAuthRoutes = require('./routes/firebaseAuthRoutes');
+console.log('✅ Firebase Auth routes loaded');
+
 const analyticsRoutes = require('./routes/analyticsRoutes');
 console.log('✅ Analytics routes loaded');
 
@@ -74,6 +77,9 @@ console.log('✅ Chat routes mounted at /api/chat');
 
 app.use('/api/auth', authRoutes);
 console.log('✅ Auth routes mounted at /api/auth');
+
+app.use('/api/auth', firebaseAuthRoutes);
+console.log('✅ Firebase Auth routes mounted at /api/auth');
 
 app.use('/api/analytics', analyticsRoutes);
 console.log('✅ Analytics routes mounted at /api/analytics');

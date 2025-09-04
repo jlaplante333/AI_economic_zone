@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { config } from '../env';
+import { useFirebaseAuth } from '../context/FirebaseAuthContext';
 import '../css/pages/forgot-password.css';
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { sendPasswordReset } = useFirebaseAuth();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -20,22 +19,9 @@ function ForgotPasswordPage() {
     setError('');
 
     try {
-      const response = await fetch(`${config.VITE_API_URL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message);
-        setEmail('');
-      } else {
-        setError(data.message || 'Failed to send password reset email. Please try again.');
-      }
+      await sendPasswordReset(email);
+      setMessage('If an account with that email exists, a password reset link has been sent.');
+      setEmail('');
     } catch (error) {
       console.error('Forgot password error:', error);
       setError('Failed to send password reset email. Please try again.');

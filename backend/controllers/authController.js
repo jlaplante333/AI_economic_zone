@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
-const { getEmailService } = require('../services/emailService');
+
 const smsService = require('../services/smsService');
 const { getPool } = require('../config/db');
 
@@ -121,13 +121,8 @@ exports.register = async (req, res) => {
       annualRevenue2024: annualRevenue2024 ? parseFloat(annualRevenue2024) : null
     });
 
-    // Send verification email
-    try {
-      await getEmailService().sendVerificationEmail(email, user.emailVerificationToken, firstName);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Don't fail registration if email fails
-    }
+    // Email verification handled by Firebase
+    console.log('User registered successfully. Email verification will be sent by Firebase.');
 
     // Send verification SMS if phone provided
     if (phone) {
@@ -310,12 +305,8 @@ exports.verifyEmail = async (req, res) => {
       });
     }
 
-    // Send welcome email
-    try {
-      await getEmailService().sendWelcomeEmail(user.email, user.first_name);
-    } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
-    }
+    // Welcome email handled by Firebase
+    console.log('Email verified successfully. Welcome flow handled by Firebase.');
 
     res.json({
       success: true,
@@ -344,16 +335,8 @@ exports.resendVerification = async (req, res) => {
       });
     }
 
-    // Send verification email
-    try {
-      await getEmailService().sendVerificationEmail(email, user.emailVerificationToken, user.first_name);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send verification email. Please try again.'
-      });
-    }
+    // Email verification handled by Firebase
+    console.log('Verification email will be sent by Firebase.');
 
     res.json({
       success: true,
@@ -393,16 +376,8 @@ exports.forgotPassword = async (req, res) => {
       });
     }
 
-    // Send password reset email
-    try {
-      await getEmailService().sendPasswordResetEmail(email, user.passwordResetToken, user.first_name);
-    } catch (emailError) {
-      console.error('Failed to send password reset email:', emailError);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to send password reset email. Please try again.'
-      });
-    }
+    // Password reset email handled by Firebase
+    console.log('Password reset email will be sent by Firebase.');
 
     res.json({
       success: true,
