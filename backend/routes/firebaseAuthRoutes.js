@@ -72,15 +72,15 @@ router.post('/firebase-signup', [
     // Create user profile
     const result = await pool.query(
       `INSERT INTO users (
-        firebase_uid, email, first_name, last_name, business_type,
+        firebase_uid, email, password_hash, first_name, last_name, business_type,
         address_line1, address_line2, city, state, zip_code,
         age, ethnicity, gender, employee_count, years_in_business,
         corporation_type, annual_revenue_2022, annual_revenue_2023, annual_revenue_2024,
         is_verified, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW(), NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, NOW(), NOW())
       RETURNING id, email, first_name, last_name, business_type, is_verified`,
       [
-        firebaseUid, email, firstName, lastName, businessType,
+        firebaseUid, email, 'firebase_auth_' + firebaseUid, firstName, lastName, businessType,
         otherFields.addressLine1 || null, otherFields.addressLine2 || null,
         otherFields.city || null, otherFields.state || null, otherFields.zipCode || null,
         otherFields.age ? parseInt(otherFields.age) : null,
